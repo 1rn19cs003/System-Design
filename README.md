@@ -7,14 +7,38 @@ System design splits into two levels, and this guide is organized around that sp
 - **HLD/ (High-Level Design)** — the big picture: how components talk to each other, how the system scales, stays available, and stores data.
 - **LLD/ (Low-Level Design)** — the detailed picture: how individual components/classes are built internally, using OOP principles and design patterns.
 
-## How this guide is organized
+## Open this guide
 
-Each topic folder (inside `HLD/` or `LLD/`) will contain:
-- `theory.md` — core concepts, definitions, trade-offs
-- `diagram.md` / `diagram.svg` — visual representation of the architecture or class structure
+**Open `index.html` (in this folder) in a browser — that's the front door.** It has a sticky sidebar with every topic in the guide, and links to whichever pages are finished so far.
+
+## Folder layout
+
+```
+System-Design-Architectures/
+├── index.html                  ← open this — the home page / navigation hub
+├── README.md                   ← this file
+├── pages/                      ← the rendered website, mirrors the HLD/LLD/pattern categories
+│   └── lld/design-patterns/creational/singleton.html
+├── assets/                     ← images used by the website, one subfolder per topic
+│   └── singleton/ (class-diagram.svg, sequence-diagram.svg)
+├── HLD/                        ← source content: theory notes + working code, by topic
+└── LLD/
+    └── Design-Patterns/
+        └── Singleton/
+            ├── theory.md, when-to-use.md, real-world-examples.md, diagram.md
+            └── code/ (Singleton.java, singleton.py, singleton.js, Singleton.cpp)
+```
+
+`HLD/` and `LLD/` hold the raw source material (prose notes + standalone runnable code) organized by topic. `pages/` and `assets/` hold the polished, browsable version of that same content — the two exist side by side on purpose: one is for editing/reference, the other is what you actually read.
+
+## How each topic is documented
+
+Each topic folder (inside `HLD/` or `LLD/`) contains:
+- `theory.md` — core concepts, explained the way it actually gets asked or used, not just definitions
+- `diagram.md` — pointer to the rendered SVG diagram(s) under `assets/<topic>/`
 - `real-world-examples.md` — which companies/products use this and how
 - `when-to-use.md` — decision criteria: when this pattern applies vs. when it doesn't
-- `code/` — **working, runnable code** for every example given, in **Java, Python, and JavaScript**. No pseudocode-only topics — if a concept is demoed, there's code that actually runs alongside it.
+- `code/` — **working, runnable code** for every example given, in **Java, Python, JavaScript, and C++**. No pseudocode-only topics — if a concept is demoed, there's code that actually runs alongside it, and its corresponding page has an interview-questions section too.
 
 ## Core Principles (apply across both HLD and LLD)
 
@@ -70,7 +94,7 @@ Each topic folder (inside `HLD/` or `LLD/`) will contain:
 
 **Behavioral** — Chain of Responsibility, Command, Interpreter, Iterator, Mediator, Memento, Observer, State, Strategy, Template Method, Visitor
 
-Every pattern folder gets: `theory.md` (intent, problem it solves, trade-offs), `diagram.md` (UML class diagram), `code/` (working implementations in Java, Python, and JavaScript), and `real-world-examples.md` (e.g., Singleton in logging frameworks, Observer in event listeners/pub-sub systems, Strategy in payment method selection, Decorator in Java I/O streams).
+Every pattern folder gets: `theory.md` (intent, problem it solves, trade-offs), `diagram.md` (UML class diagram), `code/` (working implementations in Java, Python, JavaScript, and C++), and `real-world-examples.md` (e.g., Singleton in logging frameworks, Observer in event listeners/pub-sub systems, Strategy in payment method selection, Decorator in Java I/O streams).
 
 ## Capstone case studies planned
 
@@ -80,7 +104,7 @@ Every pattern folder gets: `theory.md` (intent, problem it solves, trade-offs), 
 
 ## Code policy
 
-Every example anywhere in this guide — HLD architecture demos, LLD capstones, and every design pattern — ships with working, runnable code, not just diagrams or pseudocode, in **Java, Python, and JavaScript**.
+Every example anywhere in this guide — HLD architecture demos, LLD capstones, and every design pattern — ships with working, runnable code, not just diagrams or pseudocode, in **Java, Python, JavaScript, and C++**.
 
 ## Status
 

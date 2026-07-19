@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+  }
+  header {
+    padding: 48px 24px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 { margin: 0 0 8px; font-size: 28px; }
+  header p { margin: 0; color: var(--muted); }
+
+  .layout {
+    display: flex;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  nav.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav.sidebar h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin: 20px 0 8px;
+  }
+  nav.sidebar h3:first-child { margin-top: 0; }
+  nav.sidebar a {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+  }
+  nav.sidebar a:hover { background: var(--accent-soft); color: var(--accent); }
+  nav.sidebar a.ready { font-weight: 600; }
+  nav.sidebar a.soon { color: var(--muted); pointer-events: none; }
+  nav.sidebar a.soon::after { content: " (soon)"; font-size: 11px; }
+
+  main.content {
+    flex: 1;
+    padding: 32px 40px;
+  }
+  main.content h2 { margin-top: 0; }
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    background: #fff;
+  }
+  .card h3 { margin: 0 0 6px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14px; }
+  .tag {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>System Design Architectures</h1>
+  <p>Principles, HLD, LLD, and Design Patterns — with working code for every example.</p>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <h3>Overview</h3>
+    <a href="#" class="soon">Core Principles</a>
+
+    <h3>HLD</h3>
+    <a href="#" class="soon">Fundamentals</a>
+    <a href="#" class="soon">Load Balancing</a>
+    <a href="#" class="soon">Caching</a>
+    <a href="#" class="soon">Databases</a>
+    <a href="#" class="soon">Message Queues</a>
+    <a href="#" class="soon">Microservices</a>
+    <a href="#" class="soon">Capstones</a>
+
+    <h3>LLD</h3>
+    <a href="#" class="soon">OOP Fundamentals</a>
+    <a href="#" class="soon">SOLID Principles</a>
+    <a href="#" class="soon">LLD Capstones</a>
+
+    <h3>Design Patterns — Creational</h3>
+    <a href="pages/lld/design-patterns/creational/singleton.html" class="ready">Singleton</a>
+    <a href="#" class="soon">Factory Method</a>
+    <a href="#" class="soon">Abstract Factory</a>
+    <a href="#" class="soon">Builder</a>
+    <a href="#" class="soon">Prototype</a>
+
+    <h3>Design Patterns — Structural</h3>
+    <a href="#" class="soon">Adapter</a>
+    <a href="#" class="soon">Bridge</a>
+    <a href="#" class="soon">Composite</a>
+    <a href="#" class="soon">Decorator</a>
+    <a href="#" class="soon">Facade</a>
+    <a href="#" class="soon">Flyweight</a>
+    <a href="#" class="soon">Proxy</a>
+
+    <h3>Design Patterns — Behavioral</h3>
+    <a href="#" class="soon">Observer</a>
+    <a href="#" class="soon">Strategy</a>
+    <a href="#" class="soon">Command</a>
+    <a href="#" class="soon">State</a>
+    <a href="#" class="soon">Chain of Responsibility</a>
+  </nav>
+
+  <main class="content">
+    <h2>Welcome</h2>
+    <p>This is the home page for the guide. The sidebar on the left lists every topic and stays fixed as you scroll — the same way a Word document's navigation pane works. Click a bold link to open a finished page.</p>
+
+    <div class="card">
+      <span class="tag">Ready now</span>
+      <h3><a href="pages/lld/design-patterns/creational/singleton.html" style="color:inherit;text-decoration:none;">Singleton Pattern →</a></h3>
+      <p>Theory, UML diagram, when to use it, real-world examples, interview questions, and working code in Java, Python, JavaScript, and C++.</p>
+    </div>
+
+    <div class="card">
+      <h3>Everything else</h3>
+      <p>Grayed-out links are placeholders — pages will be added one topic at a time, following this same template.</p>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
