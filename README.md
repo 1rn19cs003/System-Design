@@ -1,4 +1,4 @@
-# System Design Architectures — Complete Study Guide /(https://1rn19cs003.github.io/System-Design/)
+# [System Design Architectures — Complete Study Guide](https://1rn19cs003.github.io/System-Design/)
 
 A structured, folder-by-folder path for learning system design: principles, theory, diagrams, real-world examples, and where each concept is actually used in production.
 
