@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prototype Pattern — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+    --code-bg: #f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 820px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  main.content h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  main.content h3 { font-size: 16px; margin: 28px 0 8px; color: var(--accent); }
+  main.content h3:first-of-type { margin-top: 16px; }
+  .tag { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-bottom: 12px; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
+  code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  ul { padding-left: 20px; }
+  img.diagram-img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; padding: 8px; }
+  figure { margin: 0 0 16px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .terminal { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #1e2228; }
+  .terminal-tabs { display: flex; background: #14171c; border-bottom: 1px solid #2b3038; }
+  .terminal-tab { padding: 10px 18px; font-size: 13px; color: #9aa2ad; background: transparent; border: none; cursor: pointer; border-right: 1px solid #2b3038; }
+  .terminal-tab:hover { color: #e6e9ed; }
+  .terminal-tab.active { color: #fff; background: #1e2228; border-top: 2px solid var(--accent); }
+  .terminal-body { padding: 16px 18px; }
+  .terminal-body pre { background: transparent; border: none; padding: 0; margin: 0 0 12px; color: #d7dbe0; }
+  .terminal-output-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6a7178; margin: 12px 0 6px; }
+  .terminal-output { background: #14171c; border-radius: 6px; padding: 12px 14px; color: #8fd19e; font-size: 13px; white-space: pre-wrap; }
+
+  .callout { border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 14.5px; }
+  .callout-title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .callout.good { background: #eef8f0; border: 1px solid #bfe3c6; }
+  .callout.good .callout-title { color: #2f8f4e; }
+  .callout.bad { background: #fdedec; border: 1px solid #f3bcb8; }
+  .callout.bad .callout-title { color: #c0392b; }
+  .callout ul { margin: 4px 0 0; padding-left: 18px; }
+  .callout p { margin: 4px 0 0; }
+  .two-col { display: flex; gap: 16px; flex-wrap: wrap; }
+  .two-col .callout { flex: 1; min-width: 260px; margin: 0; }
+
+  .qa { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .qa summary { padding: 12px 16px; cursor: pointer; font-weight: 600; background: var(--sidebar-bg); list-style: none; }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary::before { content: "▸"; display: inline-block; margin-right: 8px; color: var(--accent); transition: transform 0.15s ease; }
+  .qa[open] summary::before { transform: rotate(90deg); }
+  .qa .qa-answer { padding: 4px 16px 16px; font-size: 14.5px; }
+  .qa .qa-answer p { margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="../../../../index.html">← Back to guide</a>
+    <h3>On this page</h3>
+    <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#theory">Theory</a>
+    <a class="toc" href="#diagram">Diagram</a>
+    <a class="toc" href="#when-to-use">When to Use</a>
+    <a class="toc" href="#real-world">Real-World Examples</a>
+    <a class="toc" href="#interview-questions">Interview Questions</a>
+    <a class="toc" href="#code">Code &amp; Output</a>
+  </nav>
+
+  <main class="content">
+    <span class="tag">LLD → Design Patterns → Creational</span>
+    <h1 id="overview">Prototype Pattern</h1>
+    <p>Creates new objects by copying an existing instance (a "prototype") rather than constructing from scratch.</p>
+
+    <section id="theory">
+      <h2>Theory</h2>
+
+      <h3>The problem, in plain terms</h3>
+      <p>You've got an <code>Enemy</code> in a game that took real work to set up — loaded a 3D model, computed pathfinding data, initialized stats from config. You now need fifty more of the exact same type. Calling <code>new Enemy()</code> fifty times and re-running all that setup is wasteful — you already have a fully-configured object sitting right there. What you want is to copy the one you have.</p>
+      <p>Prototype formalizes "copy an existing object" as the creation mechanism itself. Any object that supports cloning implements a <code>clone()</code> method, and creating a new instance means calling <code>.clone()</code> on a prototype rather than invoking a constructor.</p>
+
+      <h3>How it's built</h3>
+      <p>An object implements a <code>clone()</code> method that returns a copy of itself. The critical design decision is <strong>shallow vs. deep copy</strong>: a shallow copy duplicates the object's own fields but leaves any reference fields pointing at the <em>same</em> nested objects as the original. A deep copy recursively clones referenced objects too, so the copy is fully independent.</p>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ Good practice</div>
+          <p>Deep-copy any mutable, referenced field (like a nested <code>Stats</code> object) inside <code>clone()</code> — give each clone its own independent copy of anything it might mutate.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ Common mistake</div>
+          <p>Doing a shallow copy by default and forgetting about it. Mutate a nested object through the copy, and you'll see that mutation reflected in the "original" too — a subtle bug that only shows up once something actually gets mutated.</p>
+        </div>
+      </div>
+
+      <h3>Where it bites you</h3>
+      <p>Deep-cloning an object graph with circular references, or objects wrapping external resources (open file handles, DB connections, live sockets), is genuinely tricky — those usually can't be meaningfully cloned at all and need special-casing, like re-establishing a fresh connection instead of copying the handle.</p>
+    </section>
+
+    <section id="diagram">
+      <h2>Diagram</h2>
+      <figure>
+        <img class="diagram-img" src="../../../../assets/prototype/class-diagram.svg" alt="Prototype pattern class diagram showing an Enemy prototype with a clone method, holding a nested Stats object, and two cloned copies each with their own independent Stats instance">
+        <figcaption>Each clone gets its own deep-copied Stats — no shared references</figcaption>
+      </figure>
+    </section>
+
+    <section id="when-to-use">
+      <h2>When to Use</h2>
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ Reach for it when</div>
+          <ul>
+            <li>Construction from scratch is expensive (I/O, heavy computation) and you have a similar object to copy from.</li>
+            <li>You need to create objects without knowing their exact concrete class ahead of time.</li>
+            <li>You need many near-identical objects that differ only slightly.</li>
+          </ul>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ Don't reach for it when</div>
+          <ul>
+            <li>Construction is cheap — a plain constructor is simpler and just as fast.</li>
+            <li>The object graph has circular references or wraps live external resources.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="real-world">
+      <h2>Real-World Examples</h2>
+      <ul>
+        <li><strong>Java's <code>Object.clone()</code> / <code>Cloneable</code></strong> — baked directly into the language.</li>
+        <li><strong>JavaScript's prototypal inheritance</strong> — <code>Object.create(proto)</code> creates a new object using an existing one as its prototype.</li>
+        <li><strong>Game engines</strong> — spawning many similar enemies/particles by cloning a pre-configured template instead of re-running full initialization.</li>
+        <li><strong>"Duplicate" in Google Docs/Sheets</strong> — clones an existing, fully-formatted document rather than rebuilding formatting from scratch.</li>
+        <li><strong><code>git clone</code></strong> — copying an existing, fully-initialized repository rather than reconstructing it from nothing.</li>
+      </ul>
+    </section>
+
+    <section id="interview-questions">
+      <h2>Interview Questions</h2>
+      <p>Click a question to reveal the answer.</p>
+
+      <details class="qa">
+        <summary>What's the difference between a shallow copy and a deep copy, concretely?</summary>
+        <div class="qa-answer">
+          <p>A shallow copy duplicates the object's own fields, but any field that's a reference to another object still points at the same nested object as the original. A deep copy recursively clones those nested objects too. Mutate a nested object through a shallow copy, and that change is visible through the original as well — that's the bug signature to watch for.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>When would you choose Prototype over just calling the constructor?</summary>
+        <div class="qa-answer">
+          <p>When construction is expensive — heavy computation, file/network I/O, complex initialization — and you already have a similar, fully-built object to copy from. Also useful when you need to create an object without knowing its exact concrete class, since cloning works polymorphically off whatever prototype instance you were handed.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>What are the practical pitfalls of implementing <code>clone()</code> in Java specifically?</summary>
+        <div class="qa-answer">
+          <p><code>Object.clone()</code> performs a shallow copy by default, and its checked-exception, <code>Cloneable</code>-marker-interface design is famously awkward — "Effective Java" recommends avoiding it in favor of a copy constructor or a static factory method that does the copying explicitly. If you do implement <code>clone()</code>, you must manually deep-copy any mutable reference fields yourself.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>How would you handle cloning an object that holds a live resource, like a database connection?</summary>
+        <div class="qa-answer">
+          <p>You generally don't clone the resource itself — you clone the object's configuration/state and re-establish a fresh connection using that state. Trying to literally copy a live socket or file handle doesn't make sense; the clone should re-acquire its own resource rather than share the original's.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="code">
+      <h2>Code &amp; Output</h2>
+      <p>Same pattern, four languages. Every output shown here was captured from a real run — note that mutating <code>orc1</code> never affects <code>orc2</code> or the prototype, proving the deep copy works.</p>
+
+      <div class="terminal">
+        <div class="terminal-tabs">
+          <button class="terminal-tab active" data-lang="java">Java</button>
+          <button class="terminal-tab" data-lang="python">Python</button>
+          <button class="terminal-tab" data-lang="javascript">JavaScript</button>
+          <button class="terminal-tab" data-lang="cpp">C++</button>
+        </div>
+        <div class="terminal-body">
+          <pre><code id="terminal-code"></code></pre>
+          <div class="terminal-output-label">Output</div>
+          <div class="terminal-output" id="terminal-output"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const snippets = {
+    java: {
+      code: `class Stats {
+    int health;
+    int damage;
+
+    Stats(int health, int damage) {
+        this.health = health;
+        this.damage = damage;
+    }
+
+    Stats deepCopy() {
+        return new Stats(this.health, this.damage);
+    }
+}
+
+class Enemy implements Cloneable {
+    String type;
+    Stats stats;
+
+    Enemy(String type, Stats stats) {
+        this.type = type;
+        this.stats = stats;
+    }
+
+    // Deep copy: stats gets its own independent copy, not a shared reference.
+    public Enemy clone() {
+        return new Enemy(this.type, this.stats.deepCopy());
+    }
+
+    public String toString() {
+        return type + "{health=" + stats.health + ", damage=" + stats.damage + "}";
+    }
+}
+
+public class Prototype {
+    public static void main(String[] args) {
+        Enemy orcPrototype = new Enemy("Orc", new Stats(100, 15));
+
+        Enemy orc1 = orcPrototype.clone();
+        Enemy orc2 = orcPrototype.clone();
+
+        // Mutate orc1's stats — orc2 and the prototype must stay unaffected.
+        orc1.stats.health = 40;
+
+        System.out.println("Prototype: " + orcPrototype);
+        System.out.println("orc1 (damaged): " + orc1);
+        System.out.println("orc2 (untouched): " + orc2);
+    }
+}`,
+      output: `Prototype: Orc{health=100, damage=15}
+orc1 (damaged): Orc{health=40, damage=15}
+orc2 (untouched): Orc{health=100, damage=15}`
+    },
+    python: {
+      code: `import copy
+
+
+class Stats:
+    def __init__(self, health, damage):
+        self.health = health
+        self.damage = damage
+
+
+class Enemy:
+    def __init__(self, enemy_type, stats):
+        self.type = enemy_type
+        self.stats = stats
+
+    def clone(self):
+        # copy.deepcopy recursively clones nested objects (like \`stats\`)
+        # instead of sharing references with the original.
+        return copy.deepcopy(self)
+
+    def __repr__(self):
+        return f"{self.type}{{health={self.stats.health}, damage={self.stats.damage}}}"
+
+
+if __name__ == "__main__":
+    orc_prototype = Enemy("Orc", Stats(100, 15))
+
+    orc1 = orc_prototype.clone()
+    orc2 = orc_prototype.clone()
+
+    # Mutate orc1's stats — orc2 and the prototype must stay unaffected.
+    orc1.stats.health = 40
+
+    print("Prototype:", orc_prototype)
+    print("orc1 (damaged):", orc1)
+    print("orc2 (untouched):", orc2)`,
+      output: `Prototype: Orc{health=100, damage=15}
+orc1 (damaged): Orc{health=40, damage=15}
+orc2 (untouched): Orc{health=100, damage=15}`
+    },
+    javascript: {
+      code: `class Stats {
+  constructor(health, damage) {
+    this.health = health;
+    this.damage = damage;
+  }
+
+  deepCopy() {
+    return new Stats(this.health, this.damage);
+  }
+}
+
+class Enemy {
+  constructor(type, stats) {
+    this.type = type;
+    this.stats = stats;
+  }
+
+  // Deep copy: stats gets its own independent copy, not a shared reference.
+  clone() {
+    return new Enemy(this.type, this.stats.deepCopy());
+  }
+
+  toString() {
+    return \`\${this.type}{health=\${this.stats.health}, damage=\${this.stats.damage}}\`;
+  }
+}
+
+const orcPrototype = new Enemy("Orc", new Stats(100, 15));
+
+const orc1 = orcPrototype.clone();
+const orc2 = orcPrototype.clone();
+
+// Mutate orc1's stats — orc2 and the prototype must stay unaffected.
+orc1.stats.health = 40;
+
+console.log("Prototype:", orcPrototype.toString());
+console.log("orc1 (damaged):", orc1.toString());
+console.log("orc2 (untouched):", orc2.toString());
+
+module.exports = { Enemy, Stats };`,
+      output: `Prototype: Orc{health=100, damage=15}
+orc1 (damaged): Orc{health=40, damage=15}
+orc2 (untouched): Orc{health=100, damage=15}`
+    },
+    cpp: {
+      code: `#include <iostream>
+#include <string>
+#include <memory>
+
+class Stats {
+public:
+    int health;
+    int damage;
+
+    Stats(int health, int damage) : health(health), damage(damage) {}
+
+    std::unique_ptr<Stats> deepCopy() const {
+        return std::make_unique<Stats>(health, damage);
+    }
+};
+
+class Enemy {
+public:
+    std::string type;
+    std::unique_ptr<Stats> stats;
+
+    Enemy(std::string type, std::unique_ptr<Stats> stats)
+        : type(std::move(type)), stats(std::move(stats)) {}
+
+    // Deep copy: stats gets its own independent copy, not a shared pointer.
+    std::unique_ptr<Enemy> clone() const {
+        return std::make_unique<Enemy>(type, stats->deepCopy());
+    }
+
+    void print() const {
+        std::cout << type << "{health=" << stats->health
+                   << ", damage=" << stats->damage << "}" << std::endl;
+    }
+};
+
+int main() {
+    Enemy orcPrototype("Orc", std::make_unique<Stats>(100, 15));
+
+    auto orc1 = orcPrototype.clone();
+    auto orc2 = orcPrototype.clone();
+
+    // Mutate orc1's stats — orc2 and the prototype must stay unaffected.
+    orc1->stats->health = 40;
+
+    std::cout << "Prototype: ";
+    orcPrototype.print();
+
+    std::cout << "orc1 (damaged): ";
+    orc1->print();
+
+    std::cout << "orc2 (untouched): ";
+    orc2->print();
+
+    return 0;
+}`,
+      output: `Prototype: Orc{health=100, damage=15}
+orc1 (damaged): Orc{health=40, damage=15}
+orc2 (untouched): Orc{health=100, damage=15}`
+    }
+  };
+
+  const tabs = document.querySelectorAll('.terminal-tab');
+  const codeEl = document.getElementById('terminal-code');
+  const outputEl = document.getElementById('terminal-output');
+
+  function renderLang(lang) {
+    codeEl.textContent = snippets[lang].code;
+    outputEl.textContent = snippets[lang].output;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.lang === lang));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => renderLang(tab.dataset.lang));
+  });
+
+  renderLang('java');
+</script>
+
+<script>
+  const sections = document.querySelectorAll('main section, main h1');
+  const links = document.querySelectorAll('nav.sidebar a.toc');
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 100) currentId = sec.id;
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+    });
+  });
+</script>
+
+</body>
+</html>
