@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LLD Capstone: Parking Lot — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+    --code-bg: #f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    position: sticky;
+    top: 57px;
+    align-self: flex-start;
+    height: calc(100vh - 57px);
+    overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 820px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  main.content h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  main.content h3 { font-size: 16px; margin: 28px 0 8px; color: var(--accent); }
+  main.content h3:first-of-type { margin-top: 16px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
+  code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  ul { padding-left: 20px; }
+  img.diagram-img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; padding: 8px; }
+  figure { margin: 0 0 16px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .terminal { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #1e2228; }
+  .terminal-tabs { display: flex; align-items: center; justify-content: space-between; background: #14171c; border-bottom: 1px solid #2b3038; }
+  .terminal-tabs-group { display: flex; }
+  .copy-btn { background: transparent; border: none; color: #9aa2ad; font-size: 12px; cursor: pointer; padding: 6px 14px; white-space: nowrap; }
+  .copy-btn:hover { color: #fff; }
+  .copy-btn.copied { color: #8fd19e; }
+  .terminal-tab {
+    padding: 10px 18px; font-size: 13px; color: #9aa2ad; background: transparent;
+    border: none; cursor: pointer; border-right: 1px solid #2b3038;
+  }
+  .terminal-tab:hover { color: #e6e9ed; }
+  .terminal-tab.active { color: #fff; background: #1e2228; border-top: 2px solid var(--accent); }
+  .terminal-body { padding: 16px 18px; }
+  .terminal-body pre { background: transparent; border: none; padding: 0; margin: 0 0 12px; color: #d7dbe0; }
+  .terminal-output-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6a7178; margin: 12px 0 6px; }
+  .terminal-output { background: #14171c; border-radius: 6px; padding: 12px 14px; color: #8fd19e; font-size: 13px; white-space: pre-wrap; }
+  .terminal-note { font-size: 12px; color: #9aa2ad; padding: 0 18px 14px; }
+
+  .callout { border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 14.5px; }
+  .callout-title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .callout.good { background: #eef8f0; border: 1px solid #bfe3c6; }
+  .callout.good .callout-title { color: #2f8f4e; }
+  .callout.bad { background: #fdedec; border: 1px solid #f3bcb8; }
+  .callout.bad .callout-title { color: #c0392b; }
+  .callout ul { margin: 4px 0 0; padding-left: 18px; }
+  .callout p { margin: 4px 0 0; }
+  .two-col { display: flex; gap: 16px; flex-wrap: wrap; }
+  .two-col .callout { flex: 1; min-width: 260px; margin: 0; }
+
+  .qa { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .qa summary { padding: 12px 16px; cursor: pointer; font-weight: 600; background: var(--sidebar-bg); list-style: none; }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary::before { content: "▸"; display: inline-block; margin-right: 8px; color: var(--accent); transition: transform 0.15s ease; }
+  .qa[open] summary::before { transform: rotate(90deg); }
+  .qa .qa-answer { padding: 4px 16px 16px; font-size: 14.5px; }
+  .qa .qa-answer p { margin: 8px 0; }
+
+  header.site-header {
+    position: sticky; top: 0; z-index: 20;
+    border-bottom: 1px solid var(--border); background: #fff;
+  }
+  .header-top {
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .header-brand { display: flex; align-items: center; gap: 10px; }
+  .header-brand img.logo-mark-img { width: 28px; height: 28px; border-radius: 7px; display: block; }
+  .header-brand a.site-title { font-weight: 700; font-size: 16px; color: var(--text); text-decoration: none; }
+  .header-brand a.site-title:hover { color: var(--accent); }
+  .header-brand .header-tagline { font-size: 12px; color: var(--muted); }
+  nav.header-nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav.header-nav a { font-size: 13.5px; font-weight: 600; text-decoration: none; color: var(--muted); padding: 7px 12px; border-radius: 7px; }
+  nav.header-nav a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  footer.site-footer { border-top: 1px solid var(--border); background: var(--sidebar-bg); }
+  .footer-grid {
+    max-width: 1200px; margin: 0 auto; padding: 32px 24px 20px;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 24px;
+  }
+  .footer-col h4 { margin: 0 0 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .footer-col p { margin: 0; font-size: 13px; color: var(--muted); max-width: 320px; }
+  .footer-col a { display: block; font-size: 13.5px; color: var(--text); text-decoration: none; margin-bottom: 8px; }
+  .footer-col a:hover { color: var(--accent); text-decoration: underline; }
+  .footer-bottom {
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px 20px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12.5px; color: var(--muted);
+  }
+  .footer-bottom a { color: var(--accent); text-decoration: none; }
+  .footer-bottom a:hover { text-decoration: underline; }
+  @media (max-width: 820px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+
+  .page-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .page-nav a.nav-link {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;
+    text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 2px;
+    transition: border-color 0.15s ease, background 0.15s ease; min-width: 0;
+  }
+  .page-nav a.nav-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .page-nav a.nav-link.next { text-align: right; align-items: flex-end; }
+  .page-nav .nav-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .page-nav .nav-title { font-size: 14px; font-weight: 600; color: var(--accent); }
+  .page-nav .nav-placeholder { flex: 1; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="header-brand">
+      <img class="logo-mark-img" src="../../assets/shared/logo-mark.svg" alt="System Design Architectures logo">
+      <a class="site-title" href="../../index.html">System Design Architectures</a>
+      <span class="header-tagline">LLD &middot; Capstone</span>
+    </div>
+    <nav class="header-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../index.html#hld-section">HLD</a>
+      <a href="../../index.html#lld-section">LLD</a>
+      <a href="../../index.html#patterns-section">Design Patterns</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="../../index.html">← Back to guide</a>
+    <h3>On this page</h3>
+    <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#plain-english">In Plain English</a>
+    <a class="toc" href="#theory">Theory &amp; Diagrams</a>
+    <a class="toc" href="#trade-offs">Trade-offs</a>
+    <a class="toc" href="#real-world">Real-World Examples</a>
+    <a class="toc" href="#interview-questions">Interview Questions</a>
+    <a class="toc" href="#code">Code &amp; Output</a>
+  </nav>
+
+  <main class="content">
+    <nav class="breadcrumbs">
+      <a href="../../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../../index.html#lld-section">LLD</a>
+      <span class="sep">/</span>
+      <span class="current">Capstone: Parking Lot</span>
+    </nav>
+    <h1 id="overview">LLD Capstone: Parking Lot</h1>
+    <p>A worked low-level design example that pulls together a class hierarchy, a best-fit matching rule, and a pricing calculation — one of the most commonly asked LLD interview questions in its own right.</p>
+
+    <section id="plain-english">
+      <h2>In Plain English</h2>
+      <p>Every parking garage attendant does the same small job, over and over: match the vehicle in front of them to the smallest spot that actually fits.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/lld-capstones/attendant-analogy.svg" alt="An attendant matching a motorcycle, car, or bus to the smallest available spot size that fits, out of small, medium, and large spots">
+        <figcaption>You hand over your key; the size-matching and pricing logic happen behind the scenes</figcaption>
+      </figure>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">New to this? Start here</div>
+          <p>This is the OOP Fundamentals car analogy applied for real: a <code>Vehicle</code> hierarchy (Motorcycle, Car, Bus), a <code>ParkingSpot</code> with a size, and one method that decides where each vehicle goes.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">Already comfortable? Push further</div>
+          <p>The interesting part isn't parking a car in an obviously-sized spot — it's the tie-breaking rule (always the smallest spot that still fits) and what happens when nothing fits at all: a clean rejection, not a crash.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="theory">
+      <h2>Theory &amp; Diagrams</h2>
+
+      <h3>Why this is a good capstone</h3>
+      <p>A parking lot is small enough to hold in your head end to end, but it still forces real decisions: a <code>Vehicle</code> class hierarchy (OOP), a spot-matching rule that has to pick correctly under partial availability, and a pricing rule that depends on the spot actually assigned rather than the vehicle type.</p>
+
+      <h3>Best-fit spot assignment</h3>
+      <p>A vehicle can use any spot at least as large as it needs — a motorcycle fits in a small, medium, or large spot. But assigning a motorcycle to a large spot wastes it for the next bus that arrives. Best-fit picks the <em>smallest</em> available spot that still satisfies the vehicle's size requirement.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/lld-capstones/size-matching.svg" alt="Top: a Bus is assigned to a free Large spot directly. Bottom: a Bus is rejected when only Small and Medium spots are free, even though space exists, because none of it is the right size.">
+        <figcaption>Free space isn't enough — it has to be a large-enough space</figcaption>
+      </figure>
+
+      <h3>Pricing by spot, not by vehicle</h3>
+      <p>Once a vehicle is assigned a spot, the fee is computed from that spot's hourly rate and the hours parked — not a flat per-vehicle-type rate. This keeps pricing logic decoupled from the vehicle hierarchy entirely, so a pricing change never touches <code>Vehicle</code> subclasses at all.</p>
+    </section>
+
+    <section id="trade-offs">
+      <h2>Trade-offs</h2>
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ Best-fit assignment when</div>
+          <ul>
+            <li>Spot sizes vary meaningfully and larger vehicles arrive unpredictably — wasting a large spot on a motorcycle has a real cost.</li>
+          </ul>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ First-fit assignment when</div>
+          <ul>
+            <li>Spots are roughly interchangeable, or assignment speed matters more than minimizing wasted space (best-fit scans every free spot; first-fit stops at the first match).</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> a clean separation between the vehicle hierarchy, the spot-matching rule, and the pricing rule — and handling the "no spot fits" case explicitly instead of assuming a vehicle can always park.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> a working <code>Vehicle</code> hierarchy plus a correct size-matching loop, with the rejection case handled, is enough to clear this question at most levels.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> be ready to extend it live — add a new vehicle type, change the pricing rule to a flat daily cap, or make the lot support multiple floors — without breaking the existing structure.</p>
+    </section>
+
+    <section id="real-world">
+      <h2>Real-World Examples</h2>
+      <ul>
+        <li><strong>Airport and stadium parking systems</strong> — real deployments use the same size-tiered spot model, often combined with reserved sections for permit holders.</li>
+        <li><strong>Cloud instance scheduling</strong> — the same best-fit-bin-packing idea shows up when a scheduler assigns workloads to the smallest machine that still has enough CPU/memory free.</li>
+        <li><strong>Warehouse slotting systems</strong> — items are assigned to the smallest bin size that fits, for the same reason a motorcycle shouldn't take a bus spot: wasted capacity compounds at scale.</li>
+        <li><strong>Hotel room assignment</strong> — the same is-a/has-a and best-fit-matching structure applies to matching guests to room types by size and amenity requirements.</li>
+      </ul>
+    </section>
+
+    <section id="interview-questions">
+      <h2>Interview Questions</h2>
+      <p>Click a question to reveal the answer.</p>
+
+      <details class="qa">
+        <summary>How would you design the class hierarchy for a parking lot?</summary>
+        <div class="qa-answer">
+          <p>An abstract <code>Vehicle</code> base class with concrete subclasses (Motorcycle, Car, Bus) each defining their required spot size, a <code>ParkingSpot</code> class holding a size and occupied flag, and a <code>ParkingLot</code> that owns the spots and exposes a <code>park(vehicle)</code> method — keeping vehicle behavior, spot state, and lot-level assignment logic in three separate, focused classes.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Why use best-fit instead of first-fit for spot assignment?</summary>
+        <div class="qa-answer">
+          <p>First-fit assigns the first spot found that's big enough, which can waste a large spot on a small vehicle if that happens to be first in the list. Best-fit scans all free spots and picks the smallest one that still fits, preserving larger spots for vehicles that actually need them — at the cost of scanning more spots per assignment.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>How do you handle a vehicle that can't be parked?</summary>
+        <div class="qa-answer">
+          <p>The <code>park()</code> method should return an explicit "no spot available" result (null, an Optional, or a rejected status) rather than throwing an unhandled exception or crashing — a full lot is an expected, ordinary outcome, not an error condition.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>How would you extend this design to support multiple floors or reserved spots?</summary>
+        <div class="qa-answer">
+          <p>Add a <code>floor</code> or <code>reserved</code> attribute to <code>ParkingSpot</code> and filter candidates by it before applying the same best-fit logic — because the size-matching rule is already isolated in one place, extending the filtering criteria doesn't require touching the <code>Vehicle</code> hierarchy or the pricing logic at all.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="code">
+      <h2>Code &amp; Output</h2>
+      <p>A real 5-spot lot (2 Small, 2 Medium, 1 Large) receiving 6 vehicles in order. The best-fit assignment, the one rejection (a second bus with no Large spot left), and the total revenue are all computed live from the same logic described above — not scripted to match, so the numbers below are a genuine trace of the run.</p>
+
+      <div class="terminal">
+        <div class="terminal-tabs">
+          <div class="terminal-tabs-group">
+            <button class="terminal-tab active" data-lang="java">Java</button>
+            <button class="terminal-tab" data-lang="python">Python</button>
+            <button class="terminal-tab" data-lang="javascript">JavaScript</button>
+            <button class="terminal-tab" data-lang="cpp">C++</button>
+          </div>
+          <button class="copy-btn" id="copy-btn">Copy</button>
+        </div>
+        <div class="terminal-body">
+          <pre><code id="terminal-code"></code></pre>
+          <div class="terminal-output-label">Output (deterministic — identical in every language)</div>
+          <div class="terminal-output" id="terminal-output"></div>
+        </div>
+        <div class="terminal-note">Bus B is rejected because the only free spots left (none, in this run) don't meet its Large size requirement — the lot never mis-assigns a vehicle to a spot too small for it.</div>
+      </div>
+    </section>
+
+    <nav class="page-nav">
+      <a class="nav-link prev" href="solid-principles.html">
+        <span class="nav-label">&larr; Previous</span>
+        <span class="nav-title">SOLID Principles</span>
+      </a>
+      <a class="nav-link next" href="design-patterns/creational/singleton.html">
+        <span class="nav-label">Next &rarr;</span>
+        <span class="nav-title">Design Patterns: Singleton</span>
+      </a>
+    </nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>System Design Architectures</h4>
+      <p>A self-study guide for HLD, LLD, and Design Patterns &mdash; built for focused, example-driven interview prep, with working code in Java, Python, JavaScript, and C++ for every topic.</p>
+    </div>
+    <div class="footer-col">
+      <h4>LLD</h4>
+      <a href="oop-fundamentals.html">OOP Fundamentals</a>
+      <a href="solid-principles.html">SOLID Principles</a>
+      <a href="capstones.html">LLD Capstones</a>
+    </div>
+    <div class="footer-col">
+      <h4>Design Patterns</h4>
+      <a href="design-patterns/creational/singleton.html">Singleton</a>
+      <a href="design-patterns/structural/adapter.html">Adapter</a>
+      <a href="design-patterns/behavioral/observer.html">Observer</a>
+      <a href="design-patterns/behavioral/strategy.html">Strategy</a>
+    </div>
+    <div class="footer-col">
+      <h4>Guide</h4>
+      <a href="../../index.html">Home</a>
+      <a href="../../index.html#hld-section">Browse HLD</a>
+      <a href="../../index.html#patterns-section">Browse Patterns</a>
+      <a href="#" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top &uarr;</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design Patterns.</span>
+    <span>Made for focused, example-driven interview prep.</span>
+  </div>
+</footer>
+
+<script>
+  const snippets = {
+    java: {
+      code: `import java.util.*;
+
+public class ParkingLotDemo {
+    enum SpotSize { SMALL, MEDIUM, LARGE }
+
+    static final Map<SpotSize, Integer> RATE_PER_HOUR = Map.of(
+        SpotSize.SMALL, 2,
+        SpotSize.MEDIUM, 3,
+        SpotSize.LARGE, 5
+    );
+
+    abstract static class Vehicle {
+        String name;
+        int hours;
+        Vehicle(String name, int hours) { this.name = name; this.hours = hours; }
+        abstract SpotSize requiredSize();
+    }
+
+    static class Motorcycle extends Vehicle {
+        Motorcycle(String name, int hours) { super(name, hours); }
+        SpotSize requiredSize() { return SpotSize.SMALL; }
+    }
+
+    static class Car extends Vehicle {
+        Car(String name, int hours) { super(name, hours); }
+        SpotSize requiredSize() { return SpotSize.MEDIUM; }
+    }
+
+    static class Bus extends Vehicle {
+        Bus(String name, int hours) { super(name, hours); }
+        SpotSize requiredSize() { return SpotSize.LARGE; }
+    }
+
+    static class ParkingSpot {
+        String spotId;
+        SpotSize size;
+        boolean occupied = false;
+        ParkingSpot(String spotId, SpotSize size) { this.spotId = spotId; this.size = size; }
+    }
+
+    static class ParkingLot {
+        List<ParkingSpot> spots;
+        ParkingLot(List<ParkingSpot> spots) { this.spots = spots; }
+
+        ParkingSpot park(Vehicle vehicle) {
+            ParkingSpot best = null;
+            for (ParkingSpot spot : spots) {
+                if (spot.occupied || spot.size.ordinal() < vehicle.requiredSize().ordinal()) continue;
+                if (best == null || spot.size.ordinal() < best.size.ordinal()) {
+                    best = spot;
+                }
+            }
+            if (best != null) best.occupied = true;
+            return best;
+        }
+    }
+
+    public static void main(String[] args) {
+        List<ParkingSpot> spots = new ArrayList<>(List.of(
+            new ParkingSpot("S1", SpotSize.SMALL),
+            new ParkingSpot("S2", SpotSize.SMALL),
+            new ParkingSpot("M1", SpotSize.MEDIUM),
+            new ParkingSpot("M2", SpotSize.MEDIUM),
+            new ParkingSpot("L1", SpotSize.LARGE)
+        ));
+        ParkingLot lot = new ParkingLot(spots);
+
+        List<Vehicle> vehicles = List.of(
+            new Motorcycle("Motorcycle A", 2),
+            new Car("Car A", 3),
+            new Bus("Bus A", 1),
+            new Motorcycle("Motorcycle B", 4),
+            new Car("Car B", 2),
+            new Bus("Bus B", 3)
+        );
+
+        int totalRevenue = 0;
+        int parkedCount = 0;
+        for (Vehicle vehicle : vehicles) {
+            ParkingSpot spot = lot.park(vehicle);
+            if (spot == null) {
+                System.out.printf("%s: REJECTED (no %s-or-larger spot free)%n",
+                    vehicle.name, vehicle.requiredSize().toString().toLowerCase());
+                continue;
+            }
+            int fee = vehicle.hours * RATE_PER_HOUR.get(spot.size);
+            totalRevenue += fee;
+            parkedCount++;
+            System.out.printf("%s: parked in %s (%s) for %dh, fee=$%d%n",
+                vehicle.name, spot.spotId, spot.size, vehicle.hours, fee);
+        }
+        System.out.printf("Parked %d/%d vehicles, total revenue=$%d%n", parkedCount, vehicles.size(), totalRevenue);
+    }
+}`,
+      output: `Motorcycle A: parked in S1 (SMALL) for 2h, fee=$4
+Car A: parked in M1 (MEDIUM) for 3h, fee=$9
+Bus A: parked in L1 (LARGE) for 1h, fee=$5
+Motorcycle B: parked in S2 (SMALL) for 4h, fee=$8
+Car B: parked in M2 (MEDIUM) for 2h, fee=$6
+Bus B: REJECTED (no large-or-larger spot free)
+Parked 5/6 vehicles, total revenue=$32`
+    },
+    python: {
+      code: `from abc import ABC, abstractmethod
+from enum import IntEnum
+
+
+class SpotSize(IntEnum):
+    SMALL = 1
+    MEDIUM = 2
+    LARGE = 3
+
+
+RATE_PER_HOUR = {SpotSize.SMALL: 2, SpotSize.MEDIUM: 3, SpotSize.LARGE: 5}
+
+
+class Vehicle(ABC):
+    def __init__(self, name, hours):
+        self.name = name
+        self.hours = hours
+
+    @abstractmethod
+    def required_size(self):
+        pass
+
+
+class Motorcycle(Vehicle):
+    def required_size(self):
+        return SpotSize.SMALL
+
+
+class Car(Vehicle):
+    def required_size(self):
+        return SpotSize.MEDIUM
+
+
+class Bus(Vehicle):
+    def required_size(self):
+        return SpotSize.LARGE
+
+
+class ParkingSpot:
+    def __init__(self, spot_id, size):
+        self.spot_id = spot_id
+        self.size = size
+        self.occupied = False
+
+
+class ParkingLot:
+    def __init__(self, spots):
+        self.spots = spots
+
+    def park(self, vehicle):
+        candidates = [s for s in self.spots if not s.occupied and s.size >= vehicle.required_size()]
+        if not candidates:
+            return None
+        best = min(candidates, key=lambda s: s.size)
+        best.occupied = True
+        return best
+
+
+def main():
+    spots = [
+        ParkingSpot("S1", SpotSize.SMALL),
+        ParkingSpot("S2", SpotSize.SMALL),
+        ParkingSpot("M1", SpotSize.MEDIUM),
+        ParkingSpot("M2", SpotSize.MEDIUM),
+        ParkingSpot("L1", SpotSize.LARGE),
+    ]
+    lot = ParkingLot(spots)
+
+    vehicles = [
+        Motorcycle("Motorcycle A", 2),
+        Car("Car A", 3),
+        Bus("Bus A", 1),
+        Motorcycle("Motorcycle B", 4),
+        Car("Car B", 2),
+        Bus("Bus B", 3),
+    ]
+
+    total_revenue = 0
+    parked_count = 0
+    for vehicle in vehicles:
+        spot = lot.park(vehicle)
+        if spot is None:
+            print(f"{vehicle.name}: REJECTED (no {vehicle.required_size().name.lower()}-or-larger spot free)")
+            continue
+        fee = vehicle.hours * RATE_PER_HOUR[spot.size]
+        total_revenue += fee
+        parked_count += 1
+        print(f"{vehicle.name}: parked in {spot.spot_id} ({spot.size.name}) for {vehicle.hours}h, fee=\${fee}")
+
+    print(f"Parked {parked_count}/{len(vehicles)} vehicles, total revenue=\${total_revenue}")
+
+
+if __name__ == "__main__":
+    main()`,
+      output: `Motorcycle A: parked in S1 (SMALL) for 2h, fee=$4
+Car A: parked in M1 (MEDIUM) for 3h, fee=$9
+Bus A: parked in L1 (LARGE) for 1h, fee=$5
+Motorcycle B: parked in S2 (SMALL) for 4h, fee=$8
+Car B: parked in M2 (MEDIUM) for 2h, fee=$6
+Bus B: REJECTED (no large-or-larger spot free)
+Parked 5/6 vehicles, total revenue=$32`
+    },
+    javascript: {
+      code: `const SpotSize = { SMALL: 1, MEDIUM: 2, LARGE: 3 };
+const SIZE_NAME = { 1: "SMALL", 2: "MEDIUM", 3: "LARGE" };
+const RATE_PER_HOUR = { 1: 2, 2: 3, 3: 5 };
+
+class Vehicle {
+  constructor(name, hours) {
+    this.name = name;
+    this.hours = hours;
+  }
+}
+class Motorcycle extends Vehicle {
+  requiredSize() { return SpotSize.SMALL; }
+}
+class Car extends Vehicle {
+  requiredSize() { return SpotSize.MEDIUM; }
+}
+class Bus extends Vehicle {
+  requiredSize() { return SpotSize.LARGE; }
+}
+
+class ParkingSpot {
+  constructor(spotId, size) {
+    this.spotId = spotId;
+    this.size = size;
+    this.occupied = false;
+  }
+}
+
+class ParkingLot {
+  constructor(spots) {
+    this.spots = spots;
+  }
+  park(vehicle) {
+    let best = null;
+    for (const spot of this.spots) {
+      if (spot.occupied || spot.size < vehicle.requiredSize()) continue;
+      if (best === null || spot.size < best.size) best = spot;
+    }
+    if (best) best.occupied = true;
+    return best;
+  }
+}
+
+const spots = [
+  new ParkingSpot("S1", SpotSize.SMALL),
+  new ParkingSpot("S2", SpotSize.SMALL),
+  new ParkingSpot("M1", SpotSize.MEDIUM),
+  new ParkingSpot("M2", SpotSize.MEDIUM),
+  new ParkingSpot("L1", SpotSize.LARGE),
+];
+const lot = new ParkingLot(spots);
+
+const vehicles = [
+  new Motorcycle("Motorcycle A", 2),
+  new Car("Car A", 3),
+  new Bus("Bus A", 1),
+  new Motorcycle("Motorcycle B", 4),
+  new Car("Car B", 2),
+  new Bus("Bus B", 3),
+];
+
+let totalRevenue = 0;
+let parkedCount = 0;
+for (const vehicle of vehicles) {
+  const spot = lot.park(vehicle);
+  if (!spot) {
+    console.log(\`\${vehicle.name}: REJECTED (no \${SIZE_NAME[vehicle.requiredSize()].toLowerCase()}-or-larger spot free)\`);
+    continue;
+  }
+  const fee = vehicle.hours * RATE_PER_HOUR[spot.size];
+  totalRevenue += fee;
+  parkedCount++;
+  console.log(\`\${vehicle.name}: parked in \${spot.spotId} (\${SIZE_NAME[spot.size]}) for \${vehicle.hours}h, fee=$\${fee}\`);
+}
+console.log(\`Parked \${parkedCount}/\${vehicles.length} vehicles, total revenue=$\${totalRevenue}\`);`,
+      output: `Motorcycle A: parked in S1 (SMALL) for 2h, fee=$4
+Car A: parked in M1 (MEDIUM) for 3h, fee=$9
+Bus A: parked in L1 (LARGE) for 1h, fee=$5
+Motorcycle B: parked in S2 (SMALL) for 4h, fee=$8
+Car B: parked in M2 (MEDIUM) for 2h, fee=$6
+Bus B: REJECTED (no large-or-larger spot free)
+Parked 5/6 vehicles, total revenue=$32`
+    },
+    cpp: {
+      code: `#include <iostream>
+#include <vector>
+#include <memory>
+#include <string>
+#include <cctype>
+
+enum class SpotSize { SMALL = 1, MEDIUM = 2, LARGE = 3 };
+
+std::string sizeName(SpotSize size) {
+    switch (size) {
+        case SpotSize::SMALL: return "SMALL";
+        case SpotSize::MEDIUM: return "MEDIUM";
+        case SpotSize::LARGE: return "LARGE";
+    }
+    return "";
+}
+
+int ratePerHour(SpotSize size) {
+    switch (size) {
+        case SpotSize::SMALL: return 2;
+        case SpotSize::MEDIUM: return 3;
+        case SpotSize::LARGE: return 5;
+    }
+    return 0;
+}
+
+class Vehicle {
+public:
+    std::string name;
+    int hours;
+    Vehicle(std::string name, int hours) : name(std::move(name)), hours(hours) {}
+    virtual SpotSize requiredSize() const = 0;
+    virtual ~Vehicle() = default;
+};
+
+class Motorcycle : public Vehicle {
+public:
+    Motorcycle(std::string name, int hours) : Vehicle(std::move(name), hours) {}
+    SpotSize requiredSize() const override { return SpotSize::SMALL; }
+};
+class Car : public Vehicle {
+public:
+    Car(std::string name, int hours) : Vehicle(std::move(name), hours) {}
+    SpotSize requiredSize() const override { return SpotSize::MEDIUM; }
+};
+class Bus : public Vehicle {
+public:
+    Bus(std::string name, int hours) : Vehicle(std::move(name), hours) {}
+    SpotSize requiredSize() const override { return SpotSize::LARGE; }
+};
+
+struct ParkingSpot {
+    std::string spotId;
+    SpotSize size;
+    bool occupied = false;
+    ParkingSpot(std::string spotId, SpotSize size) : spotId(std::move(spotId)), size(size) {}
+};
+
+class ParkingLot {
+public:
+    explicit ParkingLot(std::vector<ParkingSpot> spots) : spots(std::move(spots)) {}
+
+    ParkingSpot* park(const Vehicle& vehicle) {
+        ParkingSpot* best = nullptr;
+        for (auto& spot : spots) {
+            if (spot.occupied || static_cast<int>(spot.size) < static_cast<int>(vehicle.requiredSize())) continue;
+            if (best == nullptr || static_cast<int>(spot.size) < static_cast<int>(best->size)) {
+                best = &spot;
+            }
+        }
+        if (best) best->occupied = true;
+        return best;
+    }
+
+private:
+    std::vector<ParkingSpot> spots;
+};
+
+int main() {
+    std::vector<ParkingSpot> spotList = {
+        ParkingSpot("S1", SpotSize::SMALL),
+        ParkingSpot("S2", SpotSize::SMALL),
+        ParkingSpot("M1", SpotSize::MEDIUM),
+        ParkingSpot("M2", SpotSize::MEDIUM),
+        ParkingSpot("L1", SpotSize::LARGE),
+    };
+    ParkingLot lot(spotList);
+
+    std::vector<std::unique_ptr<Vehicle>> vehicles;
+    vehicles.push_back(std::make_unique<Motorcycle>("Motorcycle A", 2));
+    vehicles.push_back(std::make_unique<Car>("Car A", 3));
+    vehicles.push_back(std::make_unique<Bus>("Bus A", 1));
+    vehicles.push_back(std::make_unique<Motorcycle>("Motorcycle B", 4));
+    vehicles.push_back(std::make_unique<Car>("Car B", 2));
+    vehicles.push_back(std::make_unique<Bus>("Bus B", 3));
+
+    int totalRevenue = 0;
+    int parkedCount = 0;
+    for (const auto& vehicle : vehicles) {
+        ParkingSpot* spot = lot.park(*vehicle);
+        if (!spot) {
+            std::string req = sizeName(vehicle->requiredSize());
+            for (auto& c : req) c = static_cast<char>(tolower(c));
+            std::cout << vehicle->name << ": REJECTED (no " << req << "-or-larger spot free)" << std::endl;
+            continue;
+        }
+        int fee = vehicle->hours * ratePerHour(spot->size);
+        totalRevenue += fee;
+        parkedCount++;
+        std::cout << vehicle->name << ": parked in " << spot->spotId << " (" << sizeName(spot->size)
+                   << ") for " << vehicle->hours << "h, fee=$" << fee << std::endl;
+    }
+    std::cout << "Parked " << parkedCount << "/" << vehicles.size()
+               << " vehicles, total revenue=$" << totalRevenue << std::endl;
+    return 0;
+}`,
+      output: `Motorcycle A: parked in S1 (SMALL) for 2h, fee=$4
+Car A: parked in M1 (MEDIUM) for 3h, fee=$9
+Bus A: parked in L1 (LARGE) for 1h, fee=$5
+Motorcycle B: parked in S2 (SMALL) for 4h, fee=$8
+Car B: parked in M2 (MEDIUM) for 2h, fee=$6
+Bus B: REJECTED (no large-or-larger spot free)
+Parked 5/6 vehicles, total revenue=$32`
+    }
+  };
+
+  const tabs = document.querySelectorAll('.terminal-tab');
+  const codeEl = document.getElementById('terminal-code');
+  const outputEl = document.getElementById('terminal-output');
+  const copyBtn = document.getElementById('copy-btn');
+
+  function renderLang(lang) {
+    codeEl.textContent = snippets[lang].code;
+    outputEl.textContent = snippets[lang].output;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.lang === lang));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => renderLang(tab.dataset.lang));
+  });
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+  }
+
+  function showCopied() {
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = 'Copy';
+      copyBtn.classList.remove('copied');
+    }, 1500);
+  }
+
+  copyBtn.addEventListener('click', () => {
+    const text = codeEl.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+        fallbackCopy(text);
+        showCopied();
+      });
+    } else {
+      fallbackCopy(text);
+      showCopied();
+    }
+  });
+
+  renderLang('java');
+</script>
+
+<script>
+  const sections = document.querySelectorAll('main section, main h1');
+  const links = document.querySelectorAll('nav.sidebar a.toc');
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 100) currentId = sec.id;
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+    });
+  });
+</script>
+
+</body>
+</html>

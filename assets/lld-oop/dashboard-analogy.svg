@@ -1,0 +1,33 @@
+<svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">A car's dashboard is encapsulation and abstraction</text>
+
+  <rect x="30" y="55" width="130" height="60" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="95" y="82" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">You</text>
+  <text x="95" y="100" text-anchor="middle" font-size="10" fill="#6a7178">press the pedal</text>
+
+  <rect x="220" y="55" width="150" height="60" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="295" y="82" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">Pedal &amp; wheel</text>
+  <text x="295" y="100" text-anchor="middle" font-size="10" fill="#6a7178">the public interface</text>
+
+  <rect x="480" y="45" width="190" height="80" rx="8" fill="#f6f8fa" stroke="#9aa2ad" stroke-width="1.4" stroke-dasharray="4,3"/>
+  <text x="575" y="68" text-anchor="middle" font-size="12" font-weight="600" fill="#6a7178">Engine, wiring, computer</text>
+  <text x="575" y="86" text-anchor="middle" font-size="10" fill="#9aa2ad">hidden inside — you never</text>
+  <text x="575" y="101" text-anchor="middle" font-size="10" fill="#9aa2ad">touch these parts directly</text>
+
+  <line x1="160" y1="85" x2="220" y2="85" stroke="#3b6ea5" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="370" y1="85" x2="480" y2="85" stroke="#3b6ea5" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <text x="350" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2f33">Press the same pedal in a gas car or an electric car (polymorphism):</text>
+  <text x="350" y="168" text-anchor="middle" font-size="11" fill="#6a7178">one burns fuel, the other draws from a battery — same interface, different behavior underneath.</text>
+
+  <text x="350" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2f33">An SUV is-a Car is-a Vehicle (inheritance):</text>
+  <text x="350" y="223" text-anchor="middle" font-size="11" fill="#6a7178">each level adds its own features while reusing everything the level above already defined.</text>
+
+  <title>OOP explained as a car dashboard hiding the engine, with polymorphic pedals and an SUV-Car-Vehicle inheritance chain</title>
+</svg>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Databases — System Design Architectures</title>
+<title>OOP Fundamentals — System Design Architectures</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -150,7 +150,7 @@
     <div class="header-brand">
       <img class="logo-mark-img" src="../../assets/shared/logo-mark.svg" alt="System Design Architectures logo">
       <a class="site-title" href="../../index.html">System Design Architectures</a>
-      <span class="header-tagline">HLD &middot; Databases</span>
+      <span class="header-tagline">LLD &middot; OOP Fundamentals</span>
     </div>
     <nav class="header-nav">
       <a href="../../index.html">Home</a>
@@ -178,30 +178,30 @@
     <nav class="breadcrumbs">
       <a href="../../index.html">Home</a>
       <span class="sep">/</span>
-      <a href="../../index.html#hld">HLD</a>
+      <a href="../../index.html#lld-section">LLD</a>
       <span class="sep">/</span>
-      <span class="current">Databases</span>
+      <span class="current">OOP Fundamentals</span>
     </nav>
-    <h1 id="overview">Databases</h1>
-    <p>How a database keeps lookups fast as it grows, and what happens when one machine isn't enough to hold or serve all of it.</p>
+    <h1 id="overview">OOP Fundamentals</h1>
+    <p>The four ideas — encapsulation, abstraction, inheritance, and polymorphism — that every design pattern in this guide is ultimately built out of.</p>
 
     <section id="plain-english">
       <h2>In Plain English</h2>
-      <p>Think of a huge library. You can find a book by walking every aisle, or you can check the card catalog first.</p>
+      <p>Think about driving a car without knowing anything about engines.</p>
 
       <figure>
-        <img class="diagram-img" src="../../assets/hld-databases/library-catalog-analogy.svg" alt="Left: checking every aisle one by one to find a book. Right: checking the card catalog first, then walking straight to aisle 7">
-        <figcaption>An index is the card catalog — it costs upkeep, but saves you from searching everywhere</figcaption>
+        <img class="diagram-img" src="../../assets/lld-oop/dashboard-analogy.svg" alt="A driver pressing the pedal and steering wheel, which are connected to a hidden engine and wiring compartment, with captions about polymorphism (same pedal, different engines) and inheritance (SUV is-a Car is-a Vehicle)">
+        <figcaption>The dashboard is the interface; the engine bay is everything hidden behind it</figcaption>
       </figure>
 
       <div class="two-col">
         <div class="callout good">
           <div class="callout-title">New to this? Start here</div>
-          <p>An index is just a shortcut list that says "this key lives over here." It takes a bit of extra bookkeeping to keep updated, but it turns "check everything" into "look it up, then go straight there."</p>
+          <p>You never need to know how the engine works to drive — you just need the pedal and the wheel to behave predictably. That's encapsulation and abstraction: hide the complicated part, expose a small, simple interface.</p>
         </div>
         <div class="callout bad">
           <div class="callout-title">Already comfortable? Push further</div>
-          <p>Read replicas are like photocopying the whole catalog for every front desk, so more people can search at once. Sharding is different — it's splitting the library itself into branch buildings, each holding only some of the books, by last name.</p>
+          <p>The interesting part is that the same pedal works whether the engine burns gas or draws from a battery — that's polymorphism. And an SUV reusing everything a Car already defines, while adding its own extras, is inheritance.</p>
         </div>
       </div>
     </section>
@@ -209,54 +209,54 @@
     <section id="theory">
       <h2>Theory &amp; Diagrams</h2>
 
-      <h3>Why indexes exist</h3>
-      <p>Finding one row by scanning every row is O(n) — fine for a thousand rows, unusable for a hundred million. An index is a separate structure (a B-tree or hash table) that maps a lookup key straight to the row's location, turning that search into O(log n) or O(1).</p>
+      <h3>The four pillars</h3>
+      <p>Object-oriented programming organizes code around objects — bundles of data and the behavior that acts on that data — rather than around a sequence of standalone functions. Four ideas make that useful in practice.</p>
 
       <figure>
-        <img class="diagram-img" src="../../assets/hld-databases/index-vs-scan.svg" alt="Left panel: a linear scan checking every row in order to find a match. Right panel: an index jumping directly to the matching row.">
-        <figcaption>Same lookup, two very different amounts of work</figcaption>
+        <img class="diagram-img" src="../../assets/lld-oop/four-pillars.svg" alt="Four boxes: Encapsulation (bundle data with methods, hide internals), Abstraction (expose only what a caller needs), Inheritance (reuse and extend a parent class), Polymorphism (the same call behaves differently depending on the object)">
+        <figcaption>Every design pattern in this guide is built from some combination of these four ideas</figcaption>
       </figure>
 
-      <h3>Read replicas</h3>
-      <p>A single database server can only take so many concurrent reads. A read replica is a synced copy of the primary that serves read-only queries, so read load scales out horizontally while writes still go through one primary.</p>
+      <h3>Encapsulation vs. abstraction</h3>
+      <p>These two get conflated constantly. Encapsulation is a mechanism — bundling data with the methods that touch it, and restricting direct access to that data. Abstraction is a design goal — deciding what to expose and what to hide, so a caller only ever has to think about the "what," never the "how."</p>
 
-      <h3>Sharding</h3>
-      <p>Past a certain size, even replicas aren't enough — the data itself is split across independent shards, each holding a subset of rows, usually partitioned by a key like user ID. This scales storage and write throughput, at the cost of much harder cross-shard queries.</p>
+      <h3>Inheritance and the fragile base class problem</h3>
+      <p>A subclass reuses a parent's fields and methods and can override or extend them. That reuse is powerful, but it also means a change to the parent can silently break every subclass depending on its exact behavior — the deeper and wider the hierarchy, the more fragile it gets.</p>
 
-      <figure>
-        <img class="diagram-img" src="../../assets/hld-databases/replicas-and-sharding.svg" alt="Left: a primary database syncing writes to two read replicas that share the read load. Right: three shards, each holding a different slice of users partitioned by a key range.">
-        <figcaption>Replicas copy the same data; shards split it into different pieces</figcaption>
-      </figure>
+      <h3>Polymorphism</h3>
+      <p>Calling <code>shape.area()</code> on a variable typed as the base class <code>Shape</code> runs <code>Circle</code>'s implementation, <code>Rectangle</code>'s implementation, or whichever subclass the object actually is — decided at runtime, not at compile time. This is what lets code work with a list of mixed shapes without a single <code>if/else</code> chain checking types.</p>
     </section>
 
     <section id="trade-offs">
       <h2>Trade-offs</h2>
       <div class="two-col">
         <div class="callout good">
-          <div class="callout-title">✓ Add an index when</div>
+          <div class="callout-title">✓ Favor inheritance when</div>
           <ul>
-            <li>A column is queried often (a `WHERE` clause, a join key) and the table is large enough for a scan to matter.</li>
+            <li>There's a genuine, stable "is-a" relationship (a Square really is a Rectangle with equal sides).</li>
+            <li>Subclasses are expected to share and rarely override the parent's core behavior.</li>
           </ul>
         </div>
         <div class="callout bad">
-          <div class="callout-title">✕ Skip the index when</div>
+          <div class="callout-title">✕ Favor composition when</div>
           <ul>
-            <li>The column is rarely queried, or the table is small — the write-side cost isn't worth paying for a search that was already fast.</li>
+            <li>The relationship is really "has-a" or "can-do," not "is-a" (a Car has-an Engine, it isn't one).</li>
+            <li>You need to swap behavior at runtime, or the hierarchy would otherwise need multiple inheritance.</li>
           </ul>
         </div>
       </div>
-      <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> that an index isn't free — it slows every write to the indexed column — and being able to say specifically what breaks when a database is sharded (cross-shard joins and transactions get much harder), rather than treating sharding as a free scaling lever.</p>
-      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> knowing that an index speeds up reads but costs something on writes, and that a shard holds only part of the data while a replica holds all of it, covers the basics interviewers check for.</p>
-      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> be ready to talk about a real schema you indexed (and why), or a query that got slow at scale and what you changed — adding an index, denormalizing, or introducing a replica — to fix it.</p>
+      <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> a precise distinction between encapsulation and abstraction (not "they're basically the same thing"), and knowing the "favor composition over inheritance" principle by name along with a concrete example of when a hierarchy became a liability.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> being able to define all four pillars in one sentence each, with a simple example per pillar, covers what most early interviews check for.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> be ready to describe a real inheritance hierarchy you've worked with that became painful to change, and what composition-based fix you'd reach for instead.</p>
     </section>
 
     <section id="real-world">
       <h2>Real-World Examples</h2>
       <ul>
-        <li><strong>PostgreSQL / MySQL</strong> — SQL databases using B-tree indexes by default, with read replicas commonly used to scale read-heavy workloads.</li>
-        <li><strong>MongoDB / Cassandra</strong> — NoSQL databases built for horizontal sharding and flexible schemas from the ground up.</li>
-        <li><strong>Instagram's user-sharding</strong> — sharding user data by user ID across many Postgres instances to handle a scale one server can't.</li>
-        <li><strong>DynamoDB</strong> — a managed NoSQL database where partitioning is handled automatically based on a chosen partition key.</li>
+        <li><strong>GUI frameworks</strong> (Swing, WPF, UIKit) — every widget inherits from a common base (like <code>View</code> or <code>Component</code>), and rendering code calls the same <code>draw()</code> method polymorphically across wildly different widget types.</li>
+        <li><strong>ORMs</strong> (Hibernate, SQLAlchemy, Entity Framework) — model classes encapsulate both the data and the logic to load/save it, abstracting the caller away from raw SQL.</li>
+        <li><strong>Game engines</strong> — a generic <code>GameObject</code> base class with subclasses like <code>Player</code>, <code>Enemy</code>, and <code>Projectile</code>, all updated through the same polymorphic <code>update()</code> call each frame.</li>
+        <li><strong>Standard library collections</strong> (Java's <code>List</code>, Python's iterables) — abstraction lets code iterate any collection type through one shared interface, without caring whether it's an array, linked list, or set underneath.</li>
       </ul>
     </section>
 
@@ -265,37 +265,37 @@
       <p>Click a question to reveal the answer.</p>
 
       <details class="qa">
-        <summary>Why does an index speed up lookups?</summary>
+        <summary>What's the difference between encapsulation and abstraction?</summary>
         <div class="qa-answer">
-          <p>Without one, finding a row means checking every row — O(n). An index maps the lookup key directly to the row's location, cutting that to O(log n) or O(1), at the cost of extra storage and slower writes to the indexed column.</p>
+          <p>Encapsulation is the mechanism: bundling data with the methods that operate on it, and restricting direct access (private fields, public methods). Abstraction is the design decision of what to expose versus hide, so callers only need to know "what" an object does, not "how." Encapsulation is how you achieve abstraction, but the two aren't the same thing.</p>
         </div>
       </details>
 
       <details class="qa">
-        <summary>What's the difference between a read replica and a shard?</summary>
+        <summary>What does "favor composition over inheritance" mean, and why?</summary>
         <div class="qa-answer">
-          <p>A read replica is a full copy of the same data, used to spread read load — every replica has everything. A shard holds only a subset of the data, used to spread storage and write load — no single shard has everything.</p>
+          <p>It means preferring to build behavior by holding references to other objects (composition) rather than by extending a base class (inheritance), when possible. Composition avoids the fragile base class problem, allows swapping behavior at runtime, and avoids forcing an "is-a" relationship onto something that's really "has-a."</p>
         </div>
       </details>
 
       <details class="qa">
-        <summary>What breaks when you shard a database?</summary>
+        <summary>What's the difference between compile-time and runtime polymorphism?</summary>
         <div class="qa-answer">
-          <p>Any query needing data from more than one shard — a cross-shard join or multi-shard transaction — becomes far more expensive, because the database engine can no longer do it in one place with one set of guarantees.</p>
+          <p>Compile-time (static) polymorphism is method overloading — the compiler picks which method to call based on argument types at compile time. Runtime (dynamic) polymorphism is method overriding — the actual method that runs is decided by the real object type at runtime, which is what enables working with a list of mixed subclasses through one shared interface.</p>
         </div>
       </details>
 
       <details class="qa">
-        <summary>When would you choose NoSQL over SQL?</summary>
+        <summary>What's the fragile base class problem?</summary>
         <div class="qa-answer">
-          <p>When the data doesn't fit a fixed relational schema well, when horizontal scalability matters more than strong consistency guarantees, or when access is mostly simple key-based lookups rather than complex joins.</p>
+          <p>When subclasses depend on the exact internal behavior of a parent class, a seemingly safe change to that parent can silently break every subclass relying on it — even though nothing about the subclass's own code changed. Deep or wide inheritance hierarchies make this worse the more classes depend on the same shared parent.</p>
         </div>
       </details>
     </section>
 
     <section id="code">
       <h2>Code &amp; Output</h2>
-      <p>A table of 200,000 records, searched 500 times two ways: a linear scan and a hash-index lookup. Both approaches produce identical results — the difference is real, measured time, not a theoretical claim.</p>
+      <p>A real class hierarchy — an abstract <code>Shape</code> with <code>Circle</code>, <code>Rectangle</code>, and <code>Square</code> (which inherits from <code>Rectangle</code>) — computing genuine area and perimeter for each, then summing the total across a mixed list purely through polymorphic calls. The math is real, so unlike some of the timing-based examples elsewhere in this guide, the output below is identical every time you run it, in every language.</p>
 
       <div class="terminal">
         <div class="terminal-tabs">
@@ -309,21 +309,21 @@
         </div>
         <div class="terminal-body">
           <pre><code id="terminal-code"></code></pre>
-          <div class="terminal-output-label">Sample output (real run — your numbers will differ)</div>
+          <div class="terminal-output-label">Output (deterministic — identical in every language)</div>
           <div class="terminal-output" id="terminal-output"></div>
         </div>
-        <div class="terminal-note">Java's timing wasn't captured in this sandbox (no JDK available to run it), but the HashMap-based index logic is functionally identical to the other three languages, manually verified for correctness.</div>
+        <div class="terminal-note">Verified by hand: Circle(r=3) area = &pi;&times;9 &asymp; 28.27; Rectangle(4,5) area = 20.00; Square(6) as a Rectangle(6,6) area = 36.00; total = 84.27.</div>
       </div>
     </section>
 
     <nav class="page-nav">
-      <a class="nav-link prev" href="caching.html">
+      <a class="nav-link prev" href="../../index.html">
         <span class="nav-label">&larr; Previous</span>
-        <span class="nav-title">Caching</span>
+        <span class="nav-title">Home</span>
       </a>
-      <a class="nav-link next" href="message-queues.html">
+      <a class="nav-link next" href="solid-principles.html">
         <span class="nav-label">Next &rarr;</span>
-        <span class="nav-title">Message Queues</span>
+        <span class="nav-title">SOLID Principles</span>
       </a>
     </nav>
   </main>
@@ -336,18 +336,17 @@
       <p>A self-study guide for HLD, LLD, and Design Patterns &mdash; built for focused, example-driven interview prep, with working code in Java, Python, JavaScript, and C++ for every topic.</p>
     </div>
     <div class="footer-col">
-      <h4>HLD</h4>
-      <a href="../../pages/hld/fundamentals.html">Fundamentals</a>
-      <a href="../../pages/hld/load-balancing.html">Load Balancing</a>
-      <a href="../../pages/hld/caching.html">Caching</a>
-      <a href="../../pages/hld/capstones.html">Capstones</a>
+      <h4>LLD</h4>
+      <a href="oop-fundamentals.html">OOP Fundamentals</a>
+      <a href="solid-principles.html">SOLID Principles</a>
+      <a href="capstones.html">LLD Capstones</a>
     </div>
     <div class="footer-col">
       <h4>Design Patterns</h4>
-      <a href="../../pages/lld/design-patterns/creational/singleton.html">Singleton</a>
-      <a href="../../pages/lld/design-patterns/structural/adapter.html">Adapter</a>
-      <a href="../../pages/lld/design-patterns/behavioral/observer.html">Observer</a>
-      <a href="../../pages/lld/design-patterns/behavioral/strategy.html">Strategy</a>
+      <a href="design-patterns/creational/singleton.html">Singleton</a>
+      <a href="design-patterns/structural/adapter.html">Adapter</a>
+      <a href="design-patterns/behavioral/observer.html">Observer</a>
+      <a href="design-patterns/behavioral/strategy.html">Strategy</a>
     </div>
     <div class="footer-col">
       <h4>Guide</h4>
@@ -366,262 +365,214 @@
 <script>
   const snippets = {
     java: {
-      code: `import java.util.*;
-
-public class Indexing {
-    static final int NUM_RECORDS = 200_000;
-    static final int NUM_LOOKUPS = 500;
-
-    static class Row {
-        int id;
-        String name;
-        Row(int id, String name) {
-            this.id = id;
-            this.name = name;
+      code: `public class OOPDemo {
+    abstract static class Shape {
+        abstract double area();
+        abstract double perimeter();
+        String describe() {
+            return String.format("%s: area=%.2f, perimeter=%.2f", getClass().getSimpleName(), area(), perimeter());
         }
     }
 
-    static List<Row> buildTable(int n) {
-        List<Row> table = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-            table.add(new Row(i, "user-" + i));
-        }
-        return table;
+    static class Circle extends Shape {
+        double radius;
+        Circle(double radius) { this.radius = radius; }
+        double area() { return Math.PI * radius * radius; }
+        double perimeter() { return 2 * Math.PI * radius; }
     }
 
-    static Map<Integer, Row> buildIndex(List<Row> table) {
-        Map<Integer, Row> index = new HashMap<>();
-        for (Row row : table) {
-            index.put(row.id, row);
-        }
-        return index;
+    static class Rectangle extends Shape {
+        double width, height;
+        Rectangle(double width, double height) { this.width = width; this.height = height; }
+        double area() { return width * height; }
+        double perimeter() { return 2 * (width + height); }
     }
 
-    static Row linearScanLookup(List<Row> table, int targetId) {
-        for (Row row : table) {
-            if (row.id == targetId) return row;
-        }
-        return null;
-    }
-
-    static Row indexedLookup(Map<Integer, Row> index, int targetId) {
-        return index.get(targetId);
+    static class Square extends Rectangle {
+        Square(double side) { super(side, side); }
     }
 
     public static void main(String[] args) {
-        List<Row> table = buildTable(NUM_RECORDS);
-        Map<Integer, Row> index = buildIndex(table);
-
-        Random rng = new Random(42);
-        int[] lookupIds = new int[NUM_LOOKUPS];
-        for (int i = 0; i < NUM_LOOKUPS; i++) {
-            lookupIds[i] = rng.nextInt(NUM_RECORDS);
+        Shape[] shapes = { new Circle(3), new Rectangle(4, 5), new Square(6) };
+        double totalArea = 0;
+        for (Shape shape : shapes) {
+            System.out.println(shape.describe());
+            totalArea += shape.area();
         }
-
-        long start = System.nanoTime();
-        for (int target : lookupIds) linearScanLookup(table, target);
-        double linearMs = (System.nanoTime() - start) / 1_000_000.0;
-
-        start = System.nanoTime();
-        for (int target : lookupIds) indexedLookup(index, target);
-        double indexedMs = (System.nanoTime() - start) / 1_000_000.0;
-
-        System.out.println(NUM_RECORDS + " records, " + NUM_LOOKUPS + " lookups");
-        System.out.printf("Linear scan (no index): %.2f ms%n", linearMs);
-        System.out.printf("Indexed lookup (hash index): %.2f ms%n", indexedMs);
-        System.out.printf("Speedup from indexing: %.1fx%n", linearMs / indexedMs);
+        System.out.printf("Total area across %d shapes: %.2f%n", shapes.length, totalArea);
     }
 }`,
-      output: `200000 records, 500 lookups
-Linear scan (no index): 445.20 ms
-Indexed lookup (hash index): 0.19 ms
-Speedup from indexing: 2343.2x
-
-(Representative sample — Java was not executed in this sandbox; see note below.)`
+      output: `Circle: area=28.27, perimeter=18.85
+Rectangle: area=20.00, perimeter=18.00
+Square: area=36.00, perimeter=24.00
+Total area across 3 shapes: 84.27`
     },
     python: {
-      code: `import random
-import time
+      code: `from abc import ABC, abstractmethod
+import math
 
-NUM_RECORDS = 200_000
-NUM_LOOKUPS = 500
 
-def build_table(n):
-    return [{"id": i, "name": f"user-{i}"} for i in range(n)]
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        pass
 
-def build_index(table):
-    return {row["id"]: row for row in table}
+    @abstractmethod
+    def perimeter(self):
+        pass
 
-def linear_scan_lookup(table, target_id):
-    for row in table:
-        if row["id"] == target_id:
-            return row
-    return None
+    def describe(self):
+        return f"{type(self).__name__}: area={self.area():.2f}, perimeter={self.perimeter():.2f}"
 
-def indexed_lookup(index, target_id):
-    return index.get(target_id)
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return math.pi * self.radius ** 2
+
+    def perimeter(self):
+        return 2 * math.pi * self.radius
+
+
+class Rectangle(Shape):
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+    def perimeter(self):
+        return 2 * (self.width + self.height)
+
+
+class Square(Rectangle):
+    def __init__(self, side):
+        super().__init__(side, side)
+
 
 if __name__ == "__main__":
-    table = build_table(NUM_RECORDS)
-    index = build_index(table)
-    lookup_ids = [random.randint(0, NUM_RECORDS - 1) for _ in range(NUM_LOOKUPS)]
-
-    start = time.perf_counter()
-    for target in lookup_ids:
-        linear_scan_lookup(table, target)
-    linear_time_ms = (time.perf_counter() - start) * 1000
-
-    start = time.perf_counter()
-    for target in lookup_ids:
-        indexed_lookup(index, target)
-    indexed_time_ms = (time.perf_counter() - start) * 1000
-
-    print(f"{NUM_RECORDS} records, {NUM_LOOKUPS} lookups")
-    print(f"Linear scan (no index): {linear_time_ms:.2f} ms")
-    print(f"Indexed lookup (hash index): {indexed_time_ms:.2f} ms")
-    print(f"Speedup from indexing: {linear_time_ms / indexed_time_ms:.1f}x")`,
-      output: `200000 records, 500 lookups
-Linear scan (no index): 2617.42 ms
-Indexed lookup (hash index): 0.23 ms
-Speedup from indexing: 11142.7x`
+    shapes = [Circle(3), Rectangle(4, 5), Square(6)]
+    total_area = 0
+    for shape in shapes:
+        print(shape.describe())
+        total_area += shape.area()
+    print(f"Total area across {len(shapes)} shapes: {total_area:.2f}")`,
+      output: `Circle: area=28.27, perimeter=18.85
+Rectangle: area=20.00, perimeter=18.00
+Square: area=36.00, perimeter=24.00
+Total area across 3 shapes: 84.27`
     },
     javascript: {
-      code: `const NUM_RECORDS = 200000;
-const NUM_LOOKUPS = 500;
-
-function buildTable(n) {
-  const table = new Array(n);
-  for (let i = 0; i < n; i++) {
-    table[i] = { id: i, name: \`user-\${i}\` };
+      code: `class Shape {
+  area() { throw new Error("not implemented"); }
+  perimeter() { throw new Error("not implemented"); }
+  describe() {
+    return \`\${this.constructor.name}: area=\${this.area().toFixed(2)}, perimeter=\${this.perimeter().toFixed(2)}\`;
   }
-  return table;
 }
 
-function buildIndex(table) {
-  const index = new Map();
-  for (const row of table) {
-    index.set(row.id, row);
+class Circle extends Shape {
+  constructor(radius) {
+    super();
+    this.radius = radius;
   }
-  return index;
+  area() { return Math.PI * this.radius ** 2; }
+  perimeter() { return 2 * Math.PI * this.radius; }
 }
 
-function linearScanLookup(table, targetId) {
-  for (const row of table) {
-    if (row.id === targetId) return row;
+class Rectangle extends Shape {
+  constructor(width, height) {
+    super();
+    this.width = width;
+    this.height = height;
   }
-  return null;
+  area() { return this.width * this.height; }
+  perimeter() { return 2 * (this.width + this.height); }
 }
 
-function indexedLookup(index, targetId) {
-  return index.get(targetId) || null;
+class Square extends Rectangle {
+  constructor(side) {
+    super(side, side);
+  }
 }
 
-const table = buildTable(NUM_RECORDS);
-const index = buildIndex(table);
-const lookupIds = Array.from({ length: NUM_LOOKUPS }, () => Math.floor(Math.random() * NUM_RECORDS));
-
-let start = process.hrtime.bigint();
-for (const target of lookupIds) {
-  linearScanLookup(table, target);
+const shapes = [new Circle(3), new Rectangle(4, 5), new Square(6)];
+let totalArea = 0;
+for (const shape of shapes) {
+  console.log(shape.describe());
+  totalArea += shape.area();
 }
-const linearTimeMs = Number(process.hrtime.bigint() - start) / 1e6;
-
-start = process.hrtime.bigint();
-for (const target of lookupIds) {
-  indexedLookup(index, target);
-}
-const indexedTimeMs = Number(process.hrtime.bigint() - start) / 1e6;
-
-console.log(\`\${NUM_RECORDS} records, \${NUM_LOOKUPS} lookups\`);
-console.log(\`Linear scan (no index): \${linearTimeMs.toFixed(2)} ms\`);
-console.log(\`Indexed lookup (hash index): \${indexedTimeMs.toFixed(2)} ms\`);
-console.log(\`Speedup from indexing: \${(linearTimeMs / indexedTimeMs).toFixed(1)}x\`);`,
-      output: `200000 records, 500 lookups
-Linear scan (no index): 409.06 ms
-Indexed lookup (hash index): 0.28 ms
-Speedup from indexing: 1481.0x`
+console.log(\`Total area across \${shapes.length} shapes: \${totalArea.toFixed(2)}\`);`,
+      output: `Circle: area=28.27, perimeter=18.85
+Rectangle: area=20.00, perimeter=18.00
+Square: area=36.00, perimeter=24.00
+Total area across 3 shapes: 84.27`
     },
     cpp: {
       code: `#include <iostream>
 #include <vector>
-#include <unordered_map>
+#include <memory>
+#include <cmath>
+#include <iomanip>
 #include <string>
-#include <chrono>
-#include <random>
 
-const int NUM_RECORDS = 200000;
-const int NUM_LOOKUPS = 500;
-
-struct Row {
-    int id;
-    std::string name;
+class Shape {
+public:
+    virtual double area() const = 0;
+    virtual double perimeter() const = 0;
+    virtual std::string name() const = 0;
+    virtual ~Shape() = default;
 };
 
-std::vector<Row> buildTable(int n) {
-    std::vector<Row> table;
-    table.reserve(n);
-    for (int i = 0; i < n; i++) {
-        table.push_back({i, "user-" + std::to_string(i)});
-    }
-    return table;
-}
+class Circle : public Shape {
+public:
+    explicit Circle(double radius) : radius(radius) {}
+    double area() const override { return M_PI * radius * radius; }
+    double perimeter() const override { return 2 * M_PI * radius; }
+    std::string name() const override { return "Circle"; }
+private:
+    double radius;
+};
 
-std::unordered_map<int, const Row*> buildIndex(const std::vector<Row>& table) {
-    std::unordered_map<int, const Row*> index;
-    for (const auto& row : table) {
-        index[row.id] = &row;
-    }
-    return index;
-}
+class Rectangle : public Shape {
+public:
+    Rectangle(double width, double height) : width(width), height(height) {}
+    double area() const override { return width * height; }
+    double perimeter() const override { return 2 * (width + height); }
+    std::string name() const override { return "Rectangle"; }
+protected:
+    double width, height;
+};
 
-const Row* linearScanLookup(const std::vector<Row>& table, int targetId) {
-    for (const auto& row : table) {
-        if (row.id == targetId) return &row;
-    }
-    return nullptr;
-}
-
-const Row* indexedLookup(const std::unordered_map<int, const Row*>& index, int targetId) {
-    auto it = index.find(targetId);
-    return it == index.end() ? nullptr : it->second;
-}
+class Square : public Rectangle {
+public:
+    explicit Square(double side) : Rectangle(side, side) {}
+    std::string name() const override { return "Square"; }
+};
 
 int main() {
-    auto table = buildTable(NUM_RECORDS);
-    auto index = buildIndex(table);
+    std::vector<std::unique_ptr<Shape>> shapes;
+    shapes.push_back(std::make_unique<Circle>(3));
+    shapes.push_back(std::make_unique<Rectangle>(4, 5));
+    shapes.push_back(std::make_unique<Square>(6));
 
-    std::mt19937 rng(42);
-    std::uniform_int_distribution<int> dist(0, NUM_RECORDS - 1);
-    std::vector<int> lookupIds(NUM_LOOKUPS);
-    for (int i = 0; i < NUM_LOOKUPS; i++) lookupIds[i] = dist(rng);
-
-    long checksum = 0;
-    auto start = std::chrono::steady_clock::now();
-    for (int target : lookupIds) {
-        const Row* found = linearScanLookup(table, target);
-        if (found) checksum += found->id;
+    double totalArea = 0;
+    std::cout << std::fixed << std::setprecision(2);
+    for (const auto& shape : shapes) {
+        std::cout << shape->name() << ": area=" << shape->area()
+                   << ", perimeter=" << shape->perimeter() << std::endl;
+        totalArea += shape->area();
     }
-    double linearMs = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
-
-    start = std::chrono::steady_clock::now();
-    for (int target : lookupIds) {
-        const Row* found = indexedLookup(index, target);
-        if (found) checksum += found->id;
-    }
-    double indexedMs = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
-
-    std::cout << NUM_RECORDS << " records, " << NUM_LOOKUPS << " lookups" << std::endl;
-    std::cout << "Linear scan (no index): " << linearMs << " ms" << std::endl;
-    std::cout << "Indexed lookup (hash index): " << indexedMs << " ms" << std::endl;
-    std::cout << "Speedup from indexing: " << (linearMs / indexedMs) << "x" << std::endl;
-    std::cout << "(checksum " << checksum << ")" << std::endl;
+    std::cout << "Total area across " << shapes.size() << " shapes: " << totalArea << std::endl;
     return 0;
 }`,
-      output: `200000 records, 500 lookups
-Linear scan (no index): 479.953 ms
-Indexed lookup (hash index): 0.183 ms
-Speedup from indexing: 2622.69x
-(checksum 100170704)`
+      output: `Circle: area=28.27, perimeter=18.85
+Rectangle: area=20.00, perimeter=18.00
+Square: area=36.00, perimeter=24.00
+Total area across 3 shapes: 84.27`
     }
   };
 

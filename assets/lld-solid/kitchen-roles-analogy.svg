@@ -1,0 +1,32 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <text x="350" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">SOLID, as a well-run restaurant kitchen</text>
+
+  <circle cx="45" cy="55" r="16" fill="#3b6ea5"/>
+  <text x="45" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">S</text>
+  <text x="72" y="51" font-size="11" font-weight="600" fill="#2d2f33">The grill cook only cooks. They don't also plate desserts</text>
+  <text x="72" y="65" font-size="11" fill="#6a7178">or wash dishes — one role, one reason to change.</text>
+
+  <circle cx="45" cy="105" r="16" fill="#3b6ea5"/>
+  <text x="45" y="110" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">O</text>
+  <text x="72" y="101" font-size="11" font-weight="600" fill="#2d2f33">A new menu item is added as a new recipe card —</text>
+  <text x="72" y="115" font-size="11" fill="#6a7178">nobody has to rewrite how the grill station already works.</text>
+
+  <circle cx="45" cy="155" r="16" fill="#3b6ea5"/>
+  <text x="45" y="160" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">L</text>
+  <text x="72" y="151" font-size="11" font-weight="600" fill="#2d2f33">Any substitute grill cook can step in and the orders</text>
+  <text x="72" y="165" font-size="11" fill="#6a7178">still come out right — a substitute must honor the role.</text>
+
+  <circle cx="45" cy="205" r="16" fill="#3b6ea5"/>
+  <text x="45" y="210" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">I</text>
+  <text x="72" y="201" font-size="11" font-weight="600" fill="#2d2f33">Waiters get an order pad, not the whole kitchen manual —</text>
+  <text x="72" y="215" font-size="11" fill="#6a7178">nobody depends on parts of the system they never use.</text>
+
+  <circle cx="45" cy="255" r="16" fill="#3b6ea5"/>
+  <text x="45" y="260" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">D</text>
+  <text x="72" y="251" font-size="11" font-weight="600" fill="#2d2f33">The kitchen depends on "a produce supplier," not one</text>
+  <text x="72" y="265" font-size="11" fill="#6a7178">specific farm by name — swap the supplier, recipes don't change.</text>
+
+  <text x="350" y="300" text-anchor="middle" font-size="11" fill="#9aa2ad">Same five ideas, applied to code instead of a kitchen.</text>
+
+  <title>SOLID principles explained through five roles and habits in a well-run restaurant kitchen</title>
+</svg>
