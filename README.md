@@ -1,4 +1,4 @@
-# System Design Architectures — Complete Study Guide
+# System Design Architectures — Complete Study Guide /(https://1rn19cs003.github.io/System-Design/)
 
 A structured, folder-by-folder path for learning system design: principles, theory, diagrams, real-world examples, and where each concept is actually used in production.
 
@@ -106,6 +106,23 @@ Every pattern folder gets: `theory.md` (intent, problem it solves, trade-offs), 
 
 Every example anywhere in this guide — HLD architecture demos, LLD capstones, and every design pattern — ships with working, runnable code, not just diagrams or pseudocode, in **Java, Python, JavaScript, and C++**.
 
-## Status
+## Current Status & Progress
 
-This README defines the scope, the HLD/LLD split, the full design-patterns list, and the code policy. Individual topic folders and content (including code) will be added next, following the study paths above.
+The guide is actively being developed. Below is the current completion status:
+
+### 🌟 Creational Design Patterns (100% Completed & Hosted)
+All 5 creational design patterns are fully documented, including **theory, UML diagrams, real-world examples, interview questions, and working code** (in Java, Python, JavaScript, and C++). You can view them on the hosted site:
+
+- 🟢 [Singleton Pattern](https://1rn19cs003.github.io/System-Design/pages/lld/design-patterns/creational/singleton.html)
+- 🟢 [Factory Method Pattern](https://1rn19cs003.github.io/System-Design/pages/lld/design-patterns/creational/factory-method.html)
+- 🟢 [Abstract Factory Pattern](https://1rn19cs003.github.io/System-Design/pages/lld/design-patterns/creational/abstract-factory.html)
+- 🟢 [Builder Pattern](https://1rn19cs003.github.io/System-Design/pages/lld/design-patterns/creational/builder.html)
+- 🟢 [Prototype Pattern](https://1rn19cs003.github.io/System-Design/pages/lld/design-patterns/creational/prototype.html)
+
+---
+
+### ⏳ Upcoming Sections (In Progress / Planned)
+- **High-Level Design (HLD)** — Fundamentals, Load Balancing, Caching, Databases, Message Queues, Microservices, and Capstones (Soon)
+- **Low-Level Design (LLD)** — OOP Fundamentals, SOLID Principles, and LLD Capstones (Soon)
+- **Structural Design Patterns** — Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy (Soon)
+- **Behavioral Design Patterns** — Chain of Responsibility, Command, Interpreter, Iterator, Mediator, Memento, Observer, State, Strategy, Template Method, Visitor (Soon)
