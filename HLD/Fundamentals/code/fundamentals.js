@@ -1,11 +1,3 @@
-/**
- * HLD Fundamentals — a real TCP client-server pair measuring latency and throughput.
- * Run: node fundamentals.js
- *
- * This is not a simulation: an actual socket server and client talk over 127.0.0.1,
- * and every latency number printed is a real measured round-trip time.
- */
-
 const net = require("net");
 
 const HOST = "127.0.0.1";
@@ -36,7 +28,6 @@ server.listen(PORT, HOST, () => {
       latencies.push(latencyMs);
       requestIndex += 1;
       console.log(`Request ${requestIndex}: received '${data.toString()}' in ${latencyMs.toFixed(2)} ms`);
-
       if (requestIndex < NUM_REQUESTS) {
         sendNext();
       } else {
@@ -44,15 +35,12 @@ server.listen(PORT, HOST, () => {
         const totalSeconds = Number(overallEnd - overallStart) / 1e9;
         const avgLatency = latencies.reduce((a, b) => a + b, 0) / latencies.length;
         const throughput = NUM_REQUESTS / totalSeconds;
-
         console.log(`Average latency: ${avgLatency.toFixed(2)} ms`);
         console.log(`Throughput: ${throughput.toFixed(2)} requests/sec`);
-
         client.end();
         server.close();
       }
     });
-
     sendNext();
   });
 });

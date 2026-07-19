@@ -141,8 +141,7 @@
     <a class="back" href="../../index.html">← Back to guide</a>
     <h3>On this page</h3>
     <a class="toc" href="#overview">Overview</a>
-    <a class="toc" href="#theory">Theory</a>
-    <a class="toc" href="#diagram">Diagram</a>
+    <a class="toc" href="#theory">Theory &amp; Diagrams</a>
     <a class="toc" href="#trade-offs">Trade-offs</a>
     <a class="toc" href="#real-world">Real-World Examples</a>
     <a class="toc" href="#interview-questions">Interview Questions</a>
@@ -161,37 +160,44 @@
     <p>The client-server model, DNS, HTTP, and the difference between latency and throughput — the vocabulary every other HLD topic builds on.</p>
 
     <section id="theory">
-      <h2>Theory</h2>
+      <h2>Theory &amp; Diagrams</h2>
 
       <h3>The client-server model</h3>
-      <p>Almost everything in system design sits on top of one basic shape: a client sends a request, a server does some work and sends back a response. The client is usually the thing initiating contact (a browser, a mobile app, another service), and the server is the thing that owns some resource or capability the client wants. This is deliberately asymmetric — the server doesn't know a client exists until that client reaches out, and a single server can be reached by many different clients over time. Almost every "bigger" pattern in system design (load balancers, caches, databases, message queues) is really just refining or scaling this one basic request/response relationship.</p>
+      <p>A client sends a request, a server does the work and replies. The server never initiates contact — it waits to be reached, and many different clients can reach the same server over time. Almost every other HLD topic (load balancers, caches, databases, queues) is a refinement of this one relationship.</p>
 
-      <h3>How a client actually finds a server: DNS</h3>
-      <p>A client doesn't usually know a server's raw network address (its IP address) up front — it knows a human-readable name, like <code>api.example.com</code>. DNS (Domain Name System) is the system that translates that name into an IP address. When a client wants to talk to <code>api.example.com</code>, it first asks a DNS resolver "what's the IP for this name?", gets back something like <code>93.184.216.34</code>, and only then opens an actual network connection to that IP. This lookup is usually cached for a while (controlled by a TTL — time to live) so the same translation doesn't have to be repeated for every single request.</p>
+      <h3>How a client finds a server: DNS</h3>
+      <p>A client knows a name (<code>api.example.com</code>), not an IP. DNS translates the name into an address before any connection opens. That translation is cached for a while (a TTL controls how long) so it isn't repeated on every request.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-fundamentals/dns-resolution.svg" alt="Client asks a DNS Resolver for the IP behind api.example.com, gets back 93.184.216.34, then connects directly to the Server at that IP">
+        <figcaption>Name resolved once, then a direct connection to the resulting IP</figcaption>
+      </figure>
 
       <div class="two-col">
         <div class="callout good">
           <div class="callout-title">✓ Good practice</div>
-          <p>Set a DNS TTL that matches how often the underlying IP is actually expected to change — don't leave it at a default value without thinking about failover speed.</p>
+          <p>Set the TTL to match how often the IP actually changes — a factor in failover speed.</p>
         </div>
         <div class="callout bad">
           <div class="callout-title">✕ Common mistake</div>
-          <p>Assuming DNS changes take effect immediately everywhere — cached entries at resolvers and clients can keep serving the old IP until their TTL expires.</p>
+          <p>Assuming a DNS change is instant everywhere — cached entries keep serving the old IP until their TTL expires.</p>
         </div>
       </div>
 
-      <h3>What HTTP actually is</h3>
-      <p>Once a client has an IP address, it needs an agreed-upon format for the request and response — that's HTTP. HTTP is a request/response protocol: a request has a method (GET, POST, PUT, DELETE...), a path, headers, and optionally a body; a response has a status code (200, 404, 500...), headers, and optionally a body. Underneath HTTP sits TCP, which handles the actual reliable delivery of bytes over the network — HTTP doesn't have to worry about packet loss because TCP already solved that problem one layer down.</p>
+      <h3>HTTP over TCP</h3>
+      <p>HTTP defines the request/response shape (method, path, headers, body → status code, headers, body). TCP, underneath it, guarantees the bytes arrive in order — HTTP never has to think about retransmission.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-fundamentals/request-response.svg" alt="Sequence diagram: Client and Server lifelines showing TCP handshake, optional TLS handshake, HTTP request, then HTTP response">
+        <figcaption>Every step here adds to one request's total latency</figcaption>
+      </figure>
 
       <h3>Latency vs. throughput</h3>
-      <p>These two numbers get conflated constantly, but they measure genuinely different things. Latency is how long a single request takes, from the moment it's sent to the moment the response arrives — measured in milliseconds. Throughput is how many requests a system can handle per unit of time — measured in requests per second. A system can have low latency but low throughput (a single fast worker handling one request at a time) or high latency but high throughput (many slow workers running in parallel, so lots of total work gets done even though each individual request takes a while). Most real system-design trade-offs eventually come down to which of the two actually matters more for the use case at hand.</p>
-    </section>
+      <p>Latency: how long one request takes. Throughput: how many requests get done per second. A system can be fast-per-request but low-volume, or slower-per-request but far higher volume overall.</p>
 
-    <section id="diagram">
-      <h2>Diagram</h2>
       <figure>
-        <img class="diagram-img" src="../../assets/hld-fundamentals/system-diagram.svg" alt="System diagram showing a Client resolving a hostname via a DNS Resolver, then opening a TCP connection and exchanging an HTTP request/response with a Server, with a callout showing where latency accumulates">
-        <figcaption>A system diagram — boxes are components across a network, not classes inside one process</figcaption>
+        <img class="diagram-img" src="../../assets/hld-fundamentals/latency-vs-throughput.svg" alt="Comparison: a low-latency setup with one client and one worker handling one request at a time, versus a high-throughput setup with one client fanning out to three parallel workers">
+        <figcaption>Same client, two different things to optimize for</figcaption>
       </figure>
     </section>
 
@@ -213,7 +219,7 @@
           </ul>
         </div>
       </div>
-      <p style="margin-top:16px;"><strong>What interviewers are actually listening for:</strong> being able to state, concretely, what latency and throughput actually measure — not just "one is speed, one is volume" — and give an example of a system tuned for one at the expense of the other. Also, understanding that a request's full latency budget includes DNS lookup + TCP handshake + TLS handshake (if HTTPS) + the actual request/response, not just server processing time.</p>
+      <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> a concrete definition of both terms, an example of a system tuned for one at the expense of the other, and knowing that a request's latency budget includes DNS + TCP handshake + TLS handshake (if HTTPS) + the request/response itself, not just server processing time.</p>
     </section>
 
     <section id="real-world">
@@ -306,14 +312,7 @@
 <script>
   const snippets = {
     java: {
-      code: `// HLD Fundamentals — a real TCP client-server pair measuring latency and throughput.
-// Compile: javac Fundamentals.java
-// Run:     java Fundamentals
-//
-// This is not a simulation: an actual socket server and client talk over 127.0.0.1,
-// and every latency number printed is a real measured round-trip time.
-
-import java.io.*;
+      code: `import java.io.*;
 import java.net.*;
 import java.util.*;
 
@@ -327,7 +326,6 @@ public class Fundamentals {
             Socket clientSocket = serverSocket.accept();
             InputStream in = clientSocket.getInputStream();
             OutputStream out = clientSocket.getOutputStream();
-
             byte[] buffer = new byte[1024];
             for (int i = 0; i < NUM_REQUESTS; i++) {
                 int read = in.read(buffer);
@@ -342,37 +340,29 @@ public class Fundamentals {
     }
 
     static void runClient() throws IOException, InterruptedException {
-        Thread.sleep(300); // let the server start listening first
-
+        Thread.sleep(300);
         Socket socket = new Socket(HOST, PORT);
         InputStream in = socket.getInputStream();
         OutputStream out = socket.getOutputStream();
-
         List<Double> latencies = new ArrayList<>();
         long overallStart = System.nanoTime();
-
         for (int i = 0; i < NUM_REQUESTS; i++) {
             long requestStart = System.nanoTime();
             out.write("ping".getBytes());
             out.flush();
-
             byte[] buffer = new byte[1024];
             int read = in.read(buffer);
             long requestEnd = System.nanoTime();
-
             double latencyMs = (requestEnd - requestStart) / 1_000_000.0;
             latencies.add(latencyMs);
             String response = new String(buffer, 0, read);
             System.out.printf("Request %d: received '%s' in %.2f ms%n", i + 1, response, latencyMs);
         }
-
         long overallEnd = System.nanoTime();
         socket.close();
-
         double totalSeconds = (overallEnd - overallStart) / 1_000_000_000.0;
         double avgLatency = latencies.stream().mapToDouble(Double::doubleValue).average().orElse(0);
         double throughput = NUM_REQUESTS / totalSeconds;
-
         System.out.printf("Average latency: %.2f ms%n", avgLatency);
         System.out.printf("Throughput: %.2f requests/sec%n", throughput);
     }
@@ -395,15 +385,7 @@ Throughput: 1096.15 requests/sec
 (Representative sample — Java was not executed in this sandbox; see note below.)`
     },
     python: {
-      code: `"""
-HLD Fundamentals — a real TCP client-server pair measuring latency and throughput.
-Run: python fundamentals.py
-
-This is not a simulation: an actual socket server and client talk over 127.0.0.1,
-and every latency number printed is a real measured round-trip time.
-"""
-
-import socket
+      code: `import socket
 import threading
 import time
 
@@ -411,13 +393,11 @@ HOST = "127.0.0.1"
 PORT = 8901
 NUM_REQUESTS = 5
 
-
 def run_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((HOST, PORT))
     server_socket.listen(1)
-
     conn, _ = server_socket.accept()
     for _ in range(NUM_REQUESTS):
         data = conn.recv(1024)
@@ -427,59 +407,43 @@ def run_server():
     conn.close()
     server_socket.close()
 
-
 def run_client():
-    time.sleep(0.3)  # let the server start listening first
+    time.sleep(0.3)
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((HOST, PORT))
-
     latencies = []
     overall_start = time.perf_counter()
-
     for i in range(NUM_REQUESTS):
         request_start = time.perf_counter()
         client_socket.sendall(b"ping")
         response = client_socket.recv(1024)
         request_end = time.perf_counter()
-
         latency_ms = (request_end - request_start) * 1000
         latencies.append(latency_ms)
         print(f"Request {i + 1}: received '{response.decode()}' in {latency_ms:.2f} ms")
-
     overall_end = time.perf_counter()
     client_socket.close()
-
     total_seconds = overall_end - overall_start
     avg_latency = sum(latencies) / len(latencies)
     throughput = NUM_REQUESTS / total_seconds
-
     print(f"Average latency: {avg_latency:.2f} ms")
     print(f"Throughput: {throughput:.2f} requests/sec")
-
 
 if __name__ == "__main__":
     server_thread = threading.Thread(target=run_server)
     server_thread.start()
     run_client()
     server_thread.join()`,
-      output: `Request 1: received 'pong' in 0.45 ms
-Request 2: received 'pong' in 0.20 ms
-Request 3: received 'pong' in 0.13 ms
-Request 4: received 'pong' in 0.18 ms
-Request 5: received 'pong' in 0.20 ms
-Average latency: 0.23 ms
-Throughput: 1219.69 requests/sec`
+      output: `Request 1: received 'pong' in 0.30 ms
+Request 2: received 'pong' in 0.16 ms
+Request 3: received 'pong' in 0.15 ms
+Request 4: received 'pong' in 0.14 ms
+Request 5: received 'pong' in 0.14 ms
+Average latency: 0.30 ms
+Throughput: 3087.75 requests/sec`
     },
     javascript: {
-      code: `/**
- * HLD Fundamentals — a real TCP client-server pair measuring latency and throughput.
- * Run: node fundamentals.js
- *
- * This is not a simulation: an actual socket server and client talk over 127.0.0.1,
- * and every latency number printed is a real measured round-trip time.
- */
-
-const net = require("net");
+      code: `const net = require("net");
 
 const HOST = "127.0.0.1";
 const PORT = 8902;
@@ -509,7 +473,6 @@ server.listen(PORT, HOST, () => {
       latencies.push(latencyMs);
       requestIndex += 1;
       console.log(\`Request \${requestIndex}: received '\${data.toString()}' in \${latencyMs.toFixed(2)} ms\`);
-
       if (requestIndex < NUM_REQUESTS) {
         sendNext();
       } else {
@@ -517,35 +480,25 @@ server.listen(PORT, HOST, () => {
         const totalSeconds = Number(overallEnd - overallStart) / 1e9;
         const avgLatency = latencies.reduce((a, b) => a + b, 0) / latencies.length;
         const throughput = NUM_REQUESTS / totalSeconds;
-
         console.log(\`Average latency: \${avgLatency.toFixed(2)} ms\`);
         console.log(\`Throughput: \${throughput.toFixed(2)} requests/sec\`);
-
         client.end();
         server.close();
       }
     });
-
     sendNext();
   });
 });`,
-      output: `Request 1: received 'pong' in 1.81 ms
-Request 2: received 'pong' in 0.51 ms
-Request 3: received 'pong' in 0.32 ms
-Request 4: received 'pong' in 0.30 ms
-Request 5: received 'pong' in 0.28 ms
-Average latency: 0.64 ms
-Throughput: 919.03 requests/sec`
+      output: `Request 1: received 'pong' in 6.95 ms
+Request 2: received 'pong' in 0.42 ms
+Request 3: received 'pong' in 0.38 ms
+Request 4: received 'pong' in 0.35 ms
+Request 5: received 'pong' in 0.30 ms
+Average latency: 2.06 ms
+Throughput: 359.33 requests/sec`
     },
     cpp: {
-      code: `// HLD Fundamentals — a real TCP client-server pair measuring latency and throughput.
-// Compile: g++ -std=c++14 -pthread Fundamentals.cpp -o fundamentals
-// Run:     ./fundamentals
-//
-// This is not a simulation: an actual socket server and client talk over 127.0.0.1,
-// and every latency number printed is a real measured round-trip time.
-
-#include <iostream>
+      code: `#include <iostream>
 #include <thread>
 #include <chrono>
 #include <vector>
@@ -564,14 +517,12 @@ void runServer() {
     int serverFd = socket(AF_INET, SOCK_STREAM, 0);
     int opt = 1;
     setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
     sockaddr_in addr{};
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(PORT);
     bind(serverFd, (sockaddr*)&addr, sizeof(addr));
     listen(serverFd, 1);
-
     int clientFd = accept(serverFd, nullptr, nullptr);
     char buffer[1024];
     for (int i = 0; i < NUM_REQUESTS; i++) {
@@ -585,38 +536,29 @@ void runServer() {
 
 void runClient() {
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     sockaddr_in servAddr{};
     servAddr.sin_family = AF_INET;
     servAddr.sin_port = htons(PORT);
     inet_pton(AF_INET, HOST, &servAddr.sin_addr);
     connect(sock, (sockaddr*)&servAddr, sizeof(servAddr));
-
     std::vector<double> latencies;
     auto overallStart = std::chrono::steady_clock::now();
-
     for (int i = 0; i < NUM_REQUESTS; i++) {
         auto requestStart = std::chrono::steady_clock::now();
         send(sock, "ping", 4, 0);
-
         char buffer[1024] = {0};
         read(sock, buffer, sizeof(buffer));
         auto requestEnd = std::chrono::steady_clock::now();
-
         double latencyMs = std::chrono::duration<double, std::milli>(requestEnd - requestStart).count();
         latencies.push_back(latencyMs);
-        std::cout << "Request " << (i + 1) << ": received '" << buffer << "' in "
-                   << latencyMs << " ms" << std::endl;
+        std::cout << "Request " << (i + 1) << ": received '" << buffer << "' in " << latencyMs << " ms" << std::endl;
     }
-
     auto overallEnd = std::chrono::steady_clock::now();
     close(sock);
-
     double totalSeconds = std::chrono::duration<double>(overallEnd - overallStart).count();
     double avgLatency = std::accumulate(latencies.begin(), latencies.end(), 0.0) / latencies.size();
     double throughput = NUM_REQUESTS / totalSeconds;
-
     std::cout << "Average latency: " << avgLatency << " ms" << std::endl;
     std::cout << "Throughput: " << throughput << " requests/sec" << std::endl;
 }
@@ -627,13 +569,13 @@ int main() {
     serverThread.join();
     return 0;
 }`,
-      output: `Request 1: received 'pong' in 0.2908 ms
-Request 2: received 'pong' in 0.0577 ms
-Request 3: received 'pong' in 0.0311 ms
-Request 4: received 'pong' in 0.024 ms
-Request 5: received 'pong' in 0.0783 ms
-Average latency: 0.09638 ms
-Throughput: 7411.8 requests/sec`
+      output: `Request 1: received 'pong' in 0.3705 ms
+Request 2: received 'pong' in 0.0524 ms
+Request 3: received 'pong' in 0.0298 ms
+Request 4: received 'pong' in 0.0261 ms
+Request 5: received 'pong' in 0.0281 ms
+Average latency: 0.21536 ms
+Throughput: 2853.07 requests/sec`
     }
   };
 
