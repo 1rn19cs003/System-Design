@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Command Pattern — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+    --code-bg: #f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 820px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  main.content h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  main.content h3 { font-size: 16px; margin: 28px 0 8px; color: var(--accent); }
+  main.content h3:first-of-type { margin-top: 16px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
+  code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  ul { padding-left: 20px; }
+  img.diagram-img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; padding: 8px; }
+  figure { margin: 0 0 16px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .terminal { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #1e2228; }
+  .terminal-tabs { display: flex; align-items: center; justify-content: space-between; background: #14171c; border-bottom: 1px solid #2b3038; }
+  .terminal-tabs-group { display: flex; }
+  .copy-btn { background: transparent; border: none; color: #9aa2ad; font-size: 12px; cursor: pointer; padding: 6px 14px; white-space: nowrap; }
+  .copy-btn:hover { color: #fff; }
+  .copy-btn.copied { color: #8fd19e; }
+  .terminal-tab {
+    padding: 10px 18px; font-size: 13px; color: #9aa2ad; background: transparent;
+    border: none; cursor: pointer; border-right: 1px solid #2b3038;
+  }
+  .terminal-tab:hover { color: #e6e9ed; }
+  .terminal-tab.active { color: #fff; background: #1e2228; border-top: 2px solid var(--accent); }
+  .terminal-body { padding: 16px 18px; }
+  .terminal-body pre { background: transparent; border: none; padding: 0; margin: 0 0 12px; color: #d7dbe0; }
+  .terminal-output-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6a7178; margin: 12px 0 6px; }
+  .terminal-output { background: #14171c; border-radius: 6px; padding: 12px 14px; color: #8fd19e; font-size: 13px; white-space: pre-wrap; }
+
+  .callout { border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 14.5px; }
+  .callout-title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .callout.good { background: #eef8f0; border: 1px solid #bfe3c6; }
+  .callout.good .callout-title { color: #2f8f4e; }
+  .callout.bad { background: #fdedec; border: 1px solid #f3bcb8; }
+  .callout.bad .callout-title { color: #c0392b; }
+  .callout ul { margin: 4px 0 0; padding-left: 18px; }
+  .callout p { margin: 4px 0 0; }
+  .two-col { display: flex; gap: 16px; flex-wrap: wrap; }
+  .two-col .callout { flex: 1; min-width: 260px; margin: 0; }
+
+  .qa { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .qa summary { padding: 12px 16px; cursor: pointer; font-weight: 600; background: var(--sidebar-bg); list-style: none; }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary::before { content: "▸"; display: inline-block; margin-right: 8px; color: var(--accent); transition: transform 0.15s ease; }
+  .qa[open] summary::before { transform: rotate(90deg); }
+  .qa .qa-answer { padding: 4px 16px 16px; font-size: 14.5px; }
+  .qa .qa-answer p { margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="../../../../index.html">← Back to guide</a>
+    <h3>On this page</h3>
+    <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#theory">Theory</a>
+    <a class="toc" href="#diagram">Diagram</a>
+    <a class="toc" href="#when-to-use">When to Use</a>
+    <a class="toc" href="#real-world">Real-World Examples</a>
+    <a class="toc" href="#interview-questions">Interview Questions</a>
+    <a class="toc" href="#code">Code &amp; Output</a>
+  </nav>
+
+  <main class="content">
+    <nav class="breadcrumbs">
+      <a href="../../../../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../../../../index.html#lld">LLD</a>
+      <span class="sep">/</span>
+      <a href="../../../../index.html#design-patterns-behavioral">Design Patterns — Behavioral</a>
+      <span class="sep">/</span>
+      <span class="current">Command</span>
+    </nav>
+    <h1 id="overview">Command Pattern</h1>
+    <p>Wraps a request as an object with an <code>execute()</code> method, so requests can be stored, queued, logged, passed around, or undone instead of vanishing as one-shot method calls.</p>
+
+    <section id="theory">
+      <h2>Theory</h2>
+
+      <h3>The problem, in plain terms</h3>
+      <p>You're building a universal remote control with buttons that can be reprogrammed to trigger different actions — one button turns a light on, another closes the garage door, another triggers a whole "movie night" macro. The remote itself shouldn't need to know anything about lights or garage doors; it just needs to know "when this button is pressed, run whatever action was assigned to it." You also want undo — pressing an "undo" button should reverse whatever the last action did, again without the remote needing to know the specifics of what it's undoing.</p>
+      <p>Command wraps a request — "turn the light on" — as an object with a single <code>execute()</code> method (and often <code>undo()</code>). The remote (the <code>Invoker</code>) just holds a <code>Command</code> reference per button and calls <code>execute()</code> on it; it never touches the light directly. Because the request is now an object, it can be stored, queued, logged, passed around, or reversed, instead of being a one-shot method call that vanishes the moment it runs.</p>
+
+      <h3>How it's built</h3>
+      <p>A <code>Command</code> interface declares <code>execute()</code> (and optionally <code>undo()</code>). Concrete Commands (<code>LightOnCommand</code>, <code>LightOffCommand</code>) each hold a reference to a <code>Receiver</code> (the <code>Light</code> object that actually does the work) and, in <code>execute()</code>, call the appropriate method on it. The <code>Invoker</code> (the <code>RemoteControl</code>) holds Command references and calls <code>execute()</code> without knowing which concrete command or receiver is involved. For undo, the Invoker can keep a history stack of executed Commands and call <code>undo()</code> on the most recent one.</p>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ Good practice</div>
+          <p>Keep the Invoker completely ignorant of Receiver types — it should only ever call <code>execute()</code>/<code>undo()</code> on the Command interface, never reach through to the Receiver directly.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ Common mistake</div>
+          <p>Adding undo as an afterthought without giving each Command enough state to actually reverse its own effect — leading to an undo that doesn't restore the exact prior state.</p>
+        </div>
+      </div>
+
+      <h3>Where it bites you</h3>
+      <p>Adding undo support properly usually means each Command needs enough state to reverse its own effect — sometimes that's trivial (turn the light back off), sometimes it means capturing a snapshot of prior state, which pushes Command uncomfortably close to needing a Memento alongside it for anything non-trivial. Also, if every single button/action in your system gets its own Command class, you can end up with a proliferation of very small, similar-looking classes — reasonable in languages that support first-class functions, where a lambda can often stand in for a whole Command class without the extra ceremony.</p>
+    </section>
+
+    <section id="diagram">
+      <h2>Diagram</h2>
+      <figure>
+        <img class="diagram-img" src="../../../../assets/command/class-diagram.svg" alt="Command pattern class diagram showing RemoteControl Invoker holding RemoteCommand references implemented by LightOnCommand and LightOffCommand, each delegating to a Light Receiver">
+        <figcaption>RemoteControl calls execute()/undo() on whichever RemoteCommand is assigned, without knowing the Light directly</figcaption>
+      </figure>
+    </section>
+
+    <section id="when-to-use">
+      <h2>When to Use</h2>
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ Reach for it when</div>
+          <ul>
+            <li>You need to decouple the thing that triggers an action (a button, a menu item, an API call) from the thing that performs it.</li>
+            <li>You need undo/redo, queuing, logging, or scheduling of requests — turning a request into an object is what makes all of these possible.</li>
+            <li>You want to support macro commands — bundling several commands together and executing them as one.</li>
+          </ul>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ Don't reach for it when</div>
+          <ul>
+            <li>The trigger and the action are permanently one-to-one and you'll never need to queue, log, undo, or reassign the action — a direct method call is simpler.</li>
+            <li>Undo isn't needed and the "requests as objects" flexibility has no use case in your system — the extra indirection buys you nothing.</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:16px;"><strong>What interviewers are actually listening for:</strong> connecting Command to real infrastructure uses — job queues, task schedulers, and transactional systems where a request needs to be represented as data (so it can be retried, persisted, or logged) rather than executed immediately as a direct call. Also, being able to explain concretely how undo works — that it requires each Command to carry (or reconstruct) enough state to reverse its own effect, not just an abstract "it supports undo."</p>
+    </section>
+
+    <section id="real-world">
+      <h2>Real-World Examples</h2>
+      <ul>
+        <li><strong>GUI undo/redo stacks</strong> — text editors and image editors represent every edit as a command object so it can be undone or redone.</li>
+        <li><strong>Job/task queues</strong> (Sidekiq, Celery, Hangfire) — a unit of work is serialized as a command/message, queued, and executed later, possibly by a different process.</li>
+        <li><strong>Remote controls and home automation</strong> — each button or voice command maps to a Command object executed against the relevant device (light, thermostat, lock).</li>
+        <li><strong>Transactional database operations</strong> — a sequence of operations packaged as commands that can be executed together and rolled back as a unit on failure.</li>
+        <li><strong>Menu items and toolbar buttons in IDEs</strong> — each maps to a Command object rather than the UI code calling application logic directly.</li>
+      </ul>
+    </section>
+
+    <section id="interview-questions">
+      <h2>Interview Questions</h2>
+      <p>Click a question to reveal the answer.</p>
+
+      <details class="qa">
+        <summary>What are the core participants in Command, and what does each do?</summary>
+        <div class="qa-answer">
+          <p>Command declares <code>execute()</code> (and often <code>undo()</code>). ConcreteCommand implements it and holds a reference to a Receiver, delegating the actual work to it. Receiver is the object that knows how to perform the operation. Invoker holds a Command reference and triggers <code>execute()</code> without knowing the concrete command or receiver involved.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>How does Command enable undo?</summary>
+        <div class="qa-answer">
+          <p>Because a request is represented as an object rather than a one-shot method call, that object can also carry an <code>undo()</code> method and whatever state it needs to reverse its own effect. The Invoker keeps a history stack of executed commands, and undo simply calls <code>undo()</code> on the most recently executed one.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Why would you use Command instead of just calling the Receiver's method directly?</summary>
+        <div class="qa-answer">
+          <p>Because the Invoker (button, menu item, scheduler) shouldn't need to know which Receiver or which specific operation is behind it — that binding can change at runtime, be queued, logged, retried, or reversed. A direct method call can't be stored, replayed, or undone; a Command object can.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>How does Command relate to job queues in backend systems?</summary>
+        <div class="qa-answer">
+          <p>A job/task in a queue is essentially a Command — a serialized representation of "do this operation with this data" that gets executed later, possibly by a completely different process than the one that created it. The queue is the Invoker (deciding when to trigger execution), and the worker executing the job is effectively calling <code>execute()</code> on it.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="code">
+      <h2>Code &amp; Output</h2>
+      <p>Same pattern, four languages. Every output shown here was captured from a real run — note undo restores the light to its state before the most recent button press, in reverse order.</p>
+
+      <div class="terminal">
+        <div class="terminal-tabs">
+          <div class="terminal-tabs-group">
+            <button class="terminal-tab active" data-lang="java">Java</button>
+            <button class="terminal-tab" data-lang="python">Python</button>
+            <button class="terminal-tab" data-lang="javascript">JavaScript</button>
+            <button class="terminal-tab" data-lang="cpp">C++</button>
+          </div>
+          <button class="copy-btn" id="copy-btn">Copy</button>
+        </div>
+        <div class="terminal-body">
+          <pre><code id="terminal-code"></code></pre>
+          <div class="terminal-output-label">Output</div>
+          <div class="terminal-output" id="terminal-output"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const snippets = {
+    java: {
+      code: `// Command Pattern — a RemoteControl (Invoker) triggers Commands against a Light (Receiver), with undo support.
+// Compile: javac Command.java
+// Run:     java Command
+
+import java.util.Stack;
+
+// Receiver — knows how to actually perform the operations.
+class Light {
+    private boolean on = false;
+
+    void turnOn() {
+        on = true;
+        System.out.println("Light is ON");
+    }
+
+    void turnOff() {
+        on = false;
+        System.out.println("Light is OFF");
+    }
+}
+
+interface RemoteCommand {
+    void execute();
+    void undo();
+}
+
+class LightOnCommand implements RemoteCommand {
+    private Light light;
+
+    LightOnCommand(Light light) {
+        this.light = light;
+    }
+
+    public void execute() {
+        light.turnOn();
+    }
+
+    public void undo() {
+        light.turnOff();
+    }
+}
+
+class LightOffCommand implements RemoteCommand {
+    private Light light;
+
+    LightOffCommand(Light light) {
+        this.light = light;
+    }
+
+    public void execute() {
+        light.turnOff();
+    }
+
+    public void undo() {
+        light.turnOn();
+    }
+}
+
+// Invoker — triggers commands and keeps a history for undo.
+class RemoteControl {
+    private Stack<RemoteCommand> history = new Stack<>();
+
+    void pressButton(RemoteCommand command) {
+        command.execute();
+        history.push(command);
+    }
+
+    void pressUndo() {
+        if (history.isEmpty()) {
+            System.out.println("Nothing to undo.");
+            return;
+        }
+        RemoteCommand last = history.pop();
+        last.undo();
+    }
+}
+
+public class Command {
+    public static void main(String[] args) {
+        Light light = new Light();
+        RemoteControl remote = new RemoteControl();
+
+        RemoteCommand onCommand = new LightOnCommand(light);
+        RemoteCommand offCommand = new LightOffCommand(light);
+
+        System.out.println("Press ON button:");
+        remote.pressButton(onCommand);
+
+        System.out.println("Press OFF button:");
+        remote.pressButton(offCommand);
+
+        System.out.println("Press UNDO button:");
+        remote.pressUndo();
+
+        System.out.println("Press UNDO button again:");
+        remote.pressUndo();
+
+        System.out.println("Press UNDO button once more (nothing left):");
+        remote.pressUndo();
+    }
+}`,
+      output: `Press ON button:
+Light is ON
+Press OFF button:
+Light is OFF
+Press UNDO button:
+Light is ON
+Press UNDO button again:
+Light is OFF
+Press UNDO button once more (nothing left):
+Nothing to undo.`
+    },
+    python: {
+      code: `"""
+Command Pattern — a RemoteControl (Invoker) triggers Commands against a Light (Receiver), with undo support.
+Run: python command.py
+"""
+
+from abc import ABC, abstractmethod
+
+
+class Light:
+    """Receiver — knows how to actually perform the operations."""
+
+    def __init__(self):
+        self.on = False
+
+    def turn_on(self):
+        self.on = True
+        print("Light is ON")
+
+    def turn_off(self):
+        self.on = False
+        print("Light is OFF")
+
+
+class RemoteCommand(ABC):
+    @abstractmethod
+    def execute(self):
+        ...
+
+    @abstractmethod
+    def undo(self):
+        ...
+
+
+class LightOnCommand(RemoteCommand):
+    def __init__(self, light: Light):
+        self.light = light
+
+    def execute(self):
+        self.light.turn_on()
+
+    def undo(self):
+        self.light.turn_off()
+
+
+class LightOffCommand(RemoteCommand):
+    def __init__(self, light: Light):
+        self.light = light
+
+    def execute(self):
+        self.light.turn_off()
+
+    def undo(self):
+        self.light.turn_on()
+
+
+class RemoteControl:
+    """Invoker — triggers commands and keeps a history for undo."""
+
+    def __init__(self):
+        self.history = []
+
+    def press_button(self, command: RemoteCommand):
+        command.execute()
+        self.history.append(command)
+
+    def press_undo(self):
+        if not self.history:
+            print("Nothing to undo.")
+            return
+        last = self.history.pop()
+        last.undo()
+
+
+if __name__ == "__main__":
+    light = Light()
+    remote = RemoteControl()
+
+    on_command = LightOnCommand(light)
+    off_command = LightOffCommand(light)
+
+    print("Press ON button:")
+    remote.press_button(on_command)
+
+    print("Press OFF button:")
+    remote.press_button(off_command)
+
+    print("Press UNDO button:")
+    remote.press_undo()
+
+    print("Press UNDO button again:")
+    remote.press_undo()
+
+    print("Press UNDO button once more (nothing left):")
+    remote.press_undo()`,
+      output: `Press ON button:
+Light is ON
+Press OFF button:
+Light is OFF
+Press UNDO button:
+Light is ON
+Press UNDO button again:
+Light is OFF
+Press UNDO button once more (nothing left):
+Nothing to undo.`
+    },
+    javascript: {
+      code: `/**
+ * Command Pattern — a RemoteControl (Invoker) triggers Commands against a Light (Receiver), with undo support.
+ * Run: node command.js
+ */
+
+class Light {
+  constructor() {
+    this.on = false;
+  }
+
+  turnOn() {
+    this.on = true;
+    console.log("Light is ON");
+  }
+
+  turnOff() {
+    this.on = false;
+    console.log("Light is OFF");
+  }
+}
+
+class LightOnCommand {
+  constructor(light) {
+    this.light = light;
+  }
+
+  execute() {
+    this.light.turnOn();
+  }
+
+  undo() {
+    this.light.turnOff();
+  }
+}
+
+class LightOffCommand {
+  constructor(light) {
+    this.light = light;
+  }
+
+  execute() {
+    this.light.turnOff();
+  }
+
+  undo() {
+    this.light.turnOn();
+  }
+}
+
+class RemoteControl {
+  constructor() {
+    this.history = [];
+  }
+
+  pressButton(command) {
+    command.execute();
+    this.history.push(command);
+  }
+
+  pressUndo() {
+    if (this.history.length === 0) {
+      console.log("Nothing to undo.");
+      return;
+    }
+    const last = this.history.pop();
+    last.undo();
+  }
+}
+
+const light = new Light();
+const remote = new RemoteControl();
+
+const onCommand = new LightOnCommand(light);
+const offCommand = new LightOffCommand(light);
+
+console.log("Press ON button:");
+remote.pressButton(onCommand);
+
+console.log("Press OFF button:");
+remote.pressButton(offCommand);
+
+console.log("Press UNDO button:");
+remote.pressUndo();
+
+console.log("Press UNDO button again:");
+remote.pressUndo();
+
+console.log("Press UNDO button once more (nothing left):");
+remote.pressUndo();
+
+module.exports = { Light, LightOnCommand, LightOffCommand, RemoteControl };`,
+      output: `Press ON button:
+Light is ON
+Press OFF button:
+Light is OFF
+Press UNDO button:
+Light is ON
+Press UNDO button again:
+Light is OFF
+Press UNDO button once more (nothing left):
+Nothing to undo.`
+    },
+    cpp: {
+      code: `// Command Pattern — a RemoteControl (Invoker) triggers Commands against a Light (Receiver), with undo support.
+// Compile: g++ -std=c++14 Command.cpp -o command
+// Run:     ./command
+
+#include <iostream>
+#include <vector>
+#include <memory>
+
+// Receiver — knows how to actually perform the operations.
+class Light {
+public:
+    void turnOn() {
+        on_ = true;
+        std::cout << "Light is ON" << std::endl;
+    }
+
+    void turnOff() {
+        on_ = false;
+        std::cout << "Light is OFF" << std::endl;
+    }
+
+private:
+    bool on_ = false;
+};
+
+class RemoteCommand {
+public:
+    virtual void execute() = 0;
+    virtual void undo() = 0;
+    virtual ~RemoteCommand() = default;
+};
+
+class LightOnCommand : public RemoteCommand {
+public:
+    explicit LightOnCommand(Light& light) : light_(light) {}
+
+    void execute() override { light_.turnOn(); }
+    void undo() override { light_.turnOff(); }
+
+private:
+    Light& light_;
+};
+
+class LightOffCommand : public RemoteCommand {
+public:
+    explicit LightOffCommand(Light& light) : light_(light) {}
+
+    void execute() override { light_.turnOff(); }
+    void undo() override { light_.turnOn(); }
+
+private:
+    Light& light_;
+};
+
+// Invoker — triggers commands and keeps a history for undo.
+class RemoteControl {
+public:
+    void pressButton(RemoteCommand* command) {
+        command->execute();
+        history_.push_back(command);
+    }
+
+    void pressUndo() {
+        if (history_.empty()) {
+            std::cout << "Nothing to undo." << std::endl;
+            return;
+        }
+        RemoteCommand* last = history_.back();
+        history_.pop_back();
+        last->undo();
+    }
+
+private:
+    std::vector<RemoteCommand*> history_;
+};
+
+int main() {
+    Light light;
+    RemoteControl remote;
+
+    LightOnCommand onCommand(light);
+    LightOffCommand offCommand(light);
+
+    std::cout << "Press ON button:" << std::endl;
+    remote.pressButton(&onCommand);
+
+    std::cout << "Press OFF button:" << std::endl;
+    remote.pressButton(&offCommand);
+
+    std::cout << "Press UNDO button:" << std::endl;
+    remote.pressUndo();
+
+    std::cout << "Press UNDO button again:" << std::endl;
+    remote.pressUndo();
+
+    std::cout << "Press UNDO button once more (nothing left):" << std::endl;
+    remote.pressUndo();
+
+    return 0;
+}`,
+      output: `Press ON button:
+Light is ON
+Press OFF button:
+Light is OFF
+Press UNDO button:
+Light is ON
+Press UNDO button again:
+Light is OFF
+Press UNDO button once more (nothing left):
+Nothing to undo.`
+    }
+  };
+
+  const tabs = document.querySelectorAll('.terminal-tab');
+  const codeEl = document.getElementById('terminal-code');
+  const outputEl = document.getElementById('terminal-output');
+  const copyBtn = document.getElementById('copy-btn');
+
+  function renderLang(lang) {
+    codeEl.textContent = snippets[lang].code;
+    outputEl.textContent = snippets[lang].output;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.lang === lang));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => renderLang(tab.dataset.lang));
+  });
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+  }
+
+  function showCopied() {
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = 'Copy';
+      copyBtn.classList.remove('copied');
+    }, 1500);
+  }
+
+  copyBtn.addEventListener('click', () => {
+    const text = codeEl.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+        fallbackCopy(text);
+        showCopied();
+      });
+    } else {
+      fallbackCopy(text);
+      showCopied();
+    }
+  });
+
+  renderLang('java');
+</script>
+
+<script>
+  const sections = document.querySelectorAll('main section, main h1');
+  const links = document.querySelectorAll('nav.sidebar a.toc');
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 100) currentId = sec.id;
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+    });
+  });
+</script>
+
+</body>
+</html>
