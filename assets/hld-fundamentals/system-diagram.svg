@@ -1,0 +1,43 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <!-- Client -->
+  <rect x="20" y="130" width="130" height="70" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="85" y="170" text-anchor="middle" font-size="14" font-weight="600" fill="#2d2f33">Client</text>
+
+  <!-- DNS Resolver -->
+  <rect x="270" y="30" width="160" height="70" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="350" y="60" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">DNS Resolver</text>
+  <text x="350" y="80" text-anchor="middle" font-size="11" fill="#6a7178">name → IP</text>
+
+  <!-- Server -->
+  <rect x="550" y="130" width="130" height="70" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="615" y="170" text-anchor="middle" font-size="14" font-weight="600" fill="#2d2f33">Server</text>
+
+  <!-- Client -> DNS -->
+  <line x1="150" y1="150" x2="270" y2="80" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <text x="190" y="105" font-size="11" fill="#6a7178">1. "api.example.com"?</text>
+
+  <!-- DNS -> Client -->
+  <line x1="270" y1="90" x2="150" y2="160" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="185" y="135" font-size="11" fill="#6a7178">2. 93.184.216.34</text>
+
+  <!-- Client -> Server: TCP handshake -->
+  <line x1="150" y1="155" x2="550" y2="155" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <text x="300" y="148" text-anchor="middle" font-size="11" fill="#6a7178">3. TCP handshake + HTTP request</text>
+
+  <!-- Server -> Client: response -->
+  <line x1="550" y1="175" x2="150" y2="175" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="300" y="195" text-anchor="middle" font-size="11" fill="#6a7178">4. HTTP response</text>
+
+  <!-- latency callout -->
+  <rect x="150" y="230" width="400" height="60" rx="6" fill="#f6f8fa" stroke="#e3e6ea" stroke-width="1.2"/>
+  <text x="350" y="252" text-anchor="middle" font-size="12" fill="#2d2f33" font-weight="600">Latency budget for one request</text>
+  <text x="350" y="272" text-anchor="middle" font-size="11" fill="#6a7178">DNS lookup + TCP handshake + (TLS handshake) + request/response</text>
+
+  <text x="350" y="320" text-anchor="middle" font-size="11" fill="#6a7178">System diagram — boxes are components across a network, not classes in one process</text>
+</svg>
