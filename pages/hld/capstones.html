@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Capstone: Rate Limiter — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+    --code-bg: #f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 820px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  main.content h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  main.content h3 { font-size: 16px; margin: 28px 0 8px; color: var(--accent); }
+  main.content h3:first-of-type { margin-top: 16px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
+  code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  ul { padding-left: 20px; }
+  img.diagram-img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; padding: 8px; }
+  figure { margin: 0 0 16px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .terminal { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #1e2228; }
+  .terminal-tabs { display: flex; align-items: center; justify-content: space-between; background: #14171c; border-bottom: 1px solid #2b3038; }
+  .terminal-tabs-group { display: flex; }
+  .copy-btn { background: transparent; border: none; color: #9aa2ad; font-size: 12px; cursor: pointer; padding: 6px 14px; white-space: nowrap; }
+  .copy-btn:hover { color: #fff; }
+  .copy-btn.copied { color: #8fd19e; }
+  .terminal-tab {
+    padding: 10px 18px; font-size: 13px; color: #9aa2ad; background: transparent;
+    border: none; cursor: pointer; border-right: 1px solid #2b3038;
+  }
+  .terminal-tab:hover { color: #e6e9ed; }
+  .terminal-tab.active { color: #fff; background: #1e2228; border-top: 2px solid var(--accent); }
+  .terminal-body { padding: 16px 18px; }
+  .terminal-body pre { background: transparent; border: none; padding: 0; margin: 0 0 12px; color: #d7dbe0; }
+  .terminal-output-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6a7178; margin: 12px 0 6px; }
+  .terminal-output { background: #14171c; border-radius: 6px; padding: 12px 14px; color: #8fd19e; font-size: 13px; white-space: pre-wrap; }
+  .terminal-note { font-size: 12px; color: #9aa2ad; padding: 0 18px 14px; }
+
+  .callout { border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 14.5px; }
+  .callout-title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .callout.good { background: #eef8f0; border: 1px solid #bfe3c6; }
+  .callout.good .callout-title { color: #2f8f4e; }
+  .callout.bad { background: #fdedec; border: 1px solid #f3bcb8; }
+  .callout.bad .callout-title { color: #c0392b; }
+  .callout ul { margin: 4px 0 0; padding-left: 18px; }
+  .callout p { margin: 4px 0 0; }
+  .two-col { display: flex; gap: 16px; flex-wrap: wrap; }
+  .two-col .callout { flex: 1; min-width: 260px; margin: 0; }
+
+  .qa { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .qa summary { padding: 12px 16px; cursor: pointer; font-weight: 600; background: var(--sidebar-bg); list-style: none; }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary::before { content: "▸"; display: inline-block; margin-right: 8px; color: var(--accent); transition: transform 0.15s ease; }
+  .qa[open] summary::before { transform: rotate(90deg); }
+  .qa .qa-answer { padding: 4px 16px 16px; font-size: 14.5px; }
+  .qa .qa-answer p { margin: 8px 0; }
+
+  header.site-header { border-bottom: 1px solid var(--border); background: var(--sidebar-bg); }
+  header.site-header .header-inner {
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+  }
+  header.site-header a.site-title { font-weight: 700; font-size: 16px; color: var(--text); text-decoration: none; }
+  header.site-header a.site-title:hover { color: var(--accent); }
+  header.site-header .header-tagline { font-size: 12px; color: var(--muted); }
+
+  footer.site-footer { border-top: 1px solid var(--border); background: var(--sidebar-bg); }
+  footer.site-footer .footer-inner {
+    max-width: 1200px; margin: 0 auto; padding: 20px 24px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    font-size: 12.5px; color: var(--muted);
+  }
+  footer.site-footer a { color: var(--accent); text-decoration: none; }
+  footer.site-footer a:hover { text-decoration: underline; }
+
+  .page-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .page-nav a.nav-link {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;
+    text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 2px;
+    transition: border-color 0.15s ease, background 0.15s ease; min-width: 0;
+  }
+  .page-nav a.nav-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .page-nav a.nav-link.next { text-align: right; align-items: flex-end; }
+  .page-nav .nav-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .page-nav .nav-title { font-size: 14px; font-weight: 600; color: var(--accent); }
+  .page-nav .nav-placeholder { flex: 1; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-title" href="../../index.html">System Design Architectures</a>
+    <span class="header-tagline">HLD &middot; Capstone</span>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="../../index.html">← Back to guide</a>
+    <h3>On this page</h3>
+    <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#theory">Theory &amp; Diagrams</a>
+    <a class="toc" href="#trade-offs">Trade-offs</a>
+    <a class="toc" href="#real-world">Real-World Examples</a>
+    <a class="toc" href="#interview-questions">Interview Questions</a>
+    <a class="toc" href="#code">Code &amp; Output</a>
+  </nav>
+
+  <main class="content">
+    <nav class="breadcrumbs">
+      <a href="../../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../../index.html#hld">HLD</a>
+      <span class="sep">/</span>
+      <span class="current">Capstone: Rate Limiter</span>
+    </nav>
+    <h1 id="overview">Capstone: Rate Limiter</h1>
+    <p>A worked system design example that pulls together time-based state, per-client isolation, and the kind of trade-off reasoning the rest of this HLD section builds toward.</p>
+
+    <section id="theory">
+      <h2>Theory &amp; Diagrams</h2>
+
+      <h3>Why this is a good capstone</h3>
+      <p>A rate limiter sits where load balancing (protecting backends from overload), stateful tracking, and time-based algorithms all meet in one small, concrete system — and it's one of the most commonly asked system design questions in its own right.</p>
+
+      <h3>The token bucket algorithm</h3>
+      <p>A bucket holds up to <code>capacity</code> tokens, refilling continuously at <code>refill_rate</code> tokens per second, capped at capacity. Every request tries to take one token: available means allowed, empty means rejected.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-capstones/token-bucket.svg" alt="A bucket holding 5 tokens that refills continuously; an incoming request is allowed if a token is available, and rejected if the bucket is empty">
+        <figcaption>Tokens trickle in continuously; a request just checks whether one is there</figcaption>
+      </figure>
+
+      <h3>Why refill continuously instead of resetting per second</h3>
+      <p>A naive "N requests per second" counter that resets every second allows a burst of nearly 2N requests right at the boundary between two seconds. A token bucket refills gradually, so burstiness is always bounded by capacity — there's no reset moment to exploit.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-capstones/fixed-window-vs-token-bucket.svg" alt="Left: a fixed window counter allowing 10 requests right at the reset boundary between two 5-request windows. Right: a token bucket that never exceeds its 5-token capacity regardless of timing.">
+        <figcaption>Same intended rate, very different worst-case burst</figcaption>
+      </figure>
+    </section>
+
+    <section id="trade-offs">
+      <h2>Trade-offs</h2>
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ Token bucket when</div>
+          <ul>
+            <li>You want to allow legitimate short bursts (a user clicking rapidly) without letting the rate creep past a hard cap.</li>
+          </ul>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ Fixed window when</div>
+          <ul>
+            <li>Simplicity matters more than precision and the abuse risk from boundary bursts is acceptable for the use case.</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> understanding specifically why a fixed window counter is exploitable at its boundary, and recognizing that a real rate limiter needs per-client state reachable from every server handling that client's requests — not just one in-memory bucket per server.</p>
+    </section>
+
+    <section id="real-world">
+      <h2>Real-World Examples</h2>
+      <ul>
+        <li><strong>Stripe's API rate limits</strong> — documented per-endpoint limits using a token-bucket-style algorithm to protect the platform from any single integration.</li>
+        <li><strong>AWS API Gateway throttling</strong> — configurable burst and steady-state limits per client, modeled directly as a token bucket.</li>
+        <li><strong>GitHub API rate limiting</strong> — a fixed quota per hour per token, with response headers telling clients how many requests remain and when the quota resets.</li>
+        <li><strong>Nginx's <code>limit_req</code> module</strong> — request rate limiting at the web server layer using a leaky-bucket variant.</li>
+      </ul>
+    </section>
+
+    <section id="interview-questions">
+      <h2>Interview Questions</h2>
+      <p>Click a question to reveal the answer.</p>
+
+      <details class="qa">
+        <summary>How does a token bucket rate limiter work?</summary>
+        <div class="qa-answer">
+          <p>A bucket holds up to a fixed capacity of tokens, refilling continuously at a fixed rate. Each request consumes one token if available; if the bucket is empty, the request is rejected. Burstiness is always bounded by the bucket's capacity.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Why is a fixed window counter exploitable at its boundary?</summary>
+        <div class="qa-answer">
+          <p>Because the counter resets abruptly at each tick, a client can send a full quota right before the reset and another full quota right after — nearly double the intended rate in a short window straddling the boundary.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>How would you rate-limit per user instead of globally?</summary>
+        <div class="qa-answer">
+          <p>Give each user their own bucket, keyed by user ID, API key, or IP. A single shared bucket would let one user's traffic exhaust the budget meant for everyone else.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Where does a rate limiter's state live in a distributed system?</summary>
+        <div class="qa-answer">
+          <p>It has to be reachable from every server handling a given client's requests — usually a shared, fast store like Redis, since an in-memory bucket on one server wouldn't know about requests landing on a different server.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>What's the difference between token bucket and leaky bucket?</summary>
+        <div class="qa-answer">
+          <p>Token bucket allows bursts up to its capacity as long as tokens are available. Leaky bucket enforces a strictly constant output rate regardless of how bursty the input is, smoothing traffic rather than just capping it.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="code">
+      <h2>Code &amp; Output</h2>
+      <p>A real token bucket (capacity 5, refill rate 2/sec) hit with a burst of 8 immediate requests, then 3 more after a genuine 1.5 second wait. The allowed/rejected split and the timing of the recovery are both driven by real wall-clock time, not scripted.</p>
+
+      <div class="terminal">
+        <div class="terminal-tabs">
+          <div class="terminal-tabs-group">
+            <button class="terminal-tab active" data-lang="java">Java</button>
+            <button class="terminal-tab" data-lang="python">Python</button>
+            <button class="terminal-tab" data-lang="javascript">JavaScript</button>
+            <button class="terminal-tab" data-lang="cpp">C++</button>
+          </div>
+          <button class="copy-btn" id="copy-btn">Copy</button>
+        </div>
+        <div class="terminal-body">
+          <pre><code id="terminal-code"></code></pre>
+          <div class="terminal-output-label">Sample output (real run — your numbers will differ)</div>
+          <div class="terminal-output" id="terminal-output"></div>
+        </div>
+        <div class="terminal-note">Java's timing wasn't captured in this sandbox (no JDK available to run it), but the token-bucket math is functionally identical to the other three languages, manually verified for correctness.</div>
+      </div>
+    </section>
+
+    <nav class="page-nav">
+      <a class="nav-link prev" href="microservices.html">
+        <span class="nav-label">&larr; Previous</span>
+        <span class="nav-title">Microservices</span>
+      </a>
+      <span class="nav-link next nav-placeholder">
+        <span class="nav-label">Next</span>
+        <span class="nav-title">More HLD topics coming soon</span>
+      </span>
+    </nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design Patterns.</span>
+    <span><a href="../../index.html">Back to guide home</a></span>
+  </div>
+</footer>
+
+<script>
+  const snippets = {
+    java: {
+      code: `public class RateLimiter {
+    static final double CAPACITY = 5.0;
+    static final double REFILL_RATE_PER_SEC = 2.0;
+
+    static class TokenBucket {
+        double capacity;
+        double refillRate;
+        double tokens;
+        long lastRefillNanos;
+
+        TokenBucket(double capacity, double refillRate) {
+            this.capacity = capacity;
+            this.refillRate = refillRate;
+            this.tokens = capacity;
+            this.lastRefillNanos = System.nanoTime();
+        }
+
+        void refill() {
+            long now = System.nanoTime();
+            double elapsedSeconds = (now - lastRefillNanos) / 1_000_000_000.0;
+            double added = elapsedSeconds * refillRate;
+            if (added > 0) {
+                tokens = Math.min(capacity, tokens + added);
+                lastRefillNanos = now;
+            }
+        }
+
+        boolean allowRequest() {
+            refill();
+            if (tokens >= 1.0) {
+                tokens -= 1.0;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        TokenBucket bucket = new TokenBucket(CAPACITY, REFILL_RATE_PER_SEC);
+        long start = System.nanoTime();
+
+        System.out.println("Burst of 8 requests with no delay (capacity 5):");
+        for (int i = 0; i < 8; i++) {
+            boolean allowed = bucket.allowRequest();
+            double elapsedMs = (System.nanoTime() - start) / 1_000_000.0;
+            System.out.printf("  request %d at %.0f ms: %s%n", i + 1, elapsedMs, allowed ? "allowed" : "REJECTED (rate limited)");
+        }
+
+        System.out.println("Waiting 1.5s for tokens to refill...");
+        Thread.sleep(1500);
+
+        System.out.println("3 more requests after waiting:");
+        for (int i = 0; i < 3; i++) {
+            boolean allowed = bucket.allowRequest();
+            double elapsedMs = (System.nanoTime() - start) / 1_000_000.0;
+            System.out.printf("  request %d at %.0f ms: %s%n", i + 1, elapsedMs, allowed ? "allowed" : "REJECTED (rate limited)");
+        }
+    }
+}`,
+      output: `Burst of 8 requests with no delay (capacity 5):
+  request 1 at 0 ms: allowed
+  request 2 at 0 ms: allowed
+  request 3 at 0 ms: allowed
+  request 4 at 0 ms: allowed
+  request 5 at 0 ms: allowed
+  request 6 at 0 ms: REJECTED (rate limited)
+  request 7 at 0 ms: REJECTED (rate limited)
+  request 8 at 0 ms: REJECTED (rate limited)
+Waiting 1.5s for tokens to refill...
+3 more requests after waiting:
+  request 1 at 1501 ms: allowed
+  request 2 at 1501 ms: allowed
+  request 3 at 1501 ms: allowed
+
+(Representative sample — Java was not executed in this sandbox; see note below.)`
+    },
+    python: {
+      code: `import time
+
+CAPACITY = 5
+REFILL_RATE_PER_SEC = 2
+
+class TokenBucket:
+    def __init__(self, capacity, refill_rate):
+        self.capacity = capacity
+        self.refill_rate = refill_rate
+        self.tokens = capacity
+        self.last_refill = time.perf_counter()
+
+    def _refill(self):
+        now = time.perf_counter()
+        elapsed = now - self.last_refill
+        added = elapsed * self.refill_rate
+        if added > 0:
+            self.tokens = min(self.capacity, self.tokens + added)
+            self.last_refill = now
+
+    def allow_request(self):
+        self._refill()
+        if self.tokens >= 1:
+            self.tokens -= 1
+            return True
+        return False
+
+if __name__ == "__main__":
+    bucket = TokenBucket(CAPACITY, REFILL_RATE_PER_SEC)
+    start = time.perf_counter()
+
+    print("Burst of 8 requests with no delay (capacity 5):")
+    for i in range(8):
+        allowed = bucket.allow_request()
+        elapsed_ms = (time.perf_counter() - start) * 1000
+        print(f"  request {i + 1} at {elapsed_ms:.0f} ms: {'allowed' if allowed else 'REJECTED (rate limited)'}")
+
+    print("Waiting 1.5s for tokens to refill...")
+    time.sleep(1.5)
+
+    print("3 more requests after waiting:")
+    for i in range(3):
+        allowed = bucket.allow_request()
+        elapsed_ms = (time.perf_counter() - start) * 1000
+        print(f"  request {i + 1} at {elapsed_ms:.0f} ms: {'allowed' if allowed else 'REJECTED (rate limited)'}")`,
+      output: `Burst of 8 requests with no delay (capacity 5):
+  request 1 at 0 ms: allowed
+  request 2 at 0 ms: allowed
+  request 3 at 0 ms: allowed
+  request 4 at 0 ms: allowed
+  request 5 at 0 ms: allowed
+  request 6 at 0 ms: REJECTED (rate limited)
+  request 7 at 0 ms: REJECTED (rate limited)
+  request 8 at 0 ms: REJECTED (rate limited)
+Waiting 1.5s for tokens to refill...
+3 more requests after waiting:
+  request 1 at 1502 ms: allowed
+  request 2 at 1502 ms: allowed
+  request 3 at 1502 ms: allowed`
+    },
+    javascript: {
+      code: `const CAPACITY = 5;
+const REFILL_RATE_PER_SEC = 2;
+
+class TokenBucket {
+  constructor(capacity, refillRate) {
+    this.capacity = capacity;
+    this.refillRate = refillRate;
+    this.tokens = capacity;
+    this.lastRefill = process.hrtime.bigint();
+  }
+
+  refill() {
+    const now = process.hrtime.bigint();
+    const elapsedSeconds = Number(now - this.lastRefill) / 1e9;
+    const added = elapsedSeconds * this.refillRate;
+    if (added > 0) {
+      this.tokens = Math.min(this.capacity, this.tokens + added);
+      this.lastRefill = now;
+    }
+  }
+
+  allowRequest() {
+    this.refill();
+    if (this.tokens >= 1) {
+      this.tokens -= 1;
+      return true;
+    }
+    return false;
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+(async () => {
+  const bucket = new TokenBucket(CAPACITY, REFILL_RATE_PER_SEC);
+  const start = process.hrtime.bigint();
+
+  console.log("Burst of 8 requests with no delay (capacity 5):");
+  for (let i = 0; i < 8; i++) {
+    const allowed = bucket.allowRequest();
+    const elapsedMs = Number(process.hrtime.bigint() - start) / 1e6;
+    console.log(\`  request \${i + 1} at \${elapsedMs.toFixed(0)} ms: \${allowed ? "allowed" : "REJECTED (rate limited)"}\`);
+  }
+
+  console.log("Waiting 1.5s for tokens to refill...");
+  await sleep(1500);
+
+  console.log("3 more requests after waiting:");
+  for (let i = 0; i < 3; i++) {
+    const allowed = bucket.allowRequest();
+    const elapsedMs = Number(process.hrtime.bigint() - start) / 1e6;
+    console.log(\`  request \${i + 1} at \${elapsedMs.toFixed(0)} ms: \${allowed ? "allowed" : "REJECTED (rate limited)"}\`);
+  }
+})();`,
+      output: `Burst of 8 requests with no delay (capacity 5):
+  request 1 at 4 ms: allowed
+  request 2 at 4 ms: allowed
+  request 3 at 4 ms: allowed
+  request 4 at 4 ms: allowed
+  request 5 at 4 ms: allowed
+  request 6 at 4 ms: REJECTED (rate limited)
+  request 7 at 4 ms: REJECTED (rate limited)
+  request 8 at 4 ms: REJECTED (rate limited)
+Waiting 1.5s for tokens to refill...
+3 more requests after waiting:
+  request 1 at 1508 ms: allowed
+  request 2 at 1508 ms: allowed
+  request 3 at 1508 ms: allowed`
+    },
+    cpp: {
+      code: `#include <iostream>
+#include <thread>
+#include <chrono>
+#include <algorithm>
+
+const double CAPACITY = 5.0;
+const double REFILL_RATE_PER_SEC = 2.0;
+
+class TokenBucket {
+public:
+    TokenBucket(double capacity, double refillRate)
+        : capacity(capacity), refillRate(refillRate), tokens(capacity),
+          lastRefill(std::chrono::steady_clock::now()) {}
+
+    bool allowRequest() {
+        refill();
+        if (tokens >= 1.0) {
+            tokens -= 1.0;
+            return true;
+        }
+        return false;
+    }
+
+private:
+    double capacity;
+    double refillRate;
+    double tokens;
+    std::chrono::steady_clock::time_point lastRefill;
+
+    void refill() {
+        auto now = std::chrono::steady_clock::now();
+        double elapsedSeconds = std::chrono::duration<double>(now - lastRefill).count();
+        double added = elapsedSeconds * refillRate;
+        if (added > 0) {
+            tokens = std::min(capacity, tokens + added);
+            lastRefill = now;
+        }
+    }
+};
+
+int main() {
+    TokenBucket bucket(CAPACITY, REFILL_RATE_PER_SEC);
+    auto start = std::chrono::steady_clock::now();
+
+    std::cout << "Burst of 8 requests with no delay (capacity 5):" << std::endl;
+    for (int i = 0; i < 8; i++) {
+        bool allowed = bucket.allowRequest();
+        double elapsedMs = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+        std::cout << "  request " << (i + 1) << " at " << elapsedMs << " ms: "
+                   << (allowed ? "allowed" : "REJECTED (rate limited)") << std::endl;
+    }
+
+    std::cout << "Waiting 1.5s for tokens to refill..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+
+    std::cout << "3 more requests after waiting:" << std::endl;
+    for (int i = 0; i < 3; i++) {
+        bool allowed = bucket.allowRequest();
+        double elapsedMs = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+        std::cout << "  request " << (i + 1) << " at " << elapsedMs << " ms: "
+                   << (allowed ? "allowed" : "REJECTED (rate limited)") << std::endl;
+    }
+    return 0;
+}`,
+      output: `Burst of 8 requests with no delay (capacity 5):
+  request 1 at 0.048 ms: allowed
+  request 2 at 0.0688 ms: allowed
+  request 3 at 0.0705 ms: allowed
+  request 4 at 0.0716 ms: allowed
+  request 5 at 0.0727 ms: allowed
+  request 6 at 0.0737 ms: REJECTED (rate limited)
+  request 7 at 0.0748 ms: REJECTED (rate limited)
+  request 8 at 0.0758 ms: REJECTED (rate limited)
+Waiting 1.5s for tokens to refill...
+3 more requests after waiting:
+  request 1 at 1500.32 ms: allowed
+  request 2 at 1500.33 ms: allowed
+  request 3 at 1500.33 ms: allowed`
+    }
+  };
+
+  const tabs = document.querySelectorAll('.terminal-tab');
+  const codeEl = document.getElementById('terminal-code');
+  const outputEl = document.getElementById('terminal-output');
+  const copyBtn = document.getElementById('copy-btn');
+
+  function renderLang(lang) {
+    codeEl.textContent = snippets[lang].code;
+    outputEl.textContent = snippets[lang].output;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.lang === lang));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => renderLang(tab.dataset.lang));
+  });
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+  }
+
+  function showCopied() {
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = 'Copy';
+      copyBtn.classList.remove('copied');
+    }, 1500);
+  }
+
+  copyBtn.addEventListener('click', () => {
+    const text = codeEl.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+        fallbackCopy(text);
+        showCopied();
+      });
+    } else {
+      fallbackCopy(text);
+      showCopied();
+    }
+  });
+
+  renderLang('java');
+</script>
+
+<script>
+  const sections = document.querySelectorAll('main section, main h1');
+  const links = document.querySelectorAll('nav.sidebar a.toc');
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 100) currentId = sec.id;
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+    });
+  });
+</script>
+
+</body>
+</html>
