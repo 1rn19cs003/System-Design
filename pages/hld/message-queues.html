@@ -141,6 +141,7 @@
     <a class="back" href="../../index.html">← Back to guide</a>
     <h3>On this page</h3>
     <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#plain-english">In Plain English</a>
     <a class="toc" href="#theory">Theory &amp; Diagrams</a>
     <a class="toc" href="#trade-offs">Trade-offs</a>
     <a class="toc" href="#real-world">Real-World Examples</a>
@@ -158,6 +159,27 @@
     </nav>
     <h1 id="overview">Message Queues</h1>
     <p>How a producer and consumer stay decoupled — the producer drops work in a queue and moves on, while one or more consumers pull it off at their own pace.</p>
+
+    <section id="plain-english">
+      <h2>In Plain English</h2>
+      <p>Picture a restaurant's order-ticket rail between the waiter and the kitchen.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-message-queues/order-ticket-rail-analogy.svg" alt="A waiter pinning order tickets to a rail; three cooks each grab the next ticket whenever they're free">
+        <figcaption>The ticket rail is the queue; each cook is a consumer working independently</figcaption>
+      </figure>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">New to this? Start here</div>
+          <p>The waiter never watches the food cook — they pin the ticket and move to the next table. That's the whole point of a queue: the producer hands off work and doesn't wait around for it to finish.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">Already comfortable? Push further</div>
+          <p>Adding more cooks speeds things up, but nothing says Cook A finishes ticket 3 before Cook C finishes ticket 7. If order matters — say, all of one table's courses — those tickets need to stay pinned for the same cook.</p>
+        </div>
+      </div>
+    </section>
 
     <section id="theory">
       <h2>Theory &amp; Diagrams</h2>
@@ -201,6 +223,8 @@
         </div>
       </div>
       <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> that a queue trades immediacy for resilience and scalability, and that "add more consumers" isn't free — it specifically risks breaking ordering unless messages are partitioned by key.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> being able to say "a queue decouples producer from consumer" and give one real example (background email sending, image processing) is enough for most first-round questions.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> be ready to talk about a concrete ordering or duplicate-delivery bug you hit with a queue, and how partitioning by key or making consumers idempotent fixed it.</p>
     </section>
 
     <section id="real-world">

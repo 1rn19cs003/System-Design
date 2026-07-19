@@ -141,6 +141,7 @@
     <a class="back" href="../../index.html">← Back to guide</a>
     <h3>On this page</h3>
     <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#plain-english">In Plain English</a>
     <a class="toc" href="#theory">Theory &amp; Diagrams</a>
     <a class="toc" href="#trade-offs">Trade-offs</a>
     <a class="toc" href="#real-world">Real-World Examples</a>
@@ -158,6 +159,27 @@
     </nav>
     <h1 id="overview">Microservices</h1>
     <p>What changes when a monolith's in-process function calls become real network calls between independently deployed services.</p>
+
+    <section id="plain-english">
+      <h2>In Plain English</h2>
+      <p>Compare a single chef running one kitchen versus a restaurant with specialized stations.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-microservices/kitchen-stations-analogy.svg" alt="Left: one chef handling grill, salad, and dessert in their head inside one kitchen. Right: separate Grill, Salad, and Dessert stations passing the plate down the line to each other">
+        <figcaption>A monolith is one chef switching tasks; microservices are separate stations passing plates</figcaption>
+      </figure>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">New to this? Start here</div>
+          <p>One chef doing everything in their head never has to "hand off" anything — it's instant. Separate stations are more specialized and can each get faster at their one job, but now the plate has to physically travel between them.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">Already comfortable? Push further</div>
+          <p>Every station a plate visits adds real time — that's cascading latency. And if the dessert station is slammed, the whole plate waits, no matter how fast the grill and salad stations were.</p>
+        </div>
+      </div>
+    </section>
 
     <section id="theory">
       <h2>Theory &amp; Diagrams</h2>
@@ -201,6 +223,8 @@
         </div>
       </div>
       <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> that microservices aren't free scalability — they trade a monolith's simplicity for real network latency and operational overhead — and being able to explain concretely how a chain of service calls accumulates latency hop by hop.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> knowing that a microservice call is a real network call (not a free function call), and that this adds real latency and a real chance of failure, is the core idea interviewers check for.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> be ready to describe a real service boundary you worked with — what it owned, what it called, and a time a downstream service's slowness or downtime became your problem too.</p>
     </section>
 
     <section id="real-world">

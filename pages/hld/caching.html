@@ -141,6 +141,7 @@
     <a class="back" href="../../index.html">← Back to guide</a>
     <h3>On this page</h3>
     <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#plain-english">In Plain English</a>
     <a class="toc" href="#theory">Theory &amp; Diagrams</a>
     <a class="toc" href="#trade-offs">Trade-offs</a>
     <a class="toc" href="#real-world">Real-World Examples</a>
@@ -158,6 +159,27 @@
     </nav>
     <h1 id="overview">Caching</h1>
     <p>Storing the result of something expensive once, so the next request for the same thing is answered from fast memory instead of paying that cost again.</p>
+
+    <section id="plain-english">
+      <h2>In Plain English</h2>
+      <p>Think about keeping a document in your desk drawer instead of walking to the filing room down the hall every single time you need it.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-caching/desk-drawer-analogy.svg" alt="A person checking their desk drawer first; if it's there, they hand it over immediately; if not, they walk to the filing room, get it, and leave a copy in the drawer for next time">
+        <figcaption>The drawer is the cache; the filing room is the slow database or API</figcaption>
+      </figure>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">New to this? Start here</div>
+          <p>A cache is nothing more than "keep a copy of the answer somewhere fast, so you don't redo the slow work every time someone asks the same question."</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">Already comfortable? Push further</div>
+          <p>The hard part was never "store a copy" — it's "how do I know when the copy in the drawer is out of date?" That's the invalidation problem, and it's the part interviewers actually care about.</p>
+        </div>
+      </div>
+    </section>
 
     <section id="theory">
       <h2>Theory &amp; Diagrams</h2>
@@ -201,6 +223,8 @@
         </div>
       </div>
       <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> naming a concrete invalidation strategy (TTL vs. write-through invalidation) instead of treating "just cache it" as a complete answer, and recognizing that caching turns a data-freshness problem into a design decision rather than removing it.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> knowing that a cache trades memory for speed, and that LRU evicts the entry that hasn't been touched the longest, is enough to answer most first-pass caching questions.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> you should be able to describe a real staleness bug you hit — data in the cache that was wrong for a window of time — and whether you fixed it with a shorter TTL, active invalidation on write, or by accepting the staleness as a deliberate trade-off.</p>
     </section>
 
     <section id="real-world">

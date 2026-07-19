@@ -141,6 +141,7 @@
     <a class="back" href="../../index.html">← Back to guide</a>
     <h3>On this page</h3>
     <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#plain-english">In Plain English</a>
     <a class="toc" href="#theory">Theory &amp; Diagrams</a>
     <a class="toc" href="#trade-offs">Trade-offs</a>
     <a class="toc" href="#real-world">Real-World Examples</a>
@@ -158,6 +159,27 @@
     </nav>
     <h1 id="overview">Load Balancing</h1>
     <p>How a single point in front of many servers decides which one handles each request — and what happens when one of those servers goes down.</p>
+
+    <section id="plain-english">
+      <h2>In Plain English</h2>
+      <p>Picture a busy restaurant with one host at the door and several waiters inside.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-load-balancing/host-at-the-door.svg" alt="A restaurant host sending customers to Waiter A and Waiter B in rotation, while skipping Waiter C who is on break">
+        <figcaption>The host is the load balancer; each waiter is a backend server</figcaption>
+      </figure>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">New to this? Start here</div>
+          <p>Customers never pick their own waiter — they tell the host what they need, and the host decides. That's the whole idea: clients never talk to backends directly, only to the load balancer in front of them.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">Already comfortable? Push further</div>
+          <p>A good host doesn't send someone to a waiter who just called in sick. That's a health check. And a host who notices one waiter is drowning in orders while another is idle — that's least-connections instead of blind rotation.</p>
+        </div>
+      </div>
+    </section>
 
     <section id="theory">
       <h2>Theory &amp; Diagrams</h2>
@@ -204,6 +226,8 @@
         </div>
       </div>
       <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> that a load balancer needs a way to detect a dead backend (health checks) or it keeps routing traffic into a black hole, and being able to name a concrete case where round-robin produces uneven load despite being "fair" by request count.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> being able to explain round-robin in one sentence, and say why a load balancer without health checks is dangerous, covers most entry-level questions on this topic.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> be ready to talk about a real incident — a backend that stayed in rotation while unhealthy, or a hot spot from uneven request cost — and what you changed (health check interval, switching algorithms, sticky sessions) to fix it.</p>
     </section>
 
     <section id="real-world">

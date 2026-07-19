@@ -1,184 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>System Design Architectures</title>
-<style>
-  :root {
-    --bg: #ffffff;
-    --sidebar-bg: #f6f8fa;
-    --border: #e3e6ea;
-    --text: #2d2f33;
-    --muted: #6a7178;
-    --accent: #3b6ea5;
-    --accent-soft: #eaf1f8;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    color: var(--text);
-    background: var(--bg);
-  }
-  header {
-    padding: 48px 24px 24px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-  }
-  header h1 { margin: 0 0 8px; font-size: 28px; }
-  header p { margin: 0; color: var(--muted); }
+  <meta charset="UTF-8">
+  <title>System Design</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --sidebar-bg: #f6f8fa;
+      --border: #e3e6ea;
+      --text: #2d2f33;
+      --muted: #6a7178;
+      --accent: #3b6ea5;
+      --accent-soft: #eaf1f8;
+    }
 
-  .layout {
-    display: flex;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  nav.sidebar {
-    width: 260px;
-    flex-shrink: 0;
-    padding: 24px 16px;
-    border-right: 1px solid var(--border);
-    background: var(--sidebar-bg);
-    position: sticky;
-    top: 0;
-    align-self: flex-start;
-    height: 100vh;
-    overflow-y: auto;
-  }
-  nav.sidebar h3 {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    margin: 20px 0 8px;
-  }
-  nav.sidebar h3:first-child { margin-top: 0; }
-  nav.sidebar a {
-    display: block;
-    padding: 6px 10px;
-    border-radius: 6px;
-    color: var(--text);
-    text-decoration: none;
-    font-size: 14px;
-  }
-  nav.sidebar a:hover { background: var(--accent-soft); color: var(--accent); }
-  nav.sidebar a.ready { font-weight: 600; }
-  nav.sidebar a.soon { color: var(--muted); pointer-events: none; }
-  nav.sidebar a.soon::after { content: " (soon)"; font-size: 11px; }
+    * {
+      box-sizing: border-box;
+    }
 
-  main.content {
-    flex: 1;
-    padding: 32px 40px;
-  }
-  main.content h2 { margin-top: 0; }
-  .card {
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 16px;
-    background: #fff;
-  }
-  .card h3 { margin: 0 0 6px; }
-  .card p { margin: 0; color: var(--muted); font-size: 14px; }
-  .tag {
-    display: inline-block;
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: var(--accent-soft);
-    color: var(--accent);
-    margin-bottom: 8px;
-  }
+    body {
+      margin: 0;
+      font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
 
-  footer.site-footer { border-top: 1px solid var(--border); background: var(--sidebar-bg); }
-  footer.site-footer .footer-inner {
-    max-width: 1100px; margin: 0 auto; padding: 20px 24px;
-    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-    font-size: 12.5px; color: var(--muted);
-  }
-  footer.site-footer a { color: var(--accent); text-decoration: none; }
-  footer.site-footer a:hover { text-decoration: underline; }
-</style>
+    header {
+      padding: 48px 24px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    nav.sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      padding: 24px 16px;
+      border-right: 1px solid var(--border);
+      background: var(--sidebar-bg);
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    nav.sidebar h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin: 20px 0 8px;
+    }
+
+    nav.sidebar h3:first-child {
+      margin-top: 0;
+    }
+
+    nav.sidebar a {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav.sidebar a:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    nav.sidebar a.ready {
+      font-weight: 600;
+    }
+
+    nav.sidebar a.soon {
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    nav.sidebar a.soon::after {
+      content: " (soon)";
+      font-size: 11px;
+    }
+
+    main.content {
+      flex: 1;
+      padding: 32px 40px;
+    }
+
+    main.content h2 {
+      margin-top: 0;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+      background: #fff;
+    }
+
+    .card h3 {
+      margin: 0 0 6px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    footer.site-footer {
+      border-top: 1px solid var(--border);
+      background: var(--sidebar-bg);
+    }
+
+    footer.site-footer .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    footer.site-footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer.site-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <h1>System Design Architectures</h1>
-  <p>Principles, HLD, LLD, and Design Patterns — with working code for every example.</p>
-</header>
+  <header>
+    <h1>System Design Architectures</h1>
+    <p>Principles, HLD, LLD, and Design Patterns — with working code for every example.</p>
+  </header>
 
-<div class="layout">
-  <nav class="sidebar">
-    <h3>Overview</h3>
-    <a href="#" class="soon">Core Principles</a>
+  <div class="layout">
+    <nav class="sidebar">
+      <h3>Overview</h3>
+      <a href="#" class="soon">Core Principles</a>
 
-    <h3 id="hld">HLD</h3>
-    <a href="pages/hld/fundamentals.html" class="ready">Fundamentals</a>
-    <a href="pages/hld/load-balancing.html" class="ready">Load Balancing</a>
-    <a href="pages/hld/caching.html" class="ready">Caching</a>
-    <a href="pages/hld/databases.html" class="ready">Databases</a>
-    <a href="pages/hld/message-queues.html" class="ready">Message Queues</a>
-    <a href="pages/hld/microservices.html" class="ready">Microservices</a>
-    <a href="pages/hld/capstones.html" class="ready">Capstones</a>
+      <h3 id="hld">HLD</h3>
+      <a href="pages/hld/fundamentals.html" class="ready">Fundamentals</a>
+      <a href="pages/hld/load-balancing.html" class="ready">Load Balancing</a>
+      <a href="pages/hld/caching.html" class="ready">Caching</a>
+      <a href="pages/hld/databases.html" class="ready">Databases</a>
+      <a href="pages/hld/message-queues.html" class="ready">Message Queues</a>
+      <a href="pages/hld/microservices.html" class="ready">Microservices</a>
+      <a href="pages/hld/capstones.html" class="ready">Capstones</a>
 
-    <h3 id="lld">LLD</h3>
-    <a href="#" class="soon">OOP Fundamentals</a>
-    <a href="#" class="soon">SOLID Principles</a>
-    <a href="#" class="soon">LLD Capstones</a>
+      <h3 id="lld">LLD</h3>
+      <a href="#" class="soon">OOP Fundamentals</a>
+      <a href="#" class="soon">SOLID Principles</a>
+      <a href="#" class="soon">LLD Capstones</a>
 
-    <h3 id="design-patterns-creational">Design Patterns — Creational</h3>
-    <a href="pages/lld/design-patterns/creational/singleton.html" class="ready">Singleton</a>
-    <a href="pages/lld/design-patterns/creational/factory-method.html" class="ready">Factory Method</a>
-    <a href="pages/lld/design-patterns/creational/abstract-factory.html" class="ready">Abstract Factory</a>
-    <a href="pages/lld/design-patterns/creational/builder.html" class="ready">Builder</a>
-    <a href="pages/lld/design-patterns/creational/prototype.html" class="ready">Prototype</a>
+      <h3 id="design-patterns-creational">Design Patterns — Creational</h3>
+      <a href="pages/lld/design-patterns/creational/singleton.html" class="ready">Singleton</a>
+      <a href="pages/lld/design-patterns/creational/factory-method.html" class="ready">Factory Method</a>
+      <a href="pages/lld/design-patterns/creational/abstract-factory.html" class="ready">Abstract Factory</a>
+      <a href="pages/lld/design-patterns/creational/builder.html" class="ready">Builder</a>
+      <a href="pages/lld/design-patterns/creational/prototype.html" class="ready">Prototype</a>
 
-    <h3 id="design-patterns-structural">Design Patterns — Structural</h3>
-    <a href="pages/lld/design-patterns/structural/adapter.html" class="ready">Adapter</a>
-    <a href="pages/lld/design-patterns/structural/bridge.html" class="ready">Bridge</a>
-    <a href="pages/lld/design-patterns/structural/composite.html" class="ready">Composite</a>
-    <a href="pages/lld/design-patterns/structural/decorator.html" class="ready">Decorator</a>
-    <a href="pages/lld/design-patterns/structural/facade.html" class="ready">Facade</a>
-    <a href="pages/lld/design-patterns/structural/flyweight.html" class="ready">Flyweight</a>
-    <a href="pages/lld/design-patterns/structural/proxy.html" class="ready">Proxy</a>
+      <h3 id="design-patterns-structural">Design Patterns — Structural</h3>
+      <a href="pages/lld/design-patterns/structural/adapter.html" class="ready">Adapter</a>
+      <a href="pages/lld/design-patterns/structural/bridge.html" class="ready">Bridge</a>
+      <a href="pages/lld/design-patterns/structural/composite.html" class="ready">Composite</a>
+      <a href="pages/lld/design-patterns/structural/decorator.html" class="ready">Decorator</a>
+      <a href="pages/lld/design-patterns/structural/facade.html" class="ready">Facade</a>
+      <a href="pages/lld/design-patterns/structural/flyweight.html" class="ready">Flyweight</a>
+      <a href="pages/lld/design-patterns/structural/proxy.html" class="ready">Proxy</a>
 
-    <h3 id="design-patterns-behavioral">Design Patterns — Behavioral</h3>
-    <a href="pages/lld/design-patterns/behavioral/observer.html" class="ready">Observer</a>
-    <a href="pages/lld/design-patterns/behavioral/strategy.html" class="ready">Strategy</a>
-    <a href="pages/lld/design-patterns/behavioral/command.html" class="ready">Command</a>
-    <a href="pages/lld/design-patterns/behavioral/state.html" class="ready">State</a>
-    <a href="pages/lld/design-patterns/behavioral/chain-of-responsibility.html" class="ready">Chain of Responsibility</a>
-    <a href="pages/lld/design-patterns/behavioral/template-method.html" class="ready">Template Method</a>
-    <a href="pages/lld/design-patterns/behavioral/iterator.html" class="ready">Iterator</a>
-    <a href="pages/lld/design-patterns/behavioral/mediator.html" class="ready">Mediator</a>
-    <a href="pages/lld/design-patterns/behavioral/memento.html" class="ready">Memento</a>
-    <a href="pages/lld/design-patterns/behavioral/visitor.html" class="ready">Visitor</a>
-    <a href="pages/lld/design-patterns/behavioral/interpreter.html" class="ready">Interpreter</a>
-  </nav>
+      <h3 id="design-patterns-behavioral">Design Patterns — Behavioral</h3>
+      <a href="pages/lld/design-patterns/behavioral/observer.html" class="ready">Observer</a>
+      <a href="pages/lld/design-patterns/behavioral/strategy.html" class="ready">Strategy</a>
+      <a href="pages/lld/design-patterns/behavioral/command.html" class="ready">Command</a>
+      <a href="pages/lld/design-patterns/behavioral/state.html" class="ready">State</a>
+      <a href="pages/lld/design-patterns/behavioral/chain-of-responsibility.html" class="ready">Chain of
+        Responsibility</a>
+      <a href="pages/lld/design-patterns/behavioral/template-method.html" class="ready">Template Method</a>
+      <a href="pages/lld/design-patterns/behavioral/iterator.html" class="ready">Iterator</a>
+      <a href="pages/lld/design-patterns/behavioral/mediator.html" class="ready">Mediator</a>
+      <a href="pages/lld/design-patterns/behavioral/memento.html" class="ready">Memento</a>
+      <a href="pages/lld/design-patterns/behavioral/visitor.html" class="ready">Visitor</a>
+      <a href="pages/lld/design-patterns/behavioral/interpreter.html" class="ready">Interpreter</a>
+    </nav>
 
-  <main class="content">
-    <h2>Welcome</h2>
-    <p>This is the home page for the guide. The sidebar on the left lists every topic and stays fixed as you scroll — the same way a Word document's navigation pane works. Click a bold link to open a finished page.</p>
+    <main class="content">
+      <h2>Welcome</h2>
+      <p>This is the home page for the guide. The sidebar on the left lists every topic and stays fixed as you scroll —
+        the same way a Word document's navigation pane works. Click a bold link to open a finished page.</p>
 
-    <div class="card">
-      <span class="tag">Ready now</span>
-      <h3><a href="pages/lld/design-patterns/creational/singleton.html" style="color:inherit;text-decoration:none;">Singleton Pattern →</a></h3>
-      <p>Theory, UML diagram, when to use it, real-world examples, interview questions, and working code in Java, Python, JavaScript, and C++.</p>
-    </div>
+      <div class="card">
+        <span class="tag">Ready now</span>
+        <h3><a href="pages/lld/design-patterns/creational/singleton.html"
+            style="color:inherit;text-decoration:none;">Singleton Pattern →</a></h3>
+        <p>Theory, UML diagram, when to use it, real-world examples, interview questions, and working code in Java,
+          Python, JavaScript, and C++.</p>
+      </div>
 
-    <div class="card">
-      <h3>Everything else</h3>
-      <p>Grayed-out links are placeholders — pages will be added one topic at a time, following this same template.</p>
-    </div>
-  </main>
-</div>
-
-<footer class="site-footer">
-  <div class="footer-inner">
-    <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design Patterns.</span>
-    <span>Made for focused, example-driven interview prep.</span>
+      <div class="card">
+        <h3>Everything else</h3>
+        <p>Grayed-out links are placeholders — pages will be added one topic at a time, following this same template.
+        </p>
+      </div>
+    </main>
   </div>
-</footer>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design
+        Patterns.</span>
+      <span>Made for focused, example-driven interview prep.</span>
+    </div>
+  </footer>
 
 </body>
+
 </html>

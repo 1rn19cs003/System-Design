@@ -141,6 +141,7 @@
     <a class="back" href="../../index.html">← Back to guide</a>
     <h3>On this page</h3>
     <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#plain-english">In Plain English</a>
     <a class="toc" href="#theory">Theory &amp; Diagrams</a>
     <a class="toc" href="#trade-offs">Trade-offs</a>
     <a class="toc" href="#real-world">Real-World Examples</a>
@@ -158,6 +159,27 @@
     </nav>
     <h1 id="overview">Capstone: Rate Limiter</h1>
     <p>A worked system design example that pulls together time-based state, per-client isolation, and the kind of trade-off reasoning the rest of this HLD section builds toward.</p>
+
+    <section id="plain-english">
+      <h2>In Plain English</h2>
+      <p>Think of a jar of ride tickets at an amusement park.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-capstones/ticket-jar-analogy.svg" alt="A ticket jar holding 5 tickets that refills at 2 tickets per second; 5 friends ride right away, a 6th is rejected for lacking a ticket, then more ride once new tickets have dripped in">
+        <figcaption>The jar is the token bucket; each ride is one request</figcaption>
+      </figure>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">New to this? Start here</div>
+          <p>The jar holds a limited number of tickets and refills slowly. If you and your friends grab tickets faster than the jar refills, eventually someone has to wait — that's a request getting rate-limited.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">Already comfortable? Push further</div>
+          <p>Notice there's no "reset moment" — the jar doesn't suddenly fill back up to 5 at the top of every minute. It trickles continuously, which is exactly why it can't be gamed by timing a burst right at a reset boundary.</p>
+        </div>
+      </div>
+    </section>
 
     <section id="theory">
       <h2>Theory &amp; Diagrams</h2>
@@ -199,6 +221,8 @@
         </div>
       </div>
       <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> understanding specifically why a fixed window counter is exploitable at its boundary, and recognizing that a real rate limiter needs per-client state reachable from every server handling that client's requests — not just one in-memory bucket per server.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> being able to describe how a token bucket refills and rejects requests when empty, in your own words, covers the core of this question.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> be ready to go one level deeper — where the bucket's state actually lives across multiple servers, and what you'd pick (Redis, a local approximation, sticky routing) and why.</p>
     </section>
 
     <section id="real-world">

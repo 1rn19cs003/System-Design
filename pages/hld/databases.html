@@ -141,6 +141,7 @@
     <a class="back" href="../../index.html">← Back to guide</a>
     <h3>On this page</h3>
     <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#plain-english">In Plain English</a>
     <a class="toc" href="#theory">Theory &amp; Diagrams</a>
     <a class="toc" href="#trade-offs">Trade-offs</a>
     <a class="toc" href="#real-world">Real-World Examples</a>
@@ -158,6 +159,27 @@
     </nav>
     <h1 id="overview">Databases</h1>
     <p>How a database keeps lookups fast as it grows, and what happens when one machine isn't enough to hold or serve all of it.</p>
+
+    <section id="plain-english">
+      <h2>In Plain English</h2>
+      <p>Think of a huge library. You can find a book by walking every aisle, or you can check the card catalog first.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-databases/library-catalog-analogy.svg" alt="Left: checking every aisle one by one to find a book. Right: checking the card catalog first, then walking straight to aisle 7">
+        <figcaption>An index is the card catalog — it costs upkeep, but saves you from searching everywhere</figcaption>
+      </figure>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">New to this? Start here</div>
+          <p>An index is just a shortcut list that says "this key lives over here." It takes a bit of extra bookkeeping to keep updated, but it turns "check everything" into "look it up, then go straight there."</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">Already comfortable? Push further</div>
+          <p>Read replicas are like photocopying the whole catalog for every front desk, so more people can search at once. Sharding is different — it's splitting the library itself into branch buildings, each holding only some of the books, by last name.</p>
+        </div>
+      </div>
+    </section>
 
     <section id="theory">
       <h2>Theory &amp; Diagrams</h2>
@@ -199,6 +221,8 @@
         </div>
       </div>
       <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> that an index isn't free — it slows every write to the indexed column — and being able to say specifically what breaks when a database is sharded (cross-shard joins and transactions get much harder), rather than treating sharding as a free scaling lever.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> knowing that an index speeds up reads but costs something on writes, and that a shard holds only part of the data while a replica holds all of it, covers the basics interviewers check for.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> be ready to talk about a real schema you indexed (and why), or a query that got slow at scale and what you changed — adding an index, denormalizing, or introducing a replica — to fix it.</p>
     </section>
 
     <section id="real-world">
