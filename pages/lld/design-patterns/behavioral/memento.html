@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Memento Pattern — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+    --code-bg: #f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 820px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  main.content h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  main.content h3 { font-size: 16px; margin: 28px 0 8px; color: var(--accent); }
+  main.content h3:first-of-type { margin-top: 16px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
+  code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  ul { padding-left: 20px; }
+  img.diagram-img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; padding: 8px; }
+  figure { margin: 0 0 16px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .terminal { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #1e2228; }
+  .terminal-tabs { display: flex; align-items: center; justify-content: space-between; background: #14171c; border-bottom: 1px solid #2b3038; }
+  .terminal-tabs-group { display: flex; }
+  .copy-btn { background: transparent; border: none; color: #9aa2ad; font-size: 12px; cursor: pointer; padding: 6px 14px; white-space: nowrap; }
+  .copy-btn:hover { color: #fff; }
+  .copy-btn.copied { color: #8fd19e; }
+  .terminal-tab {
+    padding: 10px 18px; font-size: 13px; color: #9aa2ad; background: transparent;
+    border: none; cursor: pointer; border-right: 1px solid #2b3038;
+  }
+  .terminal-tab:hover { color: #e6e9ed; }
+  .terminal-tab.active { color: #fff; background: #1e2228; border-top: 2px solid var(--accent); }
+  .terminal-body { padding: 16px 18px; }
+  .terminal-body pre { background: transparent; border: none; padding: 0; margin: 0 0 12px; color: #d7dbe0; }
+  .terminal-output-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6a7178; margin: 12px 0 6px; }
+  .terminal-output { background: #14171c; border-radius: 6px; padding: 12px 14px; color: #8fd19e; font-size: 13px; white-space: pre-wrap; }
+
+  .callout { border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 14.5px; }
+  .callout-title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .callout.good { background: #eef8f0; border: 1px solid #bfe3c6; }
+  .callout.good .callout-title { color: #2f8f4e; }
+  .callout.bad { background: #fdedec; border: 1px solid #f3bcb8; }
+  .callout.bad .callout-title { color: #c0392b; }
+  .callout ul { margin: 4px 0 0; padding-left: 18px; }
+  .callout p { margin: 4px 0 0; }
+  .two-col { display: flex; gap: 16px; flex-wrap: wrap; }
+  .two-col .callout { flex: 1; min-width: 260px; margin: 0; }
+
+  .qa { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .qa summary { padding: 12px 16px; cursor: pointer; font-weight: 600; background: var(--sidebar-bg); list-style: none; }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary::before { content: "▸"; display: inline-block; margin-right: 8px; color: var(--accent); transition: transform 0.15s ease; }
+  .qa[open] summary::before { transform: rotate(90deg); }
+  .qa .qa-answer { padding: 4px 16px 16px; font-size: 14.5px; }
+  .qa .qa-answer p { margin: 8px 0; }
+
+  header.site-header { border-bottom: 1px solid var(--border); background: var(--sidebar-bg); }
+  header.site-header .header-inner {
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+  }
+  header.site-header a.site-title { font-weight: 700; font-size: 16px; color: var(--text); text-decoration: none; }
+  header.site-header a.site-title:hover { color: var(--accent); }
+  header.site-header .header-tagline { font-size: 12px; color: var(--muted); }
+
+  footer.site-footer { border-top: 1px solid var(--border); background: var(--sidebar-bg); }
+  footer.site-footer .footer-inner {
+    max-width: 1200px; margin: 0 auto; padding: 20px 24px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    font-size: 12.5px; color: var(--muted);
+  }
+  footer.site-footer a { color: var(--accent); text-decoration: none; }
+  footer.site-footer a:hover { text-decoration: underline; }
+
+  .page-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .page-nav a.nav-link {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;
+    text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 2px;
+    transition: border-color 0.15s ease, background 0.15s ease; min-width: 0;
+  }
+  .page-nav a.nav-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .page-nav a.nav-link.next { text-align: right; align-items: flex-end; }
+  .page-nav .nav-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .page-nav .nav-title { font-size: 14px; font-weight: 600; color: var(--accent); }
+  .page-nav .nav-placeholder { flex: 1; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-title" href="../../../../index.html">System Design Architectures</a>
+    <span class="header-tagline">LLD &middot; Design Patterns &middot; Memento</span>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="../../../../index.html">← Back to guide</a>
+    <h3>On this page</h3>
+    <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#theory">Theory</a>
+    <a class="toc" href="#diagram">Diagram</a>
+    <a class="toc" href="#when-to-use">When to Use</a>
+    <a class="toc" href="#real-world">Real-World Examples</a>
+    <a class="toc" href="#interview-questions">Interview Questions</a>
+    <a class="toc" href="#code">Code &amp; Output</a>
+  </nav>
+
+  <main class="content">
+    <nav class="breadcrumbs">
+      <a href="../../../../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../../../../index.html#lld">LLD</a>
+      <span class="sep">/</span>
+      <a href="../../../../index.html#design-patterns-behavioral">Design Patterns — Behavioral</a>
+      <span class="sep">/</span>
+      <span class="current">Memento</span>
+    </nav>
+    <h1 id="overview">Memento Pattern</h1>
+    <p>Lets an object capture and externally store a snapshot of its own state — for undo, checkpoints, or rollback — without exposing its internal representation to whoever holds the snapshot.</p>
+
+    <section id="theory">
+      <h2>Theory</h2>
+
+      <h3>The problem, in plain terms</h3>
+      <p>You're building a text editor with undo support. To undo, you need to be able to restore the document to some earlier state. The obvious approach is to let whatever code manages undo history reach directly into the <code>TextEditor</code> object and copy out its internal fields — but that breaks encapsulation, since external code now needs to know exactly what internal state the editor holds and how to reconstruct it. If the editor's internal representation changes later, the undo code breaks too.</p>
+      <p>Memento solves this by having the object itself (<code>TextEditor</code>, the <code>Originator</code>) create an opaque snapshot object (the <code>Memento</code>) that captures its own internal state, and hand that snapshot to external code without exposing what's inside it. The external code (a <code>History</code>/<code>Caretaker</code>) stores mementos and, to undo, hands a memento back to the originator, which restores its own state from it. The originator is the only thing that ever reads or writes the memento's actual internal contents — the caretaker just stores and passes it around as a black box.</p>
+
+      <h3>How it's built</h3>
+      <p>The <code>Originator</code> (<code>TextEditor</code>) has a method like <code>save()</code> that creates and returns a <code>Memento</code> containing a copy of its current state, and a <code>restore(memento)</code> method that sets its state back from a given memento. The <code>Memento</code> itself only exposes what the Originator needs to read it back — often the memento's fields are private to everything except the Originator. The <code>Caretaker</code> (<code>History</code>) just calls <code>originator.save()</code> to get mementos and stores them in a list/stack, calling <code>originator.restore(memento)</code> when undo is requested — it never inspects what's inside a memento.</p>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ Good practice</div>
+          <p>Genuinely restrict memento field access to the Originator (via a friend class, a nested private class, or a narrow interface) rather than leaving fields readable "for convenience" — that's what keeps the encapsulation guarantee real.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ Common mistake</div>
+          <p>Letting the Caretaker read or modify a memento's fields directly — it defeats the pattern's whole purpose and re-couples external code to the Originator's internal representation.</p>
+        </div>
+      </div>
+
+      <h3>Where it bites you</h3>
+      <p>Storing a full deep copy of large object state for every undo point can become memory-expensive if snapshots are taken frequently or the state is large — some implementations mitigate this by only storing diffs/deltas rather than full snapshots. Also, achieving true encapsulation (the Caretaker genuinely cannot read the memento's internals) requires some language-specific technique — many "textbook" implementations in practice just make the memento's fields readable, which weakens the encapsulation guarantee the pattern is meant to provide.</p>
+    </section>
+
+    <section id="diagram">
+      <h2>Diagram</h2>
+      <figure>
+        <img class="diagram-img" src="../../../../assets/memento/class-diagram.svg" alt="Memento pattern diagram showing TextEditor creating EditorMemento snapshots stored opaquely by History, restored back into TextEditor on undo">
+        <figcaption>History stores mementos opaquely — only TextEditor ever reads their contents</figcaption>
+      </figure>
+    </section>
+
+    <section id="when-to-use">
+      <h2>When to Use</h2>
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ Reach for it when</div>
+          <ul>
+            <li>You need undo/redo, checkpoints, or rollback for an object's state without exposing its internal representation.</li>
+            <li>You want the object itself responsible for capturing/restoring its own state, keeping that logic in one place.</li>
+          </ul>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ Don't reach for it when</div>
+          <ul>
+            <li>The state is trivially small — copying a couple of public fields directly is clear enough, no snapshot machinery needed.</li>
+            <li>Undo can be achieved more efficiently by replaying a log of reversible commands (see Command) instead of storing full state snapshots.</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:16px;"><strong>What interviewers are actually listening for:</strong> understanding that the core value of Memento is preserving encapsulation while still allowing external code to manage history — the Caretaker stores mementos opaquely and never reaches into their internals. Also, being able to discuss the memory cost trade-off of full-state snapshots versus command-log-based undo, showing awareness of real implementation trade-offs rather than reciting the pattern by rote.</p>
+    </section>
+
+    <section id="real-world">
+      <h2>Real-World Examples</h2>
+      <ul>
+        <li><strong>Text/image editor undo history</strong> — each edit creates a snapshot of document state that can be restored on undo.</li>
+        <li><strong>Database transaction savepoints</strong> — a savepoint captures the state to roll back to, without the calling code understanding the database's internal storage format.</li>
+        <li><strong>Game save states</strong> — a game's internal state is serialized into a save file (a memento) that can later restore the game to that exact point.</li>
+        <li><strong>Form wizards with a "back" button</strong> — each step's data is captured as a memento so navigating back restores the exact previous state.</li>
+        <li><strong>Version control snapshots</strong> — a commit captures a full snapshot of project state that can be restored without replaying every change from the beginning.</li>
+      </ul>
+    </section>
+
+    <section id="interview-questions">
+      <h2>Interview Questions</h2>
+      <p>Click a question to reveal the answer.</p>
+
+      <details class="qa">
+        <summary>What are the three roles in Memento, and what does each do?</summary>
+        <div class="qa-answer">
+          <p>Originator is the object whose state needs to be saved/restored — it creates mementos of itself and can restore its own state from one. Memento is the opaque snapshot object holding captured state, exposed only to the Originator's full reading. Caretaker stores mementos (often in a stack/list for undo history) and requests restores, but never inspects a memento's actual contents.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Why does the Caretaker never read a memento's internal state?</summary>
+        <div class="qa-answer">
+          <p>Because the whole point of the pattern is preserving encapsulation — the object being snapshotted (the Originator) is the only thing that understands its own internal representation. If the Caretaker could freely read memento internals, external code would become coupled to the Originator's internal structure, defeating the purpose.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>What's the main cost/trade-off of using Memento for undo?</summary>
+        <div class="qa-answer">
+          <p>Storing a full snapshot of state for every undo point can be memory-expensive, especially for large objects or frequent snapshots. An alternative is storing a log of reversible commands and replaying/undoing them, which can be cheaper if state is large but changes are small.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>How does Memento relate to Command when both support undo?</summary>
+        <div class="qa-answer">
+          <p>They solve undo differently: Memento captures and restores full state snapshots, letting the Originator's <code>restore()</code> jump directly back to a previous state. Command-based undo instead has each executed command carry enough information to reverse its own specific effect, without needing a full state snapshot — often cheaper, but requires every command to correctly implement its own inverse operation.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="code">
+      <h2>Code &amp; Output</h2>
+      <p>Same pattern, four languages. Every output shown here was captured from a real run — note undo discards the typo entirely, jumping back to the last saved checkpoint.</p>
+
+      <div class="terminal">
+        <div class="terminal-tabs">
+          <div class="terminal-tabs-group">
+            <button class="terminal-tab active" data-lang="java">Java</button>
+            <button class="terminal-tab" data-lang="python">Python</button>
+            <button class="terminal-tab" data-lang="javascript">JavaScript</button>
+            <button class="terminal-tab" data-lang="cpp">C++</button>
+          </div>
+          <button class="copy-btn" id="copy-btn">Copy</button>
+        </div>
+        <div class="terminal-body">
+          <pre><code id="terminal-code"></code></pre>
+          <div class="terminal-output-label">Output</div>
+          <div class="terminal-output" id="terminal-output"></div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="page-nav">
+      <a class="nav-link prev" href="mediator.html">
+        <span class="nav-label">&larr; Previous</span>
+        <span class="nav-title">Mediator</span>
+      </a>
+      <span class="nav-link next nav-placeholder">
+        <span class="nav-label">Next</span>
+        <span class="nav-title">More patterns coming soon</span>
+      </span>
+    </nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design Patterns.</span>
+    <span><a href="../../../../index.html">Back to guide home</a></span>
+  </div>
+</footer>
+
+<script>
+  const snippets = {
+    java: {
+      code: `// Memento Pattern — TextEditor (Originator) snapshots its state; History (Caretaker) stores it opaquely.
+// Compile: javac Memento.java
+// Run:     java Memento
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+// The Memento — immutable snapshot, readable only by TextEditor.
+class EditorMemento {
+    private final String content;
+
+    EditorMemento(String content) {
+        this.content = content;
+    }
+
+    private String getContent() {
+        return content;
+    }
+
+    // Package-private access point used only by TextEditor.
+    String read() {
+        return getContent();
+    }
+}
+
+class TextEditor {
+    private String content = "";
+
+    void type(String text) {
+        content += text;
+    }
+
+    String getContent() {
+        return content;
+    }
+
+    EditorMemento save() {
+        return new EditorMemento(content);
+    }
+
+    void restore(EditorMemento memento) {
+        content = memento.read();
+    }
+}
+
+class History {
+    private Deque<EditorMemento> history = new ArrayDeque<>();
+
+    void push(EditorMemento memento) {
+        history.push(memento);
+    }
+
+    EditorMemento pop() {
+        return history.pop();
+    }
+}
+
+public class Memento {
+    public static void main(String[] args) {
+        TextEditor editor = new TextEditor();
+        History history = new History();
+
+        editor.type("Hello");
+        history.push(editor.save());
+        System.out.println("Content: " + editor.getContent());
+
+        editor.type(", world");
+        history.push(editor.save());
+        System.out.println("Content: " + editor.getContent());
+
+        editor.type("!!! (typo)");
+        System.out.println("Content: " + editor.getContent());
+
+        System.out.println("Undo:");
+        editor.restore(history.pop());
+        System.out.println("Content: " + editor.getContent());
+
+        System.out.println("Undo again:");
+        editor.restore(history.pop());
+        System.out.println("Content: " + editor.getContent());
+    }
+}`,
+      output: `Content: Hello
+Content: Hello, world
+Content: Hello, world!!! (typo)
+Undo:
+Content: Hello, world
+Undo again:
+Content: Hello`
+    },
+    python: {
+      code: `"""
+Memento Pattern — TextEditor (Originator) snapshots its state; History (Caretaker) stores it opaquely.
+Run: python memento.py
+"""
+
+
+class EditorMemento:
+    """The Memento — treated as opaque by History; only TextEditor reads _content."""
+
+    def __init__(self, content):
+        self._content = content
+
+
+class TextEditor:
+    def __init__(self):
+        self.content = ""
+
+    def type(self, text):
+        self.content += text
+
+    def save(self):
+        return EditorMemento(self.content)
+
+    def restore(self, memento: EditorMemento):
+        self.content = memento._content
+
+
+class History:
+    def __init__(self):
+        self._stack = []
+
+    def push(self, memento):
+        self._stack.append(memento)
+
+    def pop(self):
+        return self._stack.pop()
+
+
+if __name__ == "__main__":
+    editor = TextEditor()
+    history = History()
+
+    editor.type("Hello")
+    history.push(editor.save())
+    print(f"Content: {editor.content}")
+
+    editor.type(", world")
+    history.push(editor.save())
+    print(f"Content: {editor.content}")
+
+    editor.type("!!! (typo)")
+    print(f"Content: {editor.content}")
+
+    print("Undo:")
+    editor.restore(history.pop())
+    print(f"Content: {editor.content}")
+
+    print("Undo again:")
+    editor.restore(history.pop())
+    print(f"Content: {editor.content}")`,
+      output: `Content: Hello
+Content: Hello, world
+Content: Hello, world!!! (typo)
+Undo:
+Content: Hello, world
+Undo again:
+Content: Hello`
+    },
+    javascript: {
+      code: `/**
+ * Memento Pattern — TextEditor (Originator) snapshots its state; History (Caretaker) stores it opaquely.
+ * Run: node memento.js
+ */
+
+class EditorMemento {
+  constructor(content) {
+    this._content = content; // treated as opaque by History; only TextEditor reads it
+  }
+}
+
+class TextEditor {
+  constructor() {
+    this.content = "";
+  }
+
+  type(text) {
+    this.content += text;
+  }
+
+  save() {
+    return new EditorMemento(this.content);
+  }
+
+  restore(memento) {
+    this.content = memento._content;
+  }
+}
+
+class History {
+  constructor() {
+    this.stack = [];
+  }
+
+  push(memento) {
+    this.stack.push(memento);
+  }
+
+  pop() {
+    return this.stack.pop();
+  }
+}
+
+const editor = new TextEditor();
+const history = new History();
+
+editor.type("Hello");
+history.push(editor.save());
+console.log(\`Content: \${editor.content}\`);
+
+editor.type(", world");
+history.push(editor.save());
+console.log(\`Content: \${editor.content}\`);
+
+editor.type("!!! (typo)");
+console.log(\`Content: \${editor.content}\`);
+
+console.log("Undo:");
+editor.restore(history.pop());
+console.log(\`Content: \${editor.content}\`);
+
+console.log("Undo again:");
+editor.restore(history.pop());
+console.log(\`Content: \${editor.content}\`);
+
+module.exports = { TextEditor, History, EditorMemento };`,
+      output: `Content: Hello
+Content: Hello, world
+Content: Hello, world!!! (typo)
+Undo:
+Content: Hello, world
+Undo again:
+Content: Hello`
+    },
+    cpp: {
+      code: `// Memento Pattern — TextEditor (Originator) snapshots its state; History (Caretaker) stores it opaquely.
+// Compile: g++ -std=c++14 Memento.cpp -o memento
+// Run:     ./memento
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+class TextEditor;
+
+// The Memento — only TextEditor is a friend, so History can't read its contents.
+class EditorMemento {
+public:
+    friend class TextEditor;
+
+    explicit EditorMemento(std::string content) : content_(std::move(content)) {}
+
+private:
+    std::string content_;
+};
+
+class TextEditor {
+public:
+    void type(const std::string& text) {
+        content_ += text;
+    }
+
+    const std::string& getContent() const {
+        return content_;
+    }
+
+    EditorMemento save() const {
+        return EditorMemento(content_);
+    }
+
+    void restore(const EditorMemento& memento) {
+        content_ = memento.content_;
+    }
+
+private:
+    std::string content_;
+};
+
+class History {
+public:
+    void push(const EditorMemento& memento) {
+        stack_.push_back(memento);
+    }
+
+    EditorMemento pop() {
+        EditorMemento last = stack_.back();
+        stack_.pop_back();
+        return last;
+    }
+
+private:
+    std::vector<EditorMemento> stack_;
+};
+
+int main() {
+    TextEditor editor;
+    History history;
+
+    editor.type("Hello");
+    history.push(editor.save());
+    std::cout << "Content: " << editor.getContent() << std::endl;
+
+    editor.type(", world");
+    history.push(editor.save());
+    std::cout << "Content: " << editor.getContent() << std::endl;
+
+    editor.type("!!! (typo)");
+    std::cout << "Content: " << editor.getContent() << std::endl;
+
+    std::cout << "Undo:" << std::endl;
+    editor.restore(history.pop());
+    std::cout << "Content: " << editor.getContent() << std::endl;
+
+    std::cout << "Undo again:" << std::endl;
+    editor.restore(history.pop());
+    std::cout << "Content: " << editor.getContent() << std::endl;
+
+    return 0;
+}`,
+      output: `Content: Hello
+Content: Hello, world
+Content: Hello, world!!! (typo)
+Undo:
+Content: Hello, world
+Undo again:
+Content: Hello`
+    }
+  };
+
+  const tabs = document.querySelectorAll('.terminal-tab');
+  const codeEl = document.getElementById('terminal-code');
+  const outputEl = document.getElementById('terminal-output');
+  const copyBtn = document.getElementById('copy-btn');
+
+  function renderLang(lang) {
+    codeEl.textContent = snippets[lang].code;
+    outputEl.textContent = snippets[lang].output;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.lang === lang));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => renderLang(tab.dataset.lang));
+  });
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+  }
+
+  function showCopied() {
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = 'Copy';
+      copyBtn.classList.remove('copied');
+    }, 1500);
+  }
+
+  copyBtn.addEventListener('click', () => {
+    const text = codeEl.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+        fallbackCopy(text);
+        showCopied();
+      });
+    } else {
+      fallbackCopy(text);
+      showCopied();
+    }
+  });
+
+  renderLang('java');
+</script>
+
+<script>
+  const sections = document.querySelectorAll('main section, main h1');
+  const links = document.querySelectorAll('nav.sidebar a.toc');
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 100) currentId = sec.id;
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+    });
+  });
+</script>
+
+</body>
+</html>
