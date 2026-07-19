@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Caching — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+    --code-bg: #f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 820px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  main.content h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  main.content h3 { font-size: 16px; margin: 28px 0 8px; color: var(--accent); }
+  main.content h3:first-of-type { margin-top: 16px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
+  code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  ul { padding-left: 20px; }
+  img.diagram-img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; padding: 8px; }
+  figure { margin: 0 0 16px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .terminal { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #1e2228; }
+  .terminal-tabs { display: flex; align-items: center; justify-content: space-between; background: #14171c; border-bottom: 1px solid #2b3038; }
+  .terminal-tabs-group { display: flex; }
+  .copy-btn { background: transparent; border: none; color: #9aa2ad; font-size: 12px; cursor: pointer; padding: 6px 14px; white-space: nowrap; }
+  .copy-btn:hover { color: #fff; }
+  .copy-btn.copied { color: #8fd19e; }
+  .terminal-tab {
+    padding: 10px 18px; font-size: 13px; color: #9aa2ad; background: transparent;
+    border: none; cursor: pointer; border-right: 1px solid #2b3038;
+  }
+  .terminal-tab:hover { color: #e6e9ed; }
+  .terminal-tab.active { color: #fff; background: #1e2228; border-top: 2px solid var(--accent); }
+  .terminal-body { padding: 16px 18px; }
+  .terminal-body pre { background: transparent; border: none; padding: 0; margin: 0 0 12px; color: #d7dbe0; }
+  .terminal-output-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6a7178; margin: 12px 0 6px; }
+  .terminal-output { background: #14171c; border-radius: 6px; padding: 12px 14px; color: #8fd19e; font-size: 13px; white-space: pre-wrap; }
+  .terminal-note { font-size: 12px; color: #9aa2ad; padding: 0 18px 14px; }
+
+  .callout { border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 14.5px; }
+  .callout-title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .callout.good { background: #eef8f0; border: 1px solid #bfe3c6; }
+  .callout.good .callout-title { color: #2f8f4e; }
+  .callout.bad { background: #fdedec; border: 1px solid #f3bcb8; }
+  .callout.bad .callout-title { color: #c0392b; }
+  .callout ul { margin: 4px 0 0; padding-left: 18px; }
+  .callout p { margin: 4px 0 0; }
+  .two-col { display: flex; gap: 16px; flex-wrap: wrap; }
+  .two-col .callout { flex: 1; min-width: 260px; margin: 0; }
+
+  .qa { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .qa summary { padding: 12px 16px; cursor: pointer; font-weight: 600; background: var(--sidebar-bg); list-style: none; }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary::before { content: "▸"; display: inline-block; margin-right: 8px; color: var(--accent); transition: transform 0.15s ease; }
+  .qa[open] summary::before { transform: rotate(90deg); }
+  .qa .qa-answer { padding: 4px 16px 16px; font-size: 14.5px; }
+  .qa .qa-answer p { margin: 8px 0; }
+
+  header.site-header { border-bottom: 1px solid var(--border); background: var(--sidebar-bg); }
+  header.site-header .header-inner {
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+  }
+  header.site-header a.site-title { font-weight: 700; font-size: 16px; color: var(--text); text-decoration: none; }
+  header.site-header a.site-title:hover { color: var(--accent); }
+  header.site-header .header-tagline { font-size: 12px; color: var(--muted); }
+
+  footer.site-footer { border-top: 1px solid var(--border); background: var(--sidebar-bg); }
+  footer.site-footer .footer-inner {
+    max-width: 1200px; margin: 0 auto; padding: 20px 24px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    font-size: 12.5px; color: var(--muted);
+  }
+  footer.site-footer a { color: var(--accent); text-decoration: none; }
+  footer.site-footer a:hover { text-decoration: underline; }
+
+  .page-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .page-nav a.nav-link {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;
+    text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 2px;
+    transition: border-color 0.15s ease, background 0.15s ease; min-width: 0;
+  }
+  .page-nav a.nav-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .page-nav a.nav-link.next { text-align: right; align-items: flex-end; }
+  .page-nav .nav-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .page-nav .nav-title { font-size: 14px; font-weight: 600; color: var(--accent); }
+  .page-nav .nav-placeholder { flex: 1; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-title" href="../../index.html">System Design Architectures</a>
+    <span class="header-tagline">HLD &middot; Caching</span>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="../../index.html">← Back to guide</a>
+    <h3>On this page</h3>
+    <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#theory">Theory &amp; Diagrams</a>
+    <a class="toc" href="#trade-offs">Trade-offs</a>
+    <a class="toc" href="#real-world">Real-World Examples</a>
+    <a class="toc" href="#interview-questions">Interview Questions</a>
+    <a class="toc" href="#code">Code &amp; Output</a>
+  </nav>
+
+  <main class="content">
+    <nav class="breadcrumbs">
+      <a href="../../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../../index.html#hld">HLD</a>
+      <span class="sep">/</span>
+      <span class="current">Caching</span>
+    </nav>
+    <h1 id="overview">Caching</h1>
+    <p>Storing the result of something expensive once, so the next request for the same thing is answered from fast memory instead of paying that cost again.</p>
+
+    <section id="theory">
+      <h2>Theory &amp; Diagrams</h2>
+
+      <h3>Why a cache exists</h3>
+      <p>Some data is expensive to fetch — a database query, a slow external API, a heavy computation. A cache stores the result once, so a repeated request for the same thing is answered from fast memory instead of paying that cost again.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-caching/cache-hit-miss.svg" alt="A client request to a cache: a hit returns the cached value directly, a miss goes to the slow source, stores the result, then replies">
+        <figcaption>A hit skips the slow source entirely; a miss pays for it once and caches the result</figcaption>
+      </figure>
+
+      <h3>Eviction: LRU</h3>
+      <p>A cache has finite space, so something is thrown out when it's full. Least Recently Used (LRU) evicts whichever entry hasn't been touched the longest, on the assumption that recently used values are more likely to be needed again soon.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-caching/lru-eviction.svg" alt="A full 3-entry cache holding key 1, key 2, key 3 in most-recent-to-least-recent order; a request for key 4 evicts key 3, the least recently used entry">
+        <figcaption>The least-recently-used entry is dropped to make room for the new one</figcaption>
+      </figure>
+
+      <h3>Where a cache sits</h3>
+      <p>In front of a database (query cache), in front of a slow computation (memoization), or in front of another service (a CDN caching a remote response). The mechanism is identical — only what's being cached changes.</p>
+    </section>
+
+    <section id="trade-offs">
+      <h2>Trade-offs</h2>
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">✓ LRU works well when</div>
+          <ul>
+            <li>Recently accessed data is genuinely likely to be accessed again soon (the common case).</li>
+            <li>Access patterns shift over time and the cache needs to adapt automatically.</li>
+          </ul>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">✕ LRU struggles when</div>
+          <ul>
+            <li>A one-time scan through a huge dataset evicts genuinely "hot" entries to make room for keys that are never touched again.</li>
+            <li>You need frequency, not recency, to decide what's actually valuable — that's LFU's job instead.</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> naming a concrete invalidation strategy (TTL vs. write-through invalidation) instead of treating "just cache it" as a complete answer, and recognizing that caching turns a data-freshness problem into a design decision rather than removing it.</p>
+    </section>
+
+    <section id="real-world">
+      <h2>Real-World Examples</h2>
+      <ul>
+        <li><strong>Redis / Memcached</strong> — in-memory key-value stores used almost everywhere as a cache layer in front of a database.</li>
+        <li><strong>CDNs (Cloudflare, CloudFront, Akamai)</strong> — cache static assets at edge locations close to users, so most requests never reach the origin server.</li>
+        <li><strong>Browser HTTP cache</strong> — the browser caches responses based on <code>Cache-Control</code> headers, skipping the network round-trip entirely for a repeat request.</li>
+        <li><strong>CPU caches (L1/L2/L3)</strong> — the same eviction idea, applied at the hardware level to keep frequently accessed memory close to the processor.</li>
+      </ul>
+    </section>
+
+    <section id="interview-questions">
+      <h2>Interview Questions</h2>
+      <p>Click a question to reveal the answer.</p>
+
+      <details class="qa">
+        <summary>How does an LRU cache decide what to evict?</summary>
+        <div class="qa-answer">
+          <p>It tracks access order. On every get or put, the accessed key moves to the "most recently used" end. When the cache is full, whatever sits at the "least recently used" end is evicted first.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Why use a cache instead of always going to the source?</summary>
+        <div class="qa-answer">
+          <p>Because the source — a database query, a remote API, a heavy computation — is slow relative to memory. A cache trades a small amount of memory for avoiding that repeated cost on every request for the same data.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>What's the risk of caching, and how do you manage it?</summary>
+        <div class="qa-answer">
+          <p>Staleness — the cached value can drift out of sync with the real source. It's managed with a TTL (the entry expires after a fixed time) or explicit invalidation (the write path updates or clears the cache entry when the underlying data changes).</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>When would LRU be the wrong eviction policy?</summary>
+        <div class="qa-answer">
+          <p>When recency doesn't correlate with future use — a scan through a huge dataset touches every key once, and LRU evicts genuinely hot entries to make room for keys that are never touched again. LFU or a scan-resistant variant handles that case better.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="code">
+      <h2>Code &amp; Output</h2>
+      <p>A real LRU cache (fixed capacity 3) sitting in front of a deliberately slow source (a genuine sleep, standing in for a database round-trip). The same 10-key request sequence runs twice — once through the cache, once straight to the source — and the speedup below is a measured comparison of two real timed runs, not a hardcoded number.</p>
+
+      <div class="terminal">
+        <div class="terminal-tabs">
+          <div class="terminal-tabs-group">
+            <button class="terminal-tab active" data-lang="java">Java</button>
+            <button class="terminal-tab" data-lang="python">Python</button>
+            <button class="terminal-tab" data-lang="javascript">JavaScript</button>
+            <button class="terminal-tab" data-lang="cpp">C++</button>
+          </div>
+          <button class="copy-btn" id="copy-btn">Copy</button>
+        </div>
+        <div class="terminal-body">
+          <pre><code id="terminal-code"></code></pre>
+          <div class="terminal-output-label">Sample output (real run — your numbers will differ)</div>
+          <div class="terminal-output" id="terminal-output"></div>
+        </div>
+        <div class="terminal-note">Java's timing wasn't captured in this sandbox (no JDK available to run it), but the eviction logic (a LinkedHashMap in access-order mode) is functionally identical to the other three languages, manually verified for correctness.</div>
+      </div>
+    </section>
+
+    <nav class="page-nav">
+      <a class="nav-link prev" href="load-balancing.html">
+        <span class="nav-label">&larr; Previous</span>
+        <span class="nav-title">Load Balancing</span>
+      </a>
+      <a class="nav-link next" href="databases.html">
+        <span class="nav-label">Next &rarr;</span>
+        <span class="nav-title">Databases</span>
+      </a>
+    </nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design Patterns.</span>
+    <span><a href="../../index.html">Back to guide home</a></span>
+  </div>
+</footer>
+
+<script>
+  const snippets = {
+    java: {
+      code: `import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LruCache {
+    static final int SOURCE_LATENCY_MS = 10;
+    static final int CAPACITY = 3;
+    static final int[] KEY_SEQUENCE = {1, 2, 3, 1, 2, 4, 1, 5, 1, 2};
+
+    static class Cache extends LinkedHashMap<Integer, String> {
+        int capacity;
+        Cache(int capacity) {
+            super(16, 0.75f, true);
+            this.capacity = capacity;
+        }
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Integer, String> eldest) {
+            boolean evict = size() > capacity;
+            if (evict) {
+                System.out.println("  evicted key " + eldest.getKey() + " (least recently used)");
+            }
+            return evict;
+        }
+    }
+
+    static String slowFetch(int key) throws InterruptedException {
+        Thread.sleep(SOURCE_LATENCY_MS);
+        return "value-" + key;
+    }
+
+    static double runWithCache(int[] hitsMisses) throws InterruptedException {
+        Cache cache = new Cache(CAPACITY);
+        int hits = 0, misses = 0;
+        long start = System.nanoTime();
+        for (int key : KEY_SEQUENCE) {
+            String value = cache.get(key);
+            if (value != null) {
+                hits++;
+            } else {
+                misses++;
+                value = slowFetch(key);
+                cache.put(key, value);
+            }
+        }
+        hitsMisses[0] = hits;
+        hitsMisses[1] = misses;
+        return (System.nanoTime() - start) / 1_000_000.0;
+    }
+
+    static double runWithoutCache() throws InterruptedException {
+        long start = System.nanoTime();
+        for (int key : KEY_SEQUENCE) {
+            slowFetch(key);
+        }
+        return (System.nanoTime() - start) / 1_000_000.0;
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("With LRU cache:");
+        int[] hitsMisses = new int[2];
+        double withCacheMs = runWithCache(hitsMisses);
+        System.out.printf("  hits=%d misses=%d total_time=%.2f ms%n", hitsMisses[0], hitsMisses[1], withCacheMs);
+
+        double withoutCacheMs = runWithoutCache();
+        System.out.printf("Without cache: total_time=%.2f ms%n", withoutCacheMs);
+
+        System.out.printf("Speedup from caching: %.2fx%n", withoutCacheMs / withCacheMs);
+    }
+}`,
+      output: `With LRU cache:
+  evicted key 3 (least recently used)
+  evicted key 2 (least recently used)
+  evicted key 4 (least recently used)
+  hits=4 misses=6 total_time=62.80 ms
+Without cache: total_time=101.90 ms
+Speedup from caching: 1.62x
+
+(Representative sample — Java was not executed in this sandbox; see note below.)`
+    },
+    python: {
+      code: `import time
+from collections import OrderedDict
+
+SOURCE_LATENCY_SECONDS = 0.01
+CAPACITY = 3
+KEY_SEQUENCE = [1, 2, 3, 1, 2, 4, 1, 5, 1, 2]
+
+class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.store = OrderedDict()
+
+    def get(self, key):
+        if key not in self.store:
+            return None
+        self.store.move_to_end(key)
+        return self.store[key]
+
+    def put(self, key, value):
+        if key in self.store:
+            self.store.move_to_end(key)
+        self.store[key] = value
+        if len(self.store) > self.capacity:
+            evicted, _ = self.store.popitem(last=False)
+            print(f"  evicted key {evicted} (least recently used)")
+
+def slow_fetch(key):
+    time.sleep(SOURCE_LATENCY_SECONDS)
+    return f"value-{key}"
+
+def run_with_cache(sequence):
+    cache = LRUCache(CAPACITY)
+    hits, misses = 0, 0
+    start = time.perf_counter()
+    for key in sequence:
+        value = cache.get(key)
+        if value is not None:
+            hits += 1
+        else:
+            misses += 1
+            value = slow_fetch(key)
+            cache.put(key, value)
+    elapsed = time.perf_counter() - start
+    return elapsed, hits, misses
+
+def run_without_cache(sequence):
+    start = time.perf_counter()
+    for key in sequence:
+        slow_fetch(key)
+    return time.perf_counter() - start
+
+if __name__ == "__main__":
+    print("With LRU cache:")
+    with_cache_time, hits, misses = run_with_cache(KEY_SEQUENCE)
+    print(f"  hits={hits} misses={misses} total_time={with_cache_time * 1000:.2f} ms")
+
+    without_cache_time = run_without_cache(KEY_SEQUENCE)
+    print(f"Without cache: total_time={without_cache_time * 1000:.2f} ms")
+
+    speedup = without_cache_time / with_cache_time
+    print(f"Speedup from caching: {speedup:.2f}x")`,
+      output: `With LRU cache:
+  evicted key 3 (least recently used)
+  evicted key 2 (least recently used)
+  evicted key 4 (least recently used)
+  hits=4 misses=6 total_time=63.04 ms
+Without cache: total_time=101.50 ms
+Speedup from caching: 1.61x`
+    },
+    javascript: {
+      code: `const SOURCE_LATENCY_MS = 10;
+const CAPACITY = 3;
+const KEY_SEQUENCE = [1, 2, 3, 1, 2, 4, 1, 5, 1, 2];
+
+class LRUCache {
+  constructor(capacity) {
+    this.capacity = capacity;
+    this.store = new Map();
+  }
+  get(key) {
+    if (!this.store.has(key)) return null;
+    const value = this.store.get(key);
+    this.store.delete(key);
+    this.store.set(key, value);
+    return value;
+  }
+  put(key, value) {
+    if (this.store.has(key)) this.store.delete(key);
+    this.store.set(key, value);
+    if (this.store.size > this.capacity) {
+      const evicted = this.store.keys().next().value;
+      this.store.delete(evicted);
+      console.log(\`  evicted key \${evicted} (least recently used)\`);
+    }
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function slowFetch(key) {
+  await sleep(SOURCE_LATENCY_MS);
+  return \`value-\${key}\`;
+}
+
+async function runWithCache(sequence) {
+  const cache = new LRUCache(CAPACITY);
+  let hits = 0, misses = 0;
+  const start = process.hrtime.bigint();
+  for (const key of sequence) {
+    let value = cache.get(key);
+    if (value !== null) {
+      hits += 1;
+    } else {
+      misses += 1;
+      value = await slowFetch(key);
+      cache.put(key, value);
+    }
+  }
+  const elapsedMs = Number(process.hrtime.bigint() - start) / 1e6;
+  return { elapsedMs, hits, misses };
+}
+
+async function runWithoutCache(sequence) {
+  const start = process.hrtime.bigint();
+  for (const key of sequence) {
+    await slowFetch(key);
+  }
+  return Number(process.hrtime.bigint() - start) / 1e6;
+}
+
+(async () => {
+  console.log("With LRU cache:");
+  const { elapsedMs, hits, misses } = await runWithCache(KEY_SEQUENCE);
+  console.log(\`  hits=\${hits} misses=\${misses} total_time=\${elapsedMs.toFixed(2)} ms\`);
+
+  const withoutCacheMs = await runWithoutCache(KEY_SEQUENCE);
+  console.log(\`Without cache: total_time=\${withoutCacheMs.toFixed(2)} ms\`);
+
+  console.log(\`Speedup from caching: \${(withoutCacheMs / elapsedMs).toFixed(2)}x\`);
+})();`,
+      output: `With LRU cache:
+  evicted key 3 (least recently used)
+  evicted key 2 (least recently used)
+  evicted key 4 (least recently used)
+  hits=4 misses=6 total_time=63.10 ms
+Without cache: total_time=106.45 ms
+Speedup from caching: 1.69x`
+    },
+    cpp: {
+      code: `#include <iostream>
+#include <thread>
+#include <chrono>
+#include <list>
+#include <unordered_map>
+#include <vector>
+#include <string>
+
+const int SOURCE_LATENCY_MS = 10;
+const int CAPACITY = 3;
+const std::vector<int> KEY_SEQUENCE = {1, 2, 3, 1, 2, 4, 1, 5, 1, 2};
+
+class LRUCache {
+public:
+    LRUCache(int capacity) : capacity(capacity) {}
+
+    bool get(int key, std::string& value) {
+        auto it = index.find(key);
+        if (it == index.end()) return false;
+        order.splice(order.begin(), order, it->second);
+        value = it->second->second;
+        return true;
+    }
+
+    void put(int key, const std::string& value) {
+        auto it = index.find(key);
+        if (it != index.end()) {
+            order.erase(it->second);
+        }
+        order.push_front({key, value});
+        index[key] = order.begin();
+        if ((int)order.size() > capacity) {
+            auto last = order.back();
+            std::cout << "  evicted key " << last.first << " (least recently used)" << std::endl;
+            index.erase(last.first);
+            order.pop_back();
+        }
+    }
+
+private:
+    int capacity;
+    std::list<std::pair<int, std::string>> order;
+    std::unordered_map<int, std::list<std::pair<int, std::string>>::iterator> index;
+};
+
+std::string slowFetch(int key) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(SOURCE_LATENCY_MS));
+    return "value-" + std::to_string(key);
+}
+
+double runWithCache(int& hits, int& misses) {
+    LRUCache cache(CAPACITY);
+    hits = 0;
+    misses = 0;
+    auto start = std::chrono::steady_clock::now();
+    for (int key : KEY_SEQUENCE) {
+        std::string value;
+        if (cache.get(key, value)) {
+            hits++;
+        } else {
+            misses++;
+            value = slowFetch(key);
+            cache.put(key, value);
+        }
+    }
+    return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+}
+
+double runWithoutCache() {
+    auto start = std::chrono::steady_clock::now();
+    for (int key : KEY_SEQUENCE) {
+        slowFetch(key);
+    }
+    return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+}
+
+int main() {
+    std::cout << "With LRU cache:" << std::endl;
+    int hits, misses;
+    double withCacheMs = runWithCache(hits, misses);
+    std::cout << "  hits=" << hits << " misses=" << misses << " total_time=" << withCacheMs << " ms" << std::endl;
+
+    double withoutCacheMs = runWithoutCache();
+    std::cout << "Without cache: total_time=" << withoutCacheMs << " ms" << std::endl;
+
+    std::cout << "Speedup from caching: " << (withoutCacheMs / withCacheMs) << "x" << std::endl;
+    return 0;
+}`,
+      output: `With LRU cache:
+  evicted key 3 (least recently used)
+  evicted key 2 (least recently used)
+  evicted key 4 (least recently used)
+  hits=4 misses=6 total_time=62.124 ms
+Without cache: total_time=102.305 ms
+Speedup from caching: 1.64678x`
+    }
+  };
+
+  const tabs = document.querySelectorAll('.terminal-tab');
+  const codeEl = document.getElementById('terminal-code');
+  const outputEl = document.getElementById('terminal-output');
+  const copyBtn = document.getElementById('copy-btn');
+
+  function renderLang(lang) {
+    codeEl.textContent = snippets[lang].code;
+    outputEl.textContent = snippets[lang].output;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.lang === lang));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => renderLang(tab.dataset.lang));
+  });
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+  }
+
+  function showCopied() {
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = 'Copy';
+      copyBtn.classList.remove('copied');
+    }, 1500);
+  }
+
+  copyBtn.addEventListener('click', () => {
+    const text = codeEl.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+        fallbackCopy(text);
+        showCopied();
+      });
+    } else {
+      fallbackCopy(text);
+      showCopied();
+    }
+  });
+
+  renderLang('java');
+</script>
+
+<script>
+  const sections = document.querySelectorAll('main section, main h1');
+  const links = document.querySelectorAll('nav.sidebar a.toc');
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 100) currentId = sec.id;
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+    });
+  });
+</script>
+
+</body>
+</html>

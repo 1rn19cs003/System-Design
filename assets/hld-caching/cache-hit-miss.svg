@@ -1,0 +1,33 @@
+<svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="arrow-good" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="100" width="110" height="55" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="75" y="132" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">Client</text>
+
+  <rect x="220" y="100" width="120" height="55" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="280" y="132" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">Cache</text>
+
+  <rect x="470" y="185" width="140" height="55" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="540" y="217" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2f33">Slow source</text>
+
+  <line x1="130" y1="120" x2="220" y2="120" stroke="#3b6ea5" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="175" y="107" text-anchor="middle" font-size="10" fill="#6a7178">request</text>
+
+  <line x1="340" y1="115" x2="130" y2="115" stroke="#2f8f4e" stroke-width="1.4" marker-end="url(#arrow-good)"/>
+  <text x="235" y="90" text-anchor="middle" font-size="11" fill="#2f8f4e">hit — return cached value</text>
+
+  <line x1="340" y1="140" x2="470" y2="205" stroke="#c0392b" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="440" y="160" text-anchor="middle" font-size="11" fill="#c0392b">miss — fetch from source</text>
+
+  <line x1="470" y1="222" x2="340" y2="150" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="440" y="245" text-anchor="middle" font-size="10" fill="#6a7178">store result, then reply to client</text>
+
+  <title>Cache hit vs. cache miss</title>
+</svg>
