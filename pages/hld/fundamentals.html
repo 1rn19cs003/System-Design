@@ -141,6 +141,7 @@
     <a class="back" href="../../index.html">← Back to guide</a>
     <h3>On this page</h3>
     <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#plain-english">In Plain English</a>
     <a class="toc" href="#theory">Theory &amp; Diagrams</a>
     <a class="toc" href="#trade-offs">Trade-offs</a>
     <a class="toc" href="#real-world">Real-World Examples</a>
@@ -158,6 +159,27 @@
     </nav>
     <h1 id="overview">HLD Fundamentals</h1>
     <p>The client-server model, DNS, HTTP, and the difference between latency and throughput — the vocabulary every other HLD topic builds on.</p>
+
+    <section id="plain-english">
+      <h2>In Plain English</h2>
+      <p>If any of the terms below are new, start here — this is the same story as the technical section, just told without jargon first.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/hld-fundamentals/restaurant-analogy.svg" alt="Ordering pizza by phone, mapped step by step to a client, a DNS resolver, a TCP/HTTP request, and a server">
+        <figcaption>Every web request is this exact story, just over a network instead of a phone line</figcaption>
+      </figure>
+
+      <div class="two-col">
+        <div class="callout good">
+          <div class="callout-title">New to this? Start here</div>
+          <p>Just remember the four nouns: <strong>client</strong> (you, asking), <strong>DNS</strong> (the phone book), <strong>request/response</strong> (the call), <strong>server</strong> (the kitchen). Everything else in HLD is these four ideas, scaled up and made more reliable.</p>
+        </div>
+        <div class="callout bad">
+          <div class="callout-title">Already comfortable? Push further</div>
+          <p>The interesting question isn't "what is a request" — it's "what happens when 10,000 people call Tony's at once." That's where load balancing, caching, and databases (the next topics) come in.</p>
+        </div>
+      </div>
+    </section>
 
     <section id="theory">
       <h2>Theory &amp; Diagrams</h2>
@@ -220,6 +242,8 @@
         </div>
       </div>
       <p style="margin-top:16px;"><strong>What interviewers are listening for:</strong> a concrete definition of both terms, an example of a system tuned for one at the expense of the other, and knowing that a request's latency budget includes DNS + TCP handshake + TLS handshake (if HTTPS) + the request/response itself, not just server processing time.</p>
+      <p style="margin-top:12px;"><strong>If you're a fresher:</strong> just being able to say "latency is per-request speed, throughput is total volume" out loud, with one example of each, clears the bar for this question at most entry-level interviews.</p>
+      <p style="margin-top:8px;"><strong>If you're ~3 years in:</strong> you should also be able to say where in your own systems latency actually gets spent (network hop, DB query, serialization) and name one real change you made that traded one metric for the other.</p>
     </section>
 
     <section id="real-world">

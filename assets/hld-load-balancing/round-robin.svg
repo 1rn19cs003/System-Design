@@ -25,7 +25,7 @@
   <text x="185" y="112" text-anchor="middle" font-size="10" fill="#6a7178">requests</text>
 
   <line x1="370" y1="112" x2="500" y2="45" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
-  <text x="470" y="50" text-anchor="middle" font-size="10" fill="#6a7178">req 1, 4, 7...</text>
+  <text x="420" y="65" text-anchor="middle" font-size="10" fill="#6a7178">req 1, 4, 7...</text>
 
   <line x1="370" y1="125" x2="500" y2="130" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
   <text x="435" y="115" text-anchor="middle" font-size="10" fill="#6a7178">req 2, 5, 8...</text>
