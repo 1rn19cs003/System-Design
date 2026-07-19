@@ -48,6 +48,11 @@
   main.content h3 { font-size: 16px; margin: 28px 0 8px; color: var(--accent); }
   main.content h3:first-of-type { margin-top: 16px; }
   .tag { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-bottom: 12px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
   pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
   code { font-family: "SF Mono", Consolas, Monaco, monospace; }
   ul { padding-left: 20px; }
@@ -56,7 +61,11 @@
   figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
 
   .terminal { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #1e2228; }
-  .terminal-tabs { display: flex; background: #14171c; border-bottom: 1px solid #2b3038; }
+  .terminal-tabs { display: flex; align-items: center; justify-content: space-between; background: #14171c; border-bottom: 1px solid #2b3038; }
+  .terminal-tabs-group { display: flex; }
+  .copy-btn { background: transparent; border: none; color: #9aa2ad; font-size: 12px; cursor: pointer; padding: 6px 14px; white-space: nowrap; }
+  .copy-btn:hover { color: #fff; }
+  .copy-btn.copied { color: #8fd19e; }
   .terminal-tab { padding: 10px 18px; font-size: 13px; color: #9aa2ad; background: transparent; border: none; cursor: pointer; border-right: 1px solid #2b3038; }
   .terminal-tab:hover { color: #e6e9ed; }
   .terminal-tab.active { color: #fff; background: #1e2228; border-top: 2px solid var(--accent); }
@@ -101,7 +110,15 @@
   </nav>
 
   <main class="content">
-    <span class="tag">LLD → Design Patterns → Creational</span>
+    <nav class="breadcrumbs">
+      <a href="../../../../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../../../../index.html#lld">LLD</a>
+      <span class="sep">/</span>
+      <a href="../../../../index.html#design-patterns-creational">Design Patterns — Creational</a>
+      <span class="sep">/</span>
+      <span class="current">Builder</span>
+    </nav>
     <h1 id="overview">Builder Pattern</h1>
     <p>Separates the construction of a complex object from its representation, so the same construction process can build different configurations, step by step.</p>
 
@@ -209,10 +226,13 @@
 
       <div class="terminal">
         <div class="terminal-tabs">
-          <button class="terminal-tab active" data-lang="java">Java</button>
-          <button class="terminal-tab" data-lang="python">Python</button>
-          <button class="terminal-tab" data-lang="javascript">JavaScript</button>
-          <button class="terminal-tab" data-lang="cpp">C++</button>
+          <div class="terminal-tabs-group">
+            <button class="terminal-tab active" data-lang="java">Java</button>
+            <button class="terminal-tab" data-lang="python">Python</button>
+            <button class="terminal-tab" data-lang="javascript">JavaScript</button>
+            <button class="terminal-tab" data-lang="cpp">C++</button>
+          </div>
+          <button class="copy-btn" id="copy-btn">Copy</button>
         </div>
         <div class="terminal-body">
           <pre><code id="terminal-code"></code></pre>
@@ -511,6 +531,7 @@ Computer{cpu=Intel i9, ramGB=32, storageGB=2000, hasGPU=true}`
   const tabs = document.querySelectorAll('.terminal-tab');
   const codeEl = document.getElementById('terminal-code');
   const outputEl = document.getElementById('terminal-output');
+  const copyBtn = document.getElementById('copy-btn');
 
   function renderLang(lang) {
     codeEl.textContent = snippets[lang].code;
@@ -520,6 +541,39 @@ Computer{cpu=Intel i9, ramGB=32, storageGB=2000, hasGPU=true}`
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => renderLang(tab.dataset.lang));
+  });
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+  }
+
+  function showCopied() {
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = 'Copy';
+      copyBtn.classList.remove('copied');
+    }, 1500);
+  }
+
+  copyBtn.addEventListener('click', () => {
+    const text = codeEl.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+        fallbackCopy(text);
+        showCopied();
+      });
+    } else {
+      fallbackCopy(text);
+      showCopied();
+    }
   });
 
   renderLang('java');
