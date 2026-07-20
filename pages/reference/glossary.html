@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>System Design Glossary — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 240px; flex-shrink: 0; padding: 24px 16px; border-right: 1px solid var(--border); background: var(--sidebar-bg);
+    position: sticky; top: 57px; align-self: flex-start; height: calc(100vh - 57px); overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 860px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
+
+  .az-bar { display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 28px; padding: 12px; background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 8px; position: sticky; top: 57px; z-index: 5; }
+  .az-bar a { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none; color: var(--text); font-size: 13px; font-weight: 600; }
+  .az-bar a:hover { background: var(--accent-soft); color: var(--accent); }
+  .az-bar a.disabled { color: var(--border); pointer-events: none; }
+
+  .letter-group { margin-bottom: 30px; scroll-margin-top: 110px; }
+  .letter-group h2 { font-size: 22px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin: 0 0 14px; }
+  dl.terms { margin: 0; }
+  dl.terms dt { font-weight: 700; font-size: 15px; margin-top: 14px; }
+  dl.terms dt:first-child { margin-top: 0; }
+  dl.terms dd { margin: 3px 0 0; font-size: 14.5px; color: var(--text); }
+  dl.terms dd a { color: var(--accent); text-decoration: none; }
+  dl.terms dd a:hover { text-decoration: underline; }
+
+  header.site-header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--border); background: #fff; }
+  .header-top { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .header-brand { display: flex; align-items: center; gap: 10px; }
+  .header-brand img.logo-mark-img { width: 28px; height: 28px; border-radius: 7px; display: block; }
+  .header-brand a.site-title { font-weight: 700; font-size: 16px; color: var(--text); text-decoration: none; }
+  .header-brand a.site-title:hover { color: var(--accent); }
+  .header-brand .header-tagline { font-size: 12px; color: var(--muted); }
+  nav.header-nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav.header-nav a { font-size: 13.5px; font-weight: 600; text-decoration: none; color: var(--muted); padding: 7px 12px; border-radius: 7px; }
+  nav.header-nav a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  footer.site-footer { border-top: 1px solid var(--border); background: var(--sidebar-bg); }
+  .footer-grid { max-width: 1200px; margin: 0 auto; padding: 32px 24px 20px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 24px; }
+  .footer-col h4 { margin: 0 0 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .footer-col p { margin: 0; font-size: 13px; color: var(--muted); max-width: 320px; }
+  .footer-col a { display: block; font-size: 13.5px; color: var(--text); text-decoration: none; margin-bottom: 8px; }
+  .footer-col a:hover { color: var(--accent); text-decoration: underline; }
+  .footer-bottom { max-width: 1200px; margin: 0 auto; padding: 14px 24px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12.5px; color: var(--muted); }
+  .footer-bottom a { color: var(--accent); text-decoration: none; }
+  .footer-bottom a:hover { text-decoration: underline; }
+  @media (max-width: 820px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+
+  .page-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .page-nav a.nav-link { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 2px; transition: border-color 0.15s ease, background 0.15s ease; min-width: 0; }
+  .page-nav a.nav-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .page-nav a.nav-link.next { text-align: right; align-items: flex-end; }
+  .page-nav .nav-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .page-nav .nav-title { font-size: 14px; font-weight: 600; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="header-brand">
+      <img class="logo-mark-img" src="../../assets/shared/logo-mark.svg" alt="System Design Architectures logo">
+      <a class="site-title" href="../../index.html">System Design Architectures</a>
+      <span class="header-tagline">Reference</span>
+    </div>
+    <nav class="header-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../index.html#hld-section">HLD</a>
+      <a href="../../index.html#lld-section">LLD</a>
+      <a href="../../index.html#patterns-section">Design Patterns</a>
+      <a href="../case-studies/index.html">Case Studies</a>
+      <a href="index.html">Reference</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="index.html">← Back to Reference</a>
+    <h3>Jump to letter</h3>
+    <a class="toc" href="#A">A</a>
+    <a class="toc" href="#B">B</a>
+    <a class="toc" href="#C">C</a>
+    <a class="toc" href="#D">D</a>
+    <a class="toc" href="#E">E</a>
+    <a class="toc" href="#F">F</a>
+    <a class="toc" href="#G">G</a>
+    <a class="toc" href="#H">H</a>
+    <a class="toc" href="#I">I</a>
+    <a class="toc" href="#J">J</a>
+    <a class="toc" href="#K">K</a>
+    <a class="toc" href="#L">L</a>
+    <a class="toc" href="#M">M</a>
+    <a class="toc" href="#N">N</a>
+    <a class="toc" href="#O">O</a>
+    <a class="toc" href="#P">P</a>
+    <a class="toc" href="#Q">Q</a>
+    <a class="toc" href="#R">R</a>
+    <a class="toc" href="#S">S</a>
+    <a class="toc" href="#T">T</a>
+    <a class="toc" href="#U">U</a>
+    <a class="toc" href="#V">V</a>
+    <a class="toc" href="#W">W</a>
+    <a class="toc" href="#Z">Z</a>
+  </nav>
+
+  <main class="content">
+    <nav class="breadcrumbs">
+      <a href="../../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="index.html">Reference</a>
+      <span class="sep">/</span>
+      <span class="current">Glossary</span>
+    </nav>
+    <h1 id="overview">System Design Glossary</h1>
+    <p>Sixty-plus terms from HLD, LLD, and design patterns, defined in one or two sentences each. Meant for scanning, not reading top to bottom — use the A&ndash;Z bar or your browser's find (Ctrl/Cmd+F) to jump straight to a term.</p>
+
+    <div class="az-bar">
+      <a href="#A">A</a><a href="#B">B</a><a href="#C">C</a><a href="#D">D</a><a href="#E">E</a>
+      <a href="#F">F</a><a href="#G">G</a><a href="#H">H</a><a href="#I">I</a><a href="#J">J</a>
+      <a href="#K">K</a><a href="#L">L</a><a href="#M">M</a><a href="#N">N</a><a href="#O">O</a>
+      <a href="#P">P</a><a href="#Q">Q</a><a href="#R">R</a><a href="#S">S</a><a href="#T">T</a>
+      <a href="#U">U</a><a href="#V">V</a><a href="#W">W</a><a class="disabled">X</a><a class="disabled">Y</a><a href="#Z">Z</a>
+    </div>
+
+    <div class="letter-group" id="A">
+      <h2>A</h2>
+      <dl class="terms">
+        <dt>ACID</dt><dd>Atomicity, Consistency, Isolation, Durability — the four guarantees a traditional relational transaction makes, so a multi-step operation either fully completes or fully rolls back.</dd>
+        <dt>API Gateway</dt><dd>A single entry point in front of a set of services that handles routing, auth, rate limiting, and request shaping, so clients don't talk to each backend service directly.</dd>
+        <dt>At-least-once delivery</dt><dd>A messaging guarantee that a message will be delivered one or more times, never zero — safe against loss, but requires the consumer to handle duplicates (idempotency).</dd>
+        <dt>At-most-once delivery</dt><dd>A messaging guarantee that a message is delivered zero or one times, never more — safe against duplicates, but can silently lose messages.</dd>
+        <dt>Availability</dt><dd>The fraction of time a system is usable, often expressed as a string of nines (99.9%, 99.99%). See <a href="../core-principles.html">Core Principles</a>.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="B">
+      <h2>B</h2>
+      <dl class="terms">
+        <dt>Back-of-envelope estimation</dt><dd>Quick, order-of-magnitude math (traffic &rarr; QPS &rarr; storage &rarr; servers) used early in a system design interview to size the problem before designing. See the <a href="latency-numbers.html">Numbers Every Engineer Should Know</a> page.</dd>
+        <dt>Backpressure</dt><dd>A mechanism where a slow downstream consumer signals an upstream producer to slow down, preventing the consumer from being overwhelmed.</dd>
+        <dt>Bloom filter</dt><dd>A space-efficient probabilistic structure that can say "definitely not present" or "maybe present" for set membership, used to avoid expensive lookups for keys that don't exist.</dd>
+        <dt>Bounded context</dt><dd>A domain-driven design boundary within which a particular model and its terms have one consistent meaning — often maps directly onto a microservice boundary.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="C">
+      <h2>C</h2>
+      <dl class="terms">
+        <dt>Cache-aside</dt><dd>A caching pattern where the application checks the cache first, and on a miss reads from the database and populates the cache itself. See <a href="../hld/caching.html">Caching</a>.</dd>
+        <dt>CAP theorem</dt><dd>During a network partition, a distributed system must choose between Consistency and Availability — partition tolerance itself isn't optional on a real network. See <a href="../core-principles.html">Core Principles</a>.</dd>
+        <dt>CDN (Content Delivery Network)</dt><dd>A geographically distributed network of caching servers that serve static (and some dynamic) content from a location physically close to the requester, cutting latency and origin load.</dd>
+        <dt>Circuit breaker</dt><dd>A pattern that stops calling a failing downstream dependency for a cooldown period after repeated failures, preventing cascading failure and giving the dependency time to recover.</dd>
+        <dt>Consensus</dt><dd>The problem of getting a set of distributed nodes to agree on a single value or decision even in the presence of failures — solved by algorithms like Paxos and Raft.</dd>
+        <dt>Consistent hashing</dt><dd>A hashing scheme that minimizes data movement when nodes are added or removed from a distributed cache or database, by mapping both keys and nodes onto the same ring. See <a href="../hld/databases.html">Databases</a>.</dd>
+        <dt>Cursor-based pagination</dt><dd>Pagination that uses an opaque pointer to the last-seen item instead of an offset/page number, avoiding the performance and consistency problems of large offsets.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="D">
+      <h2>D</h2>
+      <dl class="terms">
+        <dt>Denormalization</dt><dd>Deliberately duplicating data across tables/documents to avoid expensive joins at read time, trading storage and write complexity for read speed.</dd>
+        <dt>Distributed lock</dt><dd>A lock coordinated across multiple machines (often via a service like ZooKeeper, etcd, or Redis) so only one node performs a critical section of work at a time.</dd>
+        <dt>DNS (Domain Name System)</dt><dd>The distributed, eventually-consistent system that translates human-readable domain names into IP addresses. See <a href="../hld/fundamentals.html">HLD Fundamentals</a>.</dd>
+        <dt>Durability</dt><dd>The guarantee that once a write is acknowledged, it survives crashes, power loss, or restarts — usually achieved by writing to disk and/or replicating before acknowledging.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="E">
+      <h2>E</h2>
+      <dl class="terms">
+        <dt>Eventual consistency</dt><dd>A model where replicas may briefly disagree after a write but converge given enough time and no new writes — trades immediate correctness for availability and speed.</dd>
+        <dt>Exponential backoff</dt><dd>A retry strategy where the wait time between retries grows exponentially (often with random jitter added) to avoid overwhelming a recovering service.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="F">
+      <h2>F</h2>
+      <dl class="terms">
+        <dt>Fan-out</dt><dd>Delivering one piece of data to many recipients — e.g., pushing a new tweet to every follower's feed. See the <a href="../case-studies/twitter.html">Twitter / X case study</a>.</dd>
+        <dt>Fault tolerance</dt><dd>A system's ability to keep functioning correctly even when one or more of its components fail.</dd>
+        <dt>Federation</dt><dd>Splitting a single large database into multiple databases by function (e.g., users DB, orders DB) rather than by row — a simpler alternative to full sharding.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="G">
+      <h2>G</h2>
+      <dl class="terms">
+        <dt>Gossip protocol</dt><dd>A peer-to-peer communication style where nodes periodically exchange state with a few random peers, spreading information across a cluster without central coordination.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="H">
+      <h2>H</h2>
+      <dl class="terms">
+        <dt>Heartbeat</dt><dd>A periodic signal a node sends to indicate it's still alive; missed heartbeats are how load balancers and cluster managers detect failures.</dd>
+        <dt>Horizontal scaling</dt><dd>Adding more machines to handle more load, as opposed to making one machine bigger. See <a href="../core-principles.html">Core Principles</a>.</dd>
+        <dt>Hot partition / hotspot</dt><dd>A single shard or key that receives disproportionately more traffic than the others, becoming a bottleneck even though the system is "scaled."</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="I">
+      <h2>I</h2>
+      <dl class="terms">
+        <dt>Idempotency</dt><dd>A property where performing the same operation multiple times has the same effect as performing it once — critical for safely retrying requests.</dd>
+        <dt>Indexing</dt><dd>A data structure (commonly a B-tree or hash index) that lets a database find rows without scanning the whole table, at the cost of extra storage and slower writes.</dd>
+        <dt>Isolation level</dt><dd>How much one database transaction is shielded from the effects of concurrent transactions (e.g., Read Committed, Repeatable Read, Serializable) — stronger isolation costs concurrency.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="J">
+      <h2>J</h2>
+      <dl class="terms">
+        <dt>JWT (JSON Web Token)</dt><dd>A signed, self-contained token format commonly used to carry authentication/authorization claims between services without a shared session store.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="K">
+      <h2>K</h2>
+      <dl class="terms">
+        <dt>Key-value store</dt><dd>A database that maps unique keys to values with no required schema on the value — optimized for very fast lookups by key (e.g., Redis, DynamoDB).</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="L">
+      <h2>L</h2>
+      <dl class="terms">
+        <dt>Latency</dt><dd>The time it takes for a single request to complete, from sent to received. See the <a href="latency-numbers.html">Latency Numbers</a> reference.</dd>
+        <dt>Leader election</dt><dd>The process by which a distributed cluster picks one node to act as the coordinator/primary, so writes or decisions aren't made by multiple nodes at once.</dd>
+        <dt>Load balancer</dt><dd>A component that distributes incoming requests across multiple backend servers, improving both throughput and fault tolerance. See <a href="../hld/load-balancing.html">Load Balancing</a>.</dd>
+        <dt>Long polling</dt><dd>A technique where the client requests data and the server holds the connection open until new data is available (or a timeout), simulating push over plain HTTP.</dd>
+        <dt>LRU cache</dt><dd>"Least Recently Used" — a cache eviction policy that discards the item that hasn't been accessed in the longest time when the cache is full. See <a href="../hld/caching.html">Caching</a>.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="M">
+      <h2>M</h2>
+      <dl class="terms">
+        <dt>Message queue</dt><dd>An intermediary that buffers messages between producers and consumers, decoupling them in time and allowing async, resilient processing. See <a href="../hld/message-queues.html">Message Queues</a>.</dd>
+        <dt>Microservices</dt><dd>An architecture style that splits an application into small, independently deployable services, each owning its own data. See <a href="../hld/microservices.html">Microservices</a>.</dd>
+        <dt>Monolith</dt><dd>An application built and deployed as a single unit — simpler to develop and deploy early on, harder to scale specific parts independently.</dd>
+        <dt>MTBF / MTTR</dt><dd>Mean Time Between Failures and Mean Time To Recovery — the two numbers that together describe how often a system fails and how fast it comes back.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="N">
+      <h2>N</h2>
+      <dl class="terms">
+        <dt>N+1 problem</dt><dd>A performance bug where code issues one query to fetch a list, then one additional query per item to fetch related data, instead of a single joined/batched query.</dd>
+        <dt>Normalization</dt><dd>Structuring relational data to minimize duplication by splitting it into related tables — the opposite trade-off from denormalization.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="O">
+      <h2>O</h2>
+      <dl class="terms">
+        <dt>Optimistic locking</dt><dd>A concurrency strategy that lets multiple transactions proceed without locking, then checks for conflicts (e.g., via a version number) at commit time.</dd>
+        <dt>Outbox pattern</dt><dd>Writing a state change and the event describing it in the same local database transaction, then reliably publishing the event separately — avoids the dual-write problem between a DB and a message broker.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="P">
+      <h2>P</h2>
+      <dl class="terms">
+        <dt>Pagination</dt><dd>Returning a large result set in smaller pages instead of all at once — see also cursor-based pagination.</dd>
+        <dt>Partitioning / sharding</dt><dd>Splitting a dataset across multiple database nodes by some key, so no single node has to hold or serve all the data. See <a href="../hld/databases.html">Databases</a>.</dd>
+        <dt>Pessimistic locking</dt><dd>A concurrency strategy that locks a row/resource before modifying it, blocking other transactions until the lock is released — safer under contention, costs throughput.</dd>
+        <dt>Polling</dt><dd>A client repeatedly asking a server "is there anything new?" on a fixed interval, as opposed to the server pushing updates.</dd>
+        <dt>Publish-subscribe (pub/sub)</dt><dd>A messaging pattern where publishers send messages to a topic without knowing the subscribers, and any number of subscribers can receive them independently. See <a href="../lld/design-patterns/behavioral/observer.html">Observer pattern</a>.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="Q">
+      <h2>Q</h2>
+      <dl class="terms">
+        <dt>QPS (Queries Per Second)</dt><dd>The number of requests a system handles per second — the core unit of throughput used in capacity estimation.</dd>
+        <dt>Quorum</dt><dd>The minimum number of nodes in a distributed system that must agree (or acknowledge) for a read or write to be considered successful, used to balance consistency and availability.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="R">
+      <h2>R</h2>
+      <dl class="terms">
+        <dt>Rate limiting</dt><dd>Restricting how many requests a client can make in a given time window, protecting a system from overload or abuse. See <a href="../hld/capstones.html">HLD Capstones</a>.</dd>
+        <dt>Read replica</dt><dd>A copy of a database that serves read traffic, kept in sync with a primary that handles writes, so read load can scale independently of write load.</dd>
+        <dt>Retry with jitter</dt><dd>Adding a small random delay to retry backoff timing so that many clients retrying after the same failure don't all hit the server at exactly the same moment (the "thundering herd").</dd>
+        <dt>Reverse proxy</dt><dd>A server that sits in front of one or more backend servers and forwards client requests to them, often also handling TLS termination, caching, and load balancing.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="S">
+      <h2>S</h2>
+      <dl class="terms">
+        <dt>Sharding</dt><dd>See Partitioning.</dd>
+        <dt>Singleton</dt><dd>A design pattern that restricts a class to a single instance with a global access point. See the <a href="../lld/design-patterns/creational/singleton.html">Singleton pattern page</a>.</dd>
+        <dt>SLA / SLO / SLI</dt><dd>Service Level Agreement (the promise, often contractual), Objective (the internal target, e.g., 99.9% uptime), and Indicator (the actual measured metric) — three layers of the same reliability conversation.</dd>
+        <dt>Sticky session</dt><dd>A load balancing behavior where all requests from a given client are routed to the same backend server, often used to keep session state in server memory.</dd>
+        <dt>Strong consistency</dt><dd>A model where every read reflects the most recent write, everywhere, immediately — simpler to reason about, but costs coordination and latency.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="T">
+      <h2>T</h2>
+      <dl class="terms">
+        <dt>Throughput</dt><dd>The total amount of work a system completes per unit of time (e.g., requests/second) — distinct from latency, which is about a single request's speed.</dd>
+        <dt>TTL (Time To Live)</dt><dd>How long a piece of cached or DNS data is considered valid before it must be refreshed or re-fetched.</dd>
+        <dt>Two-phase commit</dt><dd>A protocol for committing a transaction across multiple nodes atomically: a "prepare" phase where all nodes vote, then a "commit" phase where all apply the change (or all abort).</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="U">
+      <h2>U</h2>
+      <dl class="terms">
+        <dt>Upsert</dt><dd>A single database operation that inserts a row if it doesn't exist, or updates it if it does — avoids a separate check-then-write round trip.</dd>
+        <dt>UUID</dt><dd>A 128-bit identifier that's globally unique with extremely high probability without needing a central coordinator to assign it — common for distributed ID generation.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="V">
+      <h2>V</h2>
+      <dl class="terms">
+        <dt>Vertical scaling</dt><dd>Adding more resources (CPU, RAM) to a single machine rather than adding more machines. See <a href="../core-principles.html">Core Principles</a>.</dd>
+        <dt>Vector clock</dt><dd>A mechanism for tracking causality between events across distributed nodes without relying on synchronized wall-clock time.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="W">
+      <h2>W</h2>
+      <dl class="terms">
+        <dt>Webhook</dt><dd>A server-to-server HTTP callback: instead of polling for an update, a service POSTs to a URL you registered the moment an event happens.</dd>
+        <dt>WebSocket</dt><dd>A protocol providing a persistent, full-duplex connection between client and server, used for real-time features like chat. See the <a href="../case-studies/whatsapp.html">WhatsApp case study</a>.</dd>
+        <dt>Write-ahead log (WAL)</dt><dd>A durability technique where a change is written to an append-only log before it's applied to the main data structure, so a crash mid-write can be recovered from by replaying the log.</dd>
+      </dl>
+    </div>
+
+    <div class="letter-group" id="Z">
+      <h2>Z</h2>
+      <dl class="terms">
+        <dt>Zero-downtime deployment</dt><dd>A deployment strategy (e.g., rolling or blue-green) where new versions of a service replace old ones without any window of unavailability for users.</dd>
+      </dl>
+    </div>
+
+    <nav class="page-nav">
+      <a class="nav-link prev" href="latency-numbers.html">
+        <span class="nav-label">&larr; Previous</span>
+        <span class="nav-title">Latency Numbers</span>
+      </a>
+      <a class="nav-link next" href="index.html">
+        <span class="nav-label">Next &rarr;</span>
+        <span class="nav-title">Back to Reference</span>
+      </a>
+    </nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>System Design Architectures</h4>
+      <p>A self-study guide for HLD, LLD, and Design Patterns &mdash; built for focused, example-driven interview prep, with working code in Java, Python, JavaScript, and C++ for every topic.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Reference</h4>
+      <a href="index.html">Overview</a>
+      <a href="latency-numbers.html">Latency Numbers</a>
+      <a href="glossary.html">Glossary</a>
+    </div>
+    <div class="footer-col">
+      <h4>Design Patterns</h4>
+      <a href="../lld/design-patterns/creational/singleton.html">Singleton</a>
+      <a href="../lld/design-patterns/structural/adapter.html">Adapter</a>
+      <a href="../lld/design-patterns/behavioral/observer.html">Observer</a>
+      <a href="../lld/design-patterns/behavioral/strategy.html">Strategy</a>
+    </div>
+    <div class="footer-col">
+      <h4>Guide</h4>
+      <a href="../../index.html">Home</a>
+      <a href="../../index.html#hld-section">Browse HLD</a>
+      <a href="../../index.html#patterns-section">Browse Patterns</a>
+      <a href="#" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top &uarr;</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design Patterns.</span>
+    <span>Made for focused, example-driven interview prep.</span>
+  </div>
+</footer>
+
+</body>
+</html>
