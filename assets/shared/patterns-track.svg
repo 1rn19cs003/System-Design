@@ -1,0 +1,26 @@
+<svg viewBox="0 0 1000 220" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <rect x="20" y="20" width="300" height="180" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="170" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Creational — 5</text>
+  <text x="170" y="64" text-anchor="middle" font-size="9.5" fill="#6a7178">"how objects get created"</text>
+  <text x="170" y="88" text-anchor="middle" font-size="9.5" fill="#2d2f33">Singleton · Factory Method</text>
+  <text x="170" y="104" text-anchor="middle" font-size="9.5" fill="#2d2f33">Abstract Factory · Builder</text>
+  <text x="170" y="120" text-anchor="middle" font-size="9.5" fill="#2d2f33">Prototype</text>
+
+  <rect x="350" y="20" width="300" height="180" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="500" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Structural — 7</text>
+  <text x="500" y="64" text-anchor="middle" font-size="9.5" fill="#6a7178">"how objects fit together"</text>
+  <text x="500" y="88" text-anchor="middle" font-size="9.5" fill="#2d2f33">Adapter · Bridge · Composite</text>
+  <text x="500" y="104" text-anchor="middle" font-size="9.5" fill="#2d2f33">Decorator · Facade</text>
+  <text x="500" y="120" text-anchor="middle" font-size="9.5" fill="#2d2f33">Flyweight · Proxy</text>
+
+  <rect x="680" y="20" width="300" height="180" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="830" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Behavioral — 11</text>
+  <text x="830" y="64" text-anchor="middle" font-size="9.5" fill="#6a7178">"how objects communicate"</text>
+  <text x="830" y="88" text-anchor="middle" font-size="9.5" fill="#2d2f33">Observer · Strategy · Command</text>
+  <text x="830" y="104" text-anchor="middle" font-size="9.5" fill="#2d2f33">State · Chain of Responsibility</text>
+  <text x="830" y="120" text-anchor="middle" font-size="9.5" fill="#2d2f33">Template Method · Iterator</text>
+  <text x="830" y="136" text-anchor="middle" font-size="9.5" fill="#2d2f33">Mediator · Memento</text>
+  <text x="830" y="152" text-anchor="middle" font-size="9.5" fill="#2d2f33">Visitor · Interpreter</text>
+
+  <title>The 23 design patterns grouped by category: Creational (object creation), Structural (object composition), and Behavioral (object communication)</title>
+</svg>

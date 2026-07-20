@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>High-Level Design (HLD) — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    position: sticky;
+    top: 57px;
+    align-self: flex-start;
+    height: calc(100vh - 57px);
+    overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 860px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  main.content h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
+  img.diagram-img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; padding: 8px; }
+  figure { margin: 0 0 16px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .syllabus { list-style: none; margin: 0; padding: 0; }
+  .syllabus li {
+    display: flex; gap: 14px; align-items: flex-start;
+    border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .syllabus .num {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft);
+    color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .syllabus .num.capstone { background: var(--accent); color: #fff; }
+  .syllabus a.topic-title { font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; }
+  .syllabus a.topic-title:hover { color: var(--accent); }
+  .syllabus p { margin: 4px 0 0; font-size: 13.5px; color: var(--muted); }
+
+  header.site-header {
+    position: sticky; top: 0; z-index: 20;
+    border-bottom: 1px solid var(--border); background: #fff;
+  }
+  .header-top {
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .header-brand { display: flex; align-items: center; gap: 10px; }
+  .header-brand img.logo-mark-img { width: 28px; height: 28px; border-radius: 7px; display: block; }
+  .header-brand a.site-title { font-weight: 700; font-size: 16px; color: var(--text); text-decoration: none; }
+  .header-brand a.site-title:hover { color: var(--accent); }
+  .header-brand .header-tagline { font-size: 12px; color: var(--muted); }
+  nav.header-nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav.header-nav a { font-size: 13.5px; font-weight: 600; text-decoration: none; color: var(--muted); padding: 7px 12px; border-radius: 7px; }
+  nav.header-nav a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  footer.site-footer { border-top: 1px solid var(--border); background: var(--sidebar-bg); }
+  .footer-grid {
+    max-width: 1200px; margin: 0 auto; padding: 32px 24px 20px;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 24px;
+  }
+  .footer-col h4 { margin: 0 0 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .footer-col p { margin: 0; font-size: 13px; color: var(--muted); max-width: 320px; }
+  .footer-col a { display: block; font-size: 13.5px; color: var(--text); text-decoration: none; margin-bottom: 8px; }
+  .footer-col a:hover { color: var(--accent); text-decoration: underline; }
+  .footer-bottom {
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px 20px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12.5px; color: var(--muted);
+  }
+  .footer-bottom a { color: var(--accent); text-decoration: none; }
+  .footer-bottom a:hover { text-decoration: underline; }
+  @media (max-width: 820px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+
+  .page-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .page-nav a.nav-link {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;
+    text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 2px;
+    transition: border-color 0.15s ease, background 0.15s ease; min-width: 0;
+  }
+  .page-nav a.nav-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .page-nav a.nav-link.next { text-align: right; align-items: flex-end; }
+  .page-nav .nav-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .page-nav .nav-title { font-size: 14px; font-weight: 600; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="header-brand">
+      <img class="logo-mark-img" src="../../assets/shared/logo-mark.svg" alt="System Design Architectures logo">
+      <a class="site-title" href="../../index.html">System Design Architectures</a>
+      <span class="header-tagline">HLD Overview</span>
+    </div>
+    <nav class="header-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../index.html#hld-section">HLD</a>
+      <a href="../../index.html#lld-section">LLD</a>
+      <a href="../../index.html#patterns-section">Design Patterns</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="../../index.html">← Back to guide</a>
+    <h3>On this page</h3>
+    <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#learn">What You'll Learn</a>
+    <a class="toc" href="#syllabus">The 7 Topics</a>
+    <h3>Jump straight to a topic</h3>
+    <a class="toc" href="fundamentals.html">Fundamentals</a>
+    <a class="toc" href="load-balancing.html">Load Balancing</a>
+    <a class="toc" href="caching.html">Caching</a>
+    <a class="toc" href="databases.html">Databases</a>
+    <a class="toc" href="message-queues.html">Message Queues</a>
+    <a class="toc" href="microservices.html">Microservices</a>
+    <a class="toc" href="capstones.html">Capstone</a>
+  </nav>
+
+  <main class="content">
+    <nav class="breadcrumbs">
+      <a href="../../index.html">Home</a>
+      <span class="sep">/</span>
+      <span class="current">HLD</span>
+    </nav>
+    <h1 id="overview">High-Level Design (HLD)</h1>
+    <p>HLD is the "zoomed-out" half of system design: how a request gets from a user to a working system and back, and how that system stays fast and available as traffic grows. This track has 7 topics, each building on the last, ending in a worked capstone.</p>
+
+    <section id="learn">
+      <h2>What You'll Learn</h2>
+      <p>By the end of this track you'll be able to answer the question every system design interview starts with: "walk me through what happens when a user hits this system," and back it up with real trade-offs at each step — not just name-dropping "load balancer" or "cache," but knowing why and when each one earns its complexity.</p>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/shared/hld-track.svg" alt="HLD syllabus flowchart: Fundamentals, Load Balancing, Caching, Databases, Message Queues, Microservices, then a Rate Limiter capstone">
+        <figcaption>Seven topics, one order — each assumes you've read the ones before it</figcaption>
+      </figure>
+    </section>
+
+    <section id="syllabus">
+      <h2>The 7 Topics</h2>
+      <ul class="syllabus">
+        <li>
+          <span class="num">1</span>
+          <div>
+            <a class="topic-title" href="fundamentals.html">Fundamentals</a>
+            <p>The client-server model, DNS, HTTP, and latency vs. throughput — the vocabulary every other HLD topic assumes you already have.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <div>
+            <a class="topic-title" href="load-balancing.html">Load Balancing</a>
+            <p>Once one server isn't enough, how do you spread traffic across many without any single one becoming the new bottleneck?</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <div>
+            <a class="topic-title" href="caching.html">Caching</a>
+            <p>The cheapest way to make a system faster: don't redo work you already did. Where caches live, and what happens when they're wrong.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">4</span>
+          <div>
+            <a class="topic-title" href="databases.html">Databases</a>
+            <p>SQL vs. NoSQL, replication, and sharding — how the system's actual data survives growth and failure.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">5</span>
+          <div>
+            <a class="topic-title" href="message-queues.html">Message Queues</a>
+            <p>Decoupling services in time — so a slow or failed downstream service doesn't take the whole request down with it.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">6</span>
+          <div>
+            <a class="topic-title" href="microservices.html">Microservices</a>
+            <p>Splitting one system into many services on purpose — and the very real coordination cost that comes with it.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num capstone">★</span>
+          <div>
+            <a class="topic-title" href="capstones.html">Capstone: Rate Limiter</a>
+            <p>A worked, timed example that pulls the previous six topics together into one interview-shaped design problem.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <nav class="page-nav">
+      <a class="nav-link prev" href="../core-principles.html">
+        <span class="nav-label">&larr; Previous</span>
+        <span class="nav-title">Core Principles</span>
+      </a>
+      <a class="nav-link next" href="fundamentals.html">
+        <span class="nav-label">Next &rarr;</span>
+        <span class="nav-title">Start: Fundamentals</span>
+      </a>
+    </nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>System Design Architectures</h4>
+      <p>A self-study guide for HLD, LLD, and Design Patterns &mdash; built for focused, example-driven interview prep, with working code in Java, Python, JavaScript, and C++ for every topic.</p>
+    </div>
+    <div class="footer-col">
+      <h4>HLD</h4>
+      <a href="fundamentals.html">Fundamentals</a>
+      <a href="load-balancing.html">Load Balancing</a>
+      <a href="caching.html">Caching</a>
+      <a href="capstones.html">Capstones</a>
+    </div>
+    <div class="footer-col">
+      <h4>Design Patterns</h4>
+      <a href="../lld/design-patterns/creational/singleton.html">Singleton</a>
+      <a href="../lld/design-patterns/structural/adapter.html">Adapter</a>
+      <a href="../lld/design-patterns/behavioral/observer.html">Observer</a>
+      <a href="../lld/design-patterns/behavioral/strategy.html">Strategy</a>
+    </div>
+    <div class="footer-col">
+      <h4>Guide</h4>
+      <a href="../../index.html">Home</a>
+      <a href="../../index.html#hld-section">Browse HLD</a>
+      <a href="../../index.html#patterns-section">Browse Patterns</a>
+      <a href="#" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top &uarr;</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design Patterns.</span>
+    <span>Made for focused, example-driven interview prep.</span>
+  </div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('main section, main h1');
+  const links = document.querySelectorAll('nav.sidebar a.toc');
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 100) currentId = sec.id;
+    });
+    links.forEach(link => {
+      if (link.getAttribute('href').startsWith('#')) {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
