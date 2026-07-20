@@ -16,11 +16,11 @@
 
   <text x="0" y="132" font-size="11.5" fill="#2d2f33">Read 4 KB randomly from SSD</text>
   <rect x="270" y="122" width="320" height="14" rx="2" fill="#3b6ea5"/>
-  <text x="598" y="132" font-size="11" fill="#6a7178">~150 &micro;s</text>
+  <text x="598" y="132" font-size="11" fill="#6a7178">~150 µs</text>
 
   <text x="0" y="162" font-size="11.5" fill="#2d2f33">Round trip within same datacenter</text>
   <rect x="270" y="152" width="360" height="14" rx="2" fill="#3b6ea5"/>
-  <text x="638" y="162" font-size="11" fill="#6a7178">~500 &micro;s</text>
+  <text x="638" y="162" font-size="11" fill="#6a7178">~500 µs</text>
 
   <text x="0" y="192" font-size="11.5" fill="#2d2f33">Read 1 MB sequentially from SSD</text>
   <rect x="270" y="182" width="400" height="14" rx="2" fill="#3b6ea5"/>
@@ -30,7 +30,7 @@
   <rect x="270" y="212" width="440" height="14" rx="2" fill="#c0392b"/>
   <text x="280" y="222" font-size="11" fill="#ffffff">~10 ms</text>
 
-  <text x="0" y="252" font-size="11.5" fill="#2d2f33">Send packet CA &rarr; Netherlands &rarr; CA</text>
+  <text x="0" y="252" font-size="11.5" fill="#2d2f33">Send packet CA → Netherlands → CA</text>
   <rect x="270" y="242" width="480" height="14" rx="2" fill="#c0392b"/>
   <text x="280" y="252" font-size="11" fill="#ffffff">~150 ms</text>
 
