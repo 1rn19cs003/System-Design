@@ -1,0 +1,53 @@
+<svg viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="hollow-arrow" markerWidth="14" markerHeight="12" refX="12" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L12,5 L1,9 z" fill="#ffffff" stroke="#3b6ea5" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- RemoteControl (Invoker) -->
+  <rect x="30" y="30" width="200" height="100" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="130" y="52" text-anchor="middle" font-size="14" font-weight="600" fill="#2d2f33">RemoteControl</text>
+  <line x1="30" y1="60" x2="230" y2="60" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="46" y="78" font-size="12" fill="#2d2f33">- history: Stack&lt;Command&gt;</text>
+  <line x1="30" y1="86" x2="230" y2="86" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="46" y="104" font-size="12" fill="#2d2f33">+ pressButton(cmd)</text>
+  <text x="46" y="120" font-size="12" fill="#2d2f33">+ pressUndo()</text>
+
+  <!-- RemoteCommand interface -->
+  <rect x="330" y="30" width="220" height="80" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="440" y="50" text-anchor="middle" font-size="11" fill="#3b6ea5" font-style="italic">&#171;interface&#187;</text>
+  <text x="440" y="68" text-anchor="middle" font-size="14" font-weight="600" fill="#2d2f33">RemoteCommand</text>
+  <line x1="330" y1="76" x2="550" y2="76" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="440" y="92" text-anchor="middle" font-size="12" fill="#2d2f33">+ execute() / + undo()</text>
+
+  <line x1="230" y1="80" x2="330" y2="70" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <text x="280" y="65" text-anchor="middle" font-size="11" fill="#6a7178">holds</text>
+
+  <!-- LightOnCommand / LightOffCommand -->
+  <rect x="330" y="170" width="160" height="70" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="410" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">LightOnCommand</text>
+  <line x1="330" y1="203" x2="490" y2="203" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="346" y="220" font-size="11" fill="#2d2f33">+ execute() / undo()</text>
+
+  <rect x="510" y="170" width="160" height="70" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="590" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">LightOffCommand</text>
+  <line x1="510" y1="203" x2="670" y2="203" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="526" y="220" font-size="11" fill="#2d2f33">+ execute() / undo()</text>
+
+  <line x1="410" y1="170" x2="430" y2="110" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#hollow-arrow)"/>
+  <line x1="590" y1="170" x2="460" y2="110" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#hollow-arrow)"/>
+
+  <!-- Light (Receiver) -->
+  <rect x="410" y="300" width="180" height="70" rx="6" fill="#f6f8fa" stroke="#e3e6ea" stroke-width="1.2"/>
+  <text x="500" y="325" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">Light (Receiver)</text>
+  <line x1="410" y1="333" x2="590" y2="333" stroke="#e3e6ea" stroke-width="1"/>
+  <text x="426" y="350" font-size="11" fill="#2d2f33">+ turnOn() / turnOff()</text>
+
+  <line x1="410" y1="240" x2="460" y2="300" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="590" y1="240" x2="540" y2="300" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <text x="500" y="280" text-anchor="middle" font-size="11" fill="#6a7178">delegates to</text>
+</svg>

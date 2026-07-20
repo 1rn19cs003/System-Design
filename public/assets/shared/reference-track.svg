@@ -1,0 +1,15 @@
+<svg viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <rect x="10" y="20" width="290" height="150" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="155" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">Numbers Every Engineer</text>
+  <text x="155" y="66" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">Should Know</text>
+  <text x="155" y="92" text-anchor="middle" font-size="10" fill="#6a7178">latency ladder, throughput</text>
+  <text x="155" y="106" text-anchor="middle" font-size="10" fill="#6a7178">&amp; capacity rules of thumb</text>
+
+  <rect x="320" y="20" width="290" height="150" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="465" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">System Design Glossary</text>
+  <text x="465" y="76" text-anchor="middle" font-size="10" fill="#6a7178">60+ terms from HLD, LLD,</text>
+  <text x="465" y="90" text-anchor="middle" font-size="10" fill="#6a7178">and design patterns —</text>
+  <text x="465" y="104" text-anchor="middle" font-size="10" fill="#6a7178">scannable, A to Z</text>
+
+  <title>Two reference tools: a latency/capacity numbers cheat sheet, and an A-Z glossary of system design terms</title>
+</svg>

@@ -1,0 +1,60 @@
+<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="twArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <text x="220" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">Fan-out on write (push)</text>
+
+  <rect x="30" y="50" width="100" height="45" rx="6" fill="#3b6ea5" stroke="#3b6ea5"/>
+  <text x="80" y="77" text-anchor="middle" font-size="10.5" font-weight="600" fill="#ffffff">User tweets</text>
+
+  <line x1="80" y1="95" x2="80" y2="125" stroke="#3b6ea5" stroke-width="1.4" marker-end="url(#twArrow)"/>
+
+  <rect x="15" y="130" width="130" height="35" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="80" y="152" text-anchor="middle" font-size="9.5" fill="#2d2f33">write into every</text>
+
+  <line x1="80" y1="165" x2="80" y2="190" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#twArrow)"/>
+
+  <rect x="10" y="195" width="45" height="70" rx="5" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.2"/>
+  <text x="32" y="235" text-anchor="middle" font-size="8" fill="#2f8f4e">follower</text>
+  <text x="32" y="248" text-anchor="middle" font-size="8" fill="#2f8f4e">timeline</text>
+
+  <rect x="65" y="195" width="45" height="70" rx="5" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.2"/>
+  <text x="87" y="235" text-anchor="middle" font-size="8" fill="#2f8f4e">follower</text>
+  <text x="87" y="248" text-anchor="middle" font-size="8" fill="#2f8f4e">timeline</text>
+
+  <rect x="120" y="195" width="45" height="70" rx="5" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.2"/>
+  <text x="142" y="235" text-anchor="middle" font-size="8" fill="#2f8f4e">...200</text>
+  <text x="142" y="248" text-anchor="middle" font-size="8" fill="#2f8f4e">more</text>
+
+  <text x="220" y="290" text-anchor="middle" font-size="10.5" fill="#6a7178">Reads are instant (timeline is pre-built) —</text>
+  <text x="220" y="306" text-anchor="middle" font-size="10.5" fill="#6a7178">but one tweet from a 50M-follower account means 50M writes</text>
+
+  <line x1="450" y1="20" x2="450" y2="330" stroke="#e3e6ea" stroke-width="1"/>
+
+  <text x="670" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">Fan-out on read (pull)</text>
+
+  <rect x="590" y="50" width="100" height="45" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="640" y="77" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2d2f33">User tweets</text>
+
+  <line x1="640" y1="95" x2="640" y2="125" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#twArrow)"/>
+
+  <rect x="575" y="130" width="130" height="35" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="640" y="152" text-anchor="middle" font-size="9.5" fill="#2d2f33">store the tweet once</text>
+
+  <rect x="570" y="215" width="140" height="45" rx="6" fill="#3b6ea5" stroke="#3b6ea5"/>
+  <text x="640" y="242" text-anchor="middle" font-size="10.5" font-weight="600" fill="#ffffff">Follower opens app</text>
+
+  <line x1="640" y1="165" x2="640" y2="205" stroke="#c7ccd1" stroke-width="1.3" stroke-dasharray="3,3"/>
+  <line x1="705" y1="237" x2="750" y2="185" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#twArrow)"/>
+  <text x="760" y="180" font-size="9" fill="#6a7178">pulls &amp; merges</text>
+  <text x="760" y="192" font-size="9" fill="#6a7178">tweets from</text>
+  <text x="760" y="204" font-size="9" fill="#6a7178">everyone followed</text>
+
+  <text x="670" y="290" text-anchor="middle" font-size="10.5" fill="#6a7178">Writes are cheap regardless of follower count —</text>
+  <text x="670" y="306" text-anchor="middle" font-size="10.5" fill="#6a7178">but every timeline load does real work at read time</text>
+
+  <title>Fan-out on write pre-computes every follower's timeline at post time (fast reads, expensive for celebrities); fan-out on read builds the timeline at load time (cheap writes, more read-time work) — most real feeds use a hybrid of both</title>
+</svg>

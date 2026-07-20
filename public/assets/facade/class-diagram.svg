@@ -1,0 +1,49 @@
+<svg viewBox="0 0 640 340" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .box { fill: #ffffff; stroke: #3b6ea5; stroke-width: 1.5; }
+    .title-bg { fill: #eaf1f8; }
+    .title { font-size: 13px; font-weight: 600; fill: #2d2f33; }
+    .line { fill: #2d2f33; font-size: 11px; }
+    .divider { stroke: #3b6ea5; stroke-width: 1; }
+    .arrow { stroke: #6a7178; stroke-width: 1.5; fill: none; }
+    .label { font-size: 11px; fill: #6a7178; }
+  </style>
+
+  <!-- Client -->
+  <rect x="30" y="140" width="140" height="60" rx="8" class="box"/>
+  <text x="100" y="174" text-anchor="middle" class="title">Checkout Code</text>
+
+  <!-- Facade -->
+  <rect x="230" y="120" width="200" height="100" rx="8" class="box"/>
+  <rect x="230" y="120" width="200" height="28" rx="8" class="title-bg"/>
+  <text x="330" y="139" text-anchor="middle" class="title">OrderFacade</text>
+  <line x1="230" y1="148" x2="430" y2="148" class="divider"/>
+  <text x="242" y="168" class="line" font-weight="600">+ placeOrder(item, price)</text>
+  <text x="242" y="188" class="line" font-style="italic">(coordinates 4 subsystems)</text>
+
+  <line x1="170" y1="170" x2="228" y2="170" class="arrow" marker-end="url(#arrowhead)"/>
+  <text x="175" y="163" class="label">one call</text>
+
+  <!-- Subsystems -->
+  <rect x="500" y="30" width="120" height="40" rx="6" class="box"/>
+  <text x="560" y="54" text-anchor="middle" class="line" font-weight="600">Inventory</text>
+  <rect x="500" y="90" width="120" height="40" rx="6" class="box"/>
+  <text x="560" y="114" text-anchor="middle" class="line" font-weight="600">Payment</text>
+  <rect x="500" y="150" width="120" height="40" rx="6" class="box"/>
+  <text x="560" y="174" text-anchor="middle" class="line" font-weight="600">Shipping</text>
+  <rect x="500" y="210" width="120" height="40" rx="6" class="box"/>
+  <text x="560" y="234" text-anchor="middle" class="line" font-weight="600">Notification</text>
+
+  <line x1="430" y1="150" x2="498" y2="50" class="arrow" marker-end="url(#arrowhead)"/>
+  <line x1="430" y1="160" x2="498" y2="110" class="arrow" marker-end="url(#arrowhead)"/>
+  <line x1="430" y1="180" x2="498" y2="170" class="arrow" marker-end="url(#arrowhead)"/>
+  <line x1="430" y1="195" x2="498" y2="230" class="arrow" marker-end="url(#arrowhead)"/>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#6a7178"/>
+    </marker>
+  </defs>
+
+  <text x="320" y="300" text-anchor="middle" class="label">Checkout code makes one call — OrderFacade orchestrates all four subsystems internally.</text>
+</svg>

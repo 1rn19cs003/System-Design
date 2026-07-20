@@ -1,0 +1,55 @@
+<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .lane { stroke: #c9ced3; stroke-width: 1.5; }
+    .actor-box { fill: #eaf1f8; stroke: #3b6ea5; stroke-width: 1.5; }
+    .actor-text { font-size: 13px; font-weight: 600; fill: #2d2f33; text-anchor: middle; }
+    .msg { stroke: #3b6ea5; stroke-width: 1.5; fill: none; }
+    .msg-dashed { stroke: #6a7178; stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+    .msg-label { font-size: 12px; fill: #2d2f33; }
+    .note { font-size: 11.5px; fill: #6a7178; font-style: italic; }
+  </style>
+
+  <!-- Lifelines -->
+  <line x1="90" y1="60" x2="90" y2="270" class="lane"/>
+  <line x1="320" y1="60" x2="320" y2="270" class="lane"/>
+  <line x1="550" y1="60" x2="550" y2="270" class="lane"/>
+
+  <!-- Actor boxes -->
+  <rect x="30" y="20" width="120" height="34" rx="6" class="actor-box"/>
+  <text x="90" y="42" class="actor-text">ClientA</text>
+
+  <rect x="260" y="20" width="120" height="34" rx="6" class="actor-box"/>
+  <text x="320" y="42" class="actor-text">Singleton</text>
+
+  <rect x="490" y="20" width="120" height="34" rx="6" class="actor-box"/>
+  <text x="550" y="42" class="actor-text">ClientB</text>
+
+  <!-- ClientA -> Singleton : getInstance() -->
+  <line x1="90" y1="90" x2="318" y2="90" class="msg" marker-end="url(#arrow2)"/>
+  <text x="100" y="84" class="msg-label">getInstance()</text>
+  <text x="100" y="106" class="note">instance == null → create it</text>
+
+  <!-- Singleton -> ClientA : return instance -->
+  <line x1="320" y1="126" x2="92" y2="126" class="msg-dashed" marker-end="url(#arrow2)"/>
+  <text x="100" y="120" class="msg-label">return instance</text>
+
+  <!-- ClientB -> Singleton : getInstance() -->
+  <line x1="550" y1="164" x2="322" y2="164" class="msg" marker-end="url(#arrow1)"/>
+  <text x="360" y="158" class="msg-label">getInstance()</text>
+  <text x="360" y="180" class="note">instance already exists → return same one</text>
+
+  <!-- Singleton -> ClientB : return instance -->
+  <line x1="320" y1="200" x2="548" y2="200" class="msg-dashed" marker-end="url(#arrow1)"/>
+  <text x="360" y="194" class="msg-label">return instance</text>
+
+  <text x="320" y="250" text-anchor="middle" class="note">Both ClientA and ClientB now hold a reference to the same object</text>
+
+  <defs>
+    <marker id="arrow1" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#3b6ea5"/>
+    </marker>
+    <marker id="arrow2" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+      <polygon points="10 0, 0 4, 10 8" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+</svg>

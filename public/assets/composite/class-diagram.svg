@@ -1,0 +1,53 @@
+<svg viewBox="0 0 640 340" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .box { fill: #ffffff; stroke: #3b6ea5; stroke-width: 1.5; }
+    .title-bg { fill: #eaf1f8; }
+    .title { font-size: 13px; font-weight: 600; fill: #2d2f33; }
+    .line { fill: #2d2f33; font-size: 11px; }
+    .divider { stroke: #3b6ea5; stroke-width: 1; }
+    .arrow-hollow { stroke: #6a7178; stroke-width: 1.5; fill: none; }
+    .label { font-size: 11px; fill: #6a7178; }
+    .italic { font-style: italic; }
+  </style>
+
+  <!-- Component interface -->
+  <rect x="210" y="20" width="220" height="60" rx="8" class="box"/>
+  <rect x="210" y="20" width="220" height="26" rx="8" class="title-bg"/>
+  <text x="320" y="38" text-anchor="middle" class="title italic">«interface» FileSystemComponent</text>
+  <line x1="210" y1="46" x2="430" y2="46" class="divider"/>
+  <text x="222" y="64" class="line italic">+ getSize(): int</text>
+
+  <!-- FileLeaf -->
+  <rect x="60" y="140" width="180" height="50" rx="8" class="box"/>
+  <rect x="60" y="140" width="180" height="26" rx="8" class="title-bg"/>
+  <text x="150" y="158" text-anchor="middle" class="title">FileLeaf</text>
+  <line x1="60" y1="166" x2="240" y2="166" class="divider"/>
+  <text x="72" y="182" class="line">+ getSize(): int</text>
+
+  <!-- Folder (composite) -->
+  <rect x="380" y="140" width="220" height="80" rx="8" class="box"/>
+  <rect x="380" y="140" width="220" height="26" rx="8" class="title-bg"/>
+  <text x="490" y="158" text-anchor="middle" class="title">Folder</text>
+  <line x1="380" y1="166" x2="600" y2="166" class="divider"/>
+  <text x="392" y="182" class="line">- children: List&lt;Component&gt;</text>
+  <text x="392" y="198" class="line" font-weight="600">+ getSize(): int  (sums children)</text>
+
+  <line x1="150" y1="140" x2="290" y2="83" class="arrow-hollow" marker-end="url(#hollow)"/>
+  <line x1="490" y1="140" x2="350" y2="83" class="arrow-hollow" marker-end="url(#hollow)"/>
+
+  <!-- composition arrow: Folder has-many Component -->
+  <line x1="490" y1="180" x2="330" y2="180" class="arrow-hollow" marker-end="url(#diamond)"/>
+  <path d="M 380 195 C 340 240, 260 240, 250 195" class="arrow-hollow" fill="none"/>
+  <text x="250" y="255" class="label">holds 0..* children (Component)</text>
+
+  <defs>
+    <marker id="hollow" markerWidth="14" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L10,6 L0,12 Z" fill="#ffffff" stroke="#6a7178" stroke-width="1.2"/>
+    </marker>
+    <marker id="diamond" markerWidth="12" markerHeight="10" refX="1" refY="5" orient="auto">
+      <polygon points="0 5, 6 0, 12 5, 6 10" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <text x="320" y="300" text-anchor="middle" class="label">A Folder's children can themselves be Folders — the tree recurses to any depth.</text>
+</svg>
