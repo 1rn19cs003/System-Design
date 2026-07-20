@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Case Studies — System Design Architectures</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f6f8fa;
+    --border: #e3e6ea;
+    --text: #2d2f33;
+    --muted: #6a7178;
+    --accent: #3b6ea5;
+    --accent-soft: #eaf1f8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+  nav.sidebar {
+    width: 240px; flex-shrink: 0; padding: 24px 16px; border-right: 1px solid var(--border); background: var(--sidebar-bg);
+    position: sticky; top: 57px; align-self: flex-start; height: calc(100vh - 57px); overflow-y: auto;
+  }
+  nav.sidebar a.back { display: inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  nav.sidebar h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 16px 0 8px; }
+  nav.sidebar a.toc { display: block; padding: 6px 10px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.sidebar a.toc:hover, nav.sidebar a.toc.active { background: var(--accent-soft); color: var(--accent); }
+  main.content { flex: 1; padding: 32px 48px 80px; max-width: 900px; }
+  main.content h1 { margin-top: 0; }
+  main.content section { margin-bottom: 40px; scroll-margin-top: 20px; }
+  main.content h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .breadcrumbs { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumbs a { color: var(--accent); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs .sep { margin: 0 6px; color: var(--border); }
+  .breadcrumbs .current { color: var(--text); font-weight: 600; }
+  img.diagram-img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; padding: 8px; }
+  figure { margin: 0 0 16px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: center; }
+  .syllabus { list-style: none; margin: 0; padding: 0; }
+  .syllabus li { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+  .syllabus .num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  .syllabus a.topic-title { font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; }
+  .syllabus a.topic-title:hover { color: var(--accent); }
+  .syllabus p { margin: 4px 0 0; font-size: 13.5px; color: var(--muted); }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .tag { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  header.site-header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--border); background: #fff; }
+  .header-top { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .header-brand { display: flex; align-items: center; gap: 10px; }
+  .header-brand img.logo-mark-img { width: 28px; height: 28px; border-radius: 7px; display: block; }
+  .header-brand a.site-title { font-weight: 700; font-size: 16px; color: var(--text); text-decoration: none; }
+  .header-brand a.site-title:hover { color: var(--accent); }
+  .header-brand .header-tagline { font-size: 12px; color: var(--muted); }
+  nav.header-nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav.header-nav a { font-size: 13.5px; font-weight: 600; text-decoration: none; color: var(--muted); padding: 7px 12px; border-radius: 7px; }
+  nav.header-nav a:hover { background: var(--accent-soft); color: var(--accent); }
+  footer.site-footer { border-top: 1px solid var(--border); background: var(--sidebar-bg); }
+  .footer-grid { max-width: 1200px; margin: 0 auto; padding: 32px 24px 20px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 24px; }
+  .footer-col h4 { margin: 0 0 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .footer-col p { margin: 0; font-size: 13px; color: var(--muted); max-width: 320px; }
+  .footer-col a { display: block; font-size: 13.5px; color: var(--text); text-decoration: none; margin-bottom: 8px; }
+  .footer-col a:hover { color: var(--accent); text-decoration: underline; }
+  .footer-bottom { max-width: 1200px; margin: 0 auto; padding: 14px 24px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12.5px; color: var(--muted); }
+  .footer-bottom a { color: var(--accent); text-decoration: none; }
+  .footer-bottom a:hover { text-decoration: underline; }
+  @media (max-width: 820px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+  .page-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .page-nav a.nav-link { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 2px; transition: border-color 0.15s ease, background 0.15s ease; min-width: 0; }
+  .page-nav a.nav-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .page-nav a.nav-link.next { text-align: right; align-items: flex-end; }
+  .page-nav .nav-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .page-nav .nav-title { font-size: 14px; font-weight: 600; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="header-brand">
+      <img class="logo-mark-img" src="../../assets/shared/logo-mark.svg" alt="System Design Architectures logo">
+      <a class="site-title" href="../../index.html">System Design Architectures</a>
+      <span class="header-tagline">Case Studies</span>
+    </div>
+    <nav class="header-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../index.html#hld-section">HLD</a>
+      <a href="../../index.html#lld-section">LLD</a>
+      <a href="../../index.html#patterns-section">Design Patterns</a>
+      <a href="../case-studies/index.html">Case Studies</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <a class="back" href="../../index.html">← Back to guide</a>
+    <h3>On this page</h3>
+    <a class="toc" href="#overview">Overview</a>
+    <a class="toc" href="#studies">The 5 Case Studies</a>
+    <h3>Jump straight to one</h3>
+    <a class="toc" href="url-shortener.html">URL Shortener</a>
+    <a class="toc" href="twitter.html">Twitter / X</a>
+    <a class="toc" href="whatsapp.html">WhatsApp</a>
+    <a class="toc" href="uber.html">Uber</a>
+    <a class="toc" href="netflix.html">Netflix / YouTube</a>
+  </nav>
+
+  <main class="content">
+    <nav class="breadcrumbs">
+      <a href="../../index.html">Home</a>
+      <span class="sep">/</span>
+      <span class="current">Case Studies</span>
+    </nav>
+    <h1 id="overview">Case Studies</h1>
+    <p>Five system design interview questions asked, almost verbatim, at real companies — each solved end to end with requirements gathering, capacity estimation (the back-of-envelope math interviewers actually want to see), a high-level architecture, a deep dive into the hardest part, and trade-offs. This is where HLD, LLD, and Core Principles come together on one problem at a time.</p>
+
+    <section id="studies">
+      <h2>The 5 Case Studies</h2>
+
+      <figure>
+        <img class="diagram-img" src="../../assets/shared/case-studies-track.svg" alt="Five case study boxes: URL Shortener, Twitter/X, WhatsApp, Uber, Netflix/YouTube, each tagged with its core system design challenge">
+        <figcaption>No required order — pick the one closest to your next interview, or work through all five</figcaption>
+      </figure>
+
+      <ul class="syllabus">
+        <li>
+          <span class="num">1</span>
+          <div>
+            <a class="topic-title" href="url-shortener.html">Design a URL Shortener</a>
+            <p>The "hello world" of system design — but the details (encoding, redirect latency, read-heavy caching) show up everywhere else.</p>
+            <div class="tag-row"><span class="tag">Easy</span><span class="tag">Read-heavy</span><span class="tag">Caching</span></div>
+          </div>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <div>
+            <a class="topic-title" href="twitter.html">Design Twitter / X</a>
+            <p>Feed generation at scale — the fan-out-on-write vs. fan-out-on-read trade-off that defines every social feed.</p>
+            <div class="tag-row"><span class="tag">Medium</span><span class="tag">Fan-out</span><span class="tag">Feeds</span></div>
+          </div>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <div>
+            <a class="topic-title" href="whatsapp.html">Design WhatsApp</a>
+            <p>Real-time delivery, message ordering, and the "online/offline" problem — persistent connections at massive scale.</p>
+            <div class="tag-row"><span class="tag">Medium</span><span class="tag">Real-time</span><span class="tag">Messaging</span></div>
+          </div>
+        </li>
+        <li>
+          <span class="num">4</span>
+          <div>
+            <a class="topic-title" href="uber.html">Design Uber</a>
+            <p>Geospatial indexing and matching riders to nearby drivers in real time, at city-then-global scale.</p>
+            <div class="tag-row"><span class="tag">Hard</span><span class="tag">Geospatial</span><span class="tag">Matching</span></div>
+          </div>
+        </li>
+        <li>
+          <span class="num">5</span>
+          <div>
+            <a class="topic-title" href="netflix.html">Design Netflix / YouTube</a>
+            <p>Storing and serving huge video files worldwide — transcoding, chunking, and CDN delivery.</p>
+            <div class="tag-row"><span class="tag">Hard</span><span class="tag">CDN</span><span class="tag">Storage</span></div>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <nav class="page-nav">
+      <a class="nav-link prev" href="../hld/capstones.html">
+        <span class="nav-label">&larr; Previous</span>
+        <span class="nav-title">HLD Capstone</span>
+      </a>
+      <a class="nav-link next" href="url-shortener.html">
+        <span class="nav-label">Next &rarr;</span>
+        <span class="nav-title">Start: URL Shortener</span>
+      </a>
+    </nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>System Design Architectures</h4>
+      <p>A self-study guide for HLD, LLD, and Design Patterns &mdash; built for focused, example-driven interview prep, with working code in Java, Python, JavaScript, and C++ for every topic.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Case Studies</h4>
+      <a href="url-shortener.html">URL Shortener</a>
+      <a href="twitter.html">Twitter / X</a>
+      <a href="whatsapp.html">WhatsApp</a>
+      <a href="uber.html">Uber</a>
+      <a href="netflix.html">Netflix / YouTube</a>
+    </div>
+    <div class="footer-col">
+      <h4>Design Patterns</h4>
+      <a href="../lld/design-patterns/creational/singleton.html">Singleton</a>
+      <a href="../lld/design-patterns/structural/adapter.html">Adapter</a>
+      <a href="../lld/design-patterns/behavioral/observer.html">Observer</a>
+      <a href="../lld/design-patterns/behavioral/strategy.html">Strategy</a>
+    </div>
+    <div class="footer-col">
+      <h4>Guide</h4>
+      <a href="../../index.html">Home</a>
+      <a href="../../index.html#hld-section">Browse HLD</a>
+      <a href="../../index.html#patterns-section">Browse Patterns</a>
+      <a href="#" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top &uarr;</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 System Design Architectures &mdash; a self-study guide for HLD, LLD &amp; Design Patterns.</span>
+    <span>Made for focused, example-driven interview prep.</span>
+  </div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('main section, main h1');
+  const links = document.querySelectorAll('nav.sidebar a.toc');
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 100) currentId = sec.id;
+    });
+    links.forEach(link => {
+      if (link.getAttribute('href').startsWith('#')) {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
