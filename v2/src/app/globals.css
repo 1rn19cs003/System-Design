@@ -525,6 +525,34 @@ main.content h3:first-of-type {
   margin-top: 2px;
 }
 
+/* Case study estimate tables */
+.estimate-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  margin: 12px 0;
+}
+
+.estimate-table th,
+.estimate-table td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.estimate-table th {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.estimate-table td.num {
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
 /* Diagrams */
 img.diagram-img {
   max-width: 100%;

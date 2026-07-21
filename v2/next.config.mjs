@@ -5,6 +5,7 @@ const nextConfig = {
     unoptimized: true,
   },
   reactStrictMode: true,
+  staticPageGenerationTimeout: 180,
 };
 
 export default nextConfig;
