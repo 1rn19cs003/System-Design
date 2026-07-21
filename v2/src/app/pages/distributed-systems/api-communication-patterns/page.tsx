@@ -6,6 +6,10 @@ import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
 import QA from '@/components/QA';
 import CodeTerminal from '@/components/CodeTerminal';
+import FlowStep from '@/components/FlowStep';
+import FlowContinue from '@/components/FlowContinue';
+
+const TOTAL_STEPS = 6;
 
 export const metadata = {
   title: 'API & Communication Patterns — System Design Architectures',
@@ -179,8 +183,7 @@ export default function ApiCommunicationPatternsPage() {
             different flavor of &quot;who talks first, and how often.&quot;
           </p>
 
-          <section id="plain-english">
-            <h2>In Plain English</h2>
+          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
             <p>
               Imagine a large office building with dozens of departments. Instead of visitors
               wandering the halls trying to find the right department, guessing at security rules
@@ -213,11 +216,10 @@ export default function ApiCommunicationPatternsPage() {
                 </p>
               </Callout>
             </TwoCol>
-          </section>
+            <FlowContinue nextId="theory" label="Theory & Diagrams" />
+          </FlowStep>
 
-          <section id="theory">
-            <h2>Theory &amp; Diagrams</h2>
-
+          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
             <h3>API gateways</h3>
             <p>
               An API gateway is a single entry point that sits in front of a set of backend services
@@ -331,10 +333,10 @@ export default function ApiCommunicationPatternsPage() {
               and handle the sender potentially retrying delivery if your endpoint doesn&apos;t
               acknowledge in time.
             </p>
-          </section>
+            <FlowContinue nextId="trade-offs" label="Trade-offs" />
+          </FlowStep>
 
-          <section id="trade-offs">
-            <h2>Trade-offs</h2>
+          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
             <TwoCol>
               <Callout kind="good" title="✓ Reach for GraphQL / WebSockets / webhooks when">
                 <ul>
@@ -367,10 +369,10 @@ export default function ApiCommunicationPatternsPage() {
               scaled and made redundant?), and to justify a WebSocket vs. long-polling vs. webhook
               choice against the actual latency and infrastructure constraints of a given system.
             </p>
-          </section>
+            <FlowContinue nextId="real-world" label="Real-World Examples" />
+          </FlowStep>
 
-          <section id="real-world">
-            <h2>Real-World Examples</h2>
+          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
             <ul>
               <li><strong>Stripe</strong> — requires an <code>Idempotency-Key</code> header on payment-creating API calls specifically so a network retry can never double-charge a customer.</li>
               <li><strong>Kong, AWS API Gateway, Apigee</strong> — dedicated API gateway products that handle routing, auth, and rate limiting in front of microservice backends at scale.</li>
@@ -379,16 +381,16 @@ export default function ApiCommunicationPatternsPage() {
               <li><strong>Stripe &amp; GitHub webhooks</strong> — notify external systems the instant a payment event or a repository event happens, rather than making integrators poll for changes.</li>
               <li><strong>Google Meet &amp; Discord voice/video</strong> — use WebRTC to route audio and video directly between participants&apos; devices wherever possible, minimizing server relay cost and latency.</li>
             </ul>
-          </section>
+            <FlowContinue nextId="interview-questions" label="Interview Questions" />
+          </FlowStep>
 
-          <section id="interview-questions">
-            <h2>Interview Questions</h2>
+          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
             <p>Click a question to reveal the answer.</p>
             <QA items={qaItems} />
-          </section>
+            <FlowContinue nextId="code" label="Code & Output" />
+          </FlowStep>
 
-          <section id="code">
-            <h2>Code &amp; Output</h2>
+          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
             <p>
               A simplified idempotency-key cache for a &quot;charge&quot; endpoint. The first call
               with a given key processes the charge and stores the result; two further calls with the
@@ -396,7 +398,7 @@ export default function ApiCommunicationPatternsPage() {
               a new charge. The output is identical across all four languages.
             </p>
             <CodeTerminal snippets={snippets} />
-          </section>
+          </FlowStep>
 
           <PageNav
             prev={{ label: 'Resilience Patterns', href: '/pages/distributed-systems/resilience-patterns' }}

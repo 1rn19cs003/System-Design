@@ -6,6 +6,10 @@ import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
 import QA from '@/components/QA';
 import CodeTerminal from '@/components/CodeTerminal';
+import FlowStep from '@/components/FlowStep';
+import FlowContinue from '@/components/FlowContinue';
+
+const TOTAL_STEPS = 6;
 
 export const metadata = {
   title: 'Resilience Patterns — System Design Architectures',
@@ -367,8 +371,7 @@ export default function ResiliencePatternsPage() {
             (cascading failures, bulkheads, timeouts).
           </p>
 
-          <section id="plain-english">
-            <h2>In Plain English</h2>
+          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
             <p>
               Picture calling a friend who never picks up. The first few times, you call, let it
               ring out, and hang up — that costs you a little time each try. After enough unanswered
@@ -408,11 +411,10 @@ export default function ResiliencePatternsPage() {
                 </p>
               </Callout>
             </TwoCol>
-          </section>
+            <FlowContinue nextId="theory" label="Theory & Diagrams" />
+          </FlowStep>
 
-          <section id="theory">
-            <h2>Theory &amp; Diagrams</h2>
-
+          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
             <h3>Circuit breaker</h3>
             <p>
               A circuit breaker wraps calls to a downstream dependency and tracks their outcomes. In
@@ -516,10 +518,10 @@ export default function ResiliencePatternsPage() {
               effectively a SPOF even if it&apos;s &quot;just one service among many&quot; — its
               failure mode is capable of taking the rest of the system down with it.
             </p>
-          </section>
+            <FlowContinue nextId="trade-offs" label="Trade-offs" />
+          </FlowStep>
 
-          <section id="trade-offs">
-            <h2>Trade-offs</h2>
+          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
             <TwoCol>
               <Callout kind="good" title="✓ Circuit breakers and bulkheads are worth the complexity when">
                 <ul>
@@ -552,10 +554,10 @@ export default function ResiliencePatternsPage() {
               bulkheads, and how you&apos;d choose thresholds — plus explain the sidecar/service mesh
               trade-off (operational uniformity vs. added infrastructure complexity and latency).
             </p>
-          </section>
+            <FlowContinue nextId="real-world" label="Real-World Examples" />
+          </FlowStep>
 
-          <section id="real-world">
-            <h2>Real-World Examples</h2>
+          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
             <ul>
               <li><strong>Netflix Hystrix</strong> — the library that popularized the circuit breaker pattern for microservices, wrapping calls to dependencies with configurable failure thresholds, fallbacks, and bulkheaded thread pools per dependency; though now in maintenance mode, its design heavily influenced later resilience libraries (like resilience4j).</li>
               <li><strong>Istio &amp; Linkerd</strong> — the two dominant service mesh implementations, both built on the sidecar-plus-control-plane architecture to provide uniform mTLS, retries, and observability across a Kubernetes fleet.</li>
@@ -563,16 +565,16 @@ export default function ResiliencePatternsPage() {
               <li><strong>Thread-pool-per-dependency designs</strong> — a classic bulkhead implementation where each downstream dependency gets its own dedicated, isolated thread pool, so exhausting the pool for one slow dependency can&apos;t starve calls to any other dependency.</li>
               <li><strong>API gateways with rate limiting</strong> — gateways like Kong, Envoy, or a cloud provider's own API gateway enforce per-client and per-route rate limits, which caps how much load any single caller can place on downstream services before a cascading failure even has a chance to start.</li>
             </ul>
-          </section>
+            <FlowContinue nextId="interview-questions" label="Interview Questions" />
+          </FlowStep>
 
-          <section id="interview-questions">
-            <h2>Interview Questions</h2>
+          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
             <p>Click a question to reveal the answer.</p>
             <QA items={qaItems} />
-          </section>
+            <FlowContinue nextId="code" label="Code & Output" />
+          </FlowStep>
 
-          <section id="code">
-            <h2>Code &amp; Output</h2>
+          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
             <p>
               A deterministic circuit breaker simulation. The breaker trips after 3 consecutive
               failures, short-circuits calls while open, and (to keep the demo deterministic) treats
@@ -582,7 +584,7 @@ export default function ResiliencePatternsPage() {
               half-open back to closed.
             </p>
             <CodeTerminal snippets={snippets} />
-          </section>
+          </FlowStep>
 
           <PageNav
             prev={{ label: 'Distributed Transactions & State', href: '/pages/distributed-systems/distributed-transactions' }}

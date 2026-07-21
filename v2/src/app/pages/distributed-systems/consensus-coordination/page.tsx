@@ -6,6 +6,10 @@ import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
 import QA from '@/components/QA';
 import CodeTerminal from '@/components/CodeTerminal';
+import FlowStep from '@/components/FlowStep';
+import FlowContinue from '@/components/FlowContinue';
+
+const TOTAL_STEPS = 6;
 
 export const metadata = {
   title: 'Consensus & Coordination — System Design Architectures',
@@ -219,8 +223,7 @@ export default function ConsensusCoordinationPage() {
             even when some nodes are slow, unreachable, or actively wrong.
           </p>
 
-          <section id="plain-english">
-            <h2>In Plain English</h2>
+          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
             <p>
               Think of a group project with five people and no manager. Someone has to decide who
               submits the final file — that&apos;s leader election. If that person goes silent for a
@@ -250,11 +253,10 @@ export default function ConsensusCoordinationPage() {
                 </p>
               </Callout>
             </TwoCol>
-          </section>
+            <FlowContinue nextId="theory" label="Theory & Diagrams" />
+          </FlowStep>
 
-          <section id="theory">
-            <h2>Theory &amp; Diagrams</h2>
-
+          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
             <h3>Heartbeats &amp; failure detection</h3>
             <p>
               A heartbeat is a small, periodic signal a node sends to prove it&apos;s still alive
@@ -329,10 +331,10 @@ export default function ConsensusCoordinationPage() {
               />
               <figcaption>No leader required — just make sure information keeps spreading</figcaption>
             </figure>
-          </section>
+            <FlowContinue nextId="trade-offs" label="Trade-offs" />
+          </FlowStep>
 
-          <section id="trade-offs">
-            <h2>Trade-offs</h2>
+          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
             <TwoCol>
               <Callout kind="good" title="✓ Reach for leader-based consensus (Raft/Paxos) when">
                 <ul>
@@ -366,10 +368,10 @@ export default function ConsensusCoordinationPage() {
               progress, and why a majority-based protocol prevents both sides from committing
               conflicting writes simultaneously.
             </p>
-          </section>
+            <FlowContinue nextId="real-world" label="Real-World Examples" />
+          </FlowStep>
 
-          <section id="real-world">
-            <h2>Real-World Examples</h2>
+          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
             <ul>
               <li><strong>etcd &amp; Kubernetes</strong> — etcd uses Raft to replicate cluster state consistently across nodes; Kubernetes relies on etcd as its source of truth for the entire cluster&apos;s configuration.</li>
               <li><strong>Apache ZooKeeper</strong> — uses a Paxos-inspired protocol (ZAB) for leader election and coordination, historically the backbone of Kafka&apos;s and Hadoop&apos;s cluster coordination before Kafka moved to its own Raft-based controller (KRaft).</li>
@@ -377,16 +379,16 @@ export default function ConsensusCoordinationPage() {
               <li><strong>Amazon DynamoDB</strong> — uses gossip-style protocols internally for membership and failure detection, prioritizing availability over immediate strong consistency by design.</li>
               <li><strong>Redis Sentinel &amp; Redis Cluster</strong> — use heartbeats and a quorum-based voting process to detect a failed primary and promote a replica automatically.</li>
             </ul>
-          </section>
+            <FlowContinue nextId="interview-questions" label="Interview Questions" />
+          </FlowStep>
 
-          <section id="interview-questions">
-            <h2>Interview Questions</h2>
+          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
             <p>Click a question to reveal the answer.</p>
             <QA items={qaItems} />
-          </section>
+            <FlowContinue nextId="code" label="Code & Output" />
+          </FlowStep>
 
-          <section id="code">
-            <h2>Code &amp; Output</h2>
+          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
             <p>
               A simplified, deterministic simulation of gossip propagation across 5 nodes. Real
               gossip protocols pick peers randomly each round; this demo uses a fixed fanout so the
@@ -394,7 +396,7 @@ export default function ConsensusCoordinationPage() {
               exponential spread — 1 node informed, then 3, then all 5, in three rounds.
             </p>
             <CodeTerminal snippets={snippets} />
-          </section>
+          </FlowStep>
 
           <PageNav
             prev={{ label: 'Distributed Systems', href: '/pages/distributed-systems' }}

@@ -6,6 +6,10 @@ import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
 import QA from '@/components/QA';
 import CodeTerminal from '@/components/CodeTerminal';
+import FlowStep from '@/components/FlowStep';
+import FlowContinue from '@/components/FlowContinue';
+
+const TOTAL_STEPS = 6;
 
 export const metadata = {
   title: 'Big Data Processing — System Design Architectures',
@@ -201,8 +205,7 @@ export default function BigDataProcessingPage() {
             warehouse.
           </p>
 
-          <section id="plain-english">
-            <h2>In Plain English</h2>
+          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
             <p>
               Imagine a warehouse receiving deliveries all day. Batch processing is like closing the
               doors at 6pm and having one team sort and log everything that arrived that day, all at
@@ -237,11 +240,10 @@ export default function BigDataProcessingPage() {
                 </p>
               </Callout>
             </TwoCol>
-          </section>
+            <FlowContinue nextId="theory" label="Theory & Diagrams" />
+          </FlowStep>
 
-          <section id="theory">
-            <h2>Theory &amp; Diagrams</h2>
-
+          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
             <h3>Batch vs. stream processing</h3>
             <p>
               <strong>Batch processing</strong> accumulates data over a window of time and processes
@@ -336,10 +338,10 @@ export default function BigDataProcessingPage() {
               />
               <figcaption>Structure it when you read it, or structure it when you write it — the trade-off is flexibility versus query speed</figcaption>
             </figure>
-          </section>
+            <FlowContinue nextId="trade-offs" label="Trade-offs" />
+          </FlowStep>
 
-          <section id="trade-offs">
-            <h2>Trade-offs</h2>
+          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
             <TwoCol>
               <Callout kind="good" title="✓ Reach for stream processing / a data lake when">
                 <ul>
@@ -373,10 +375,10 @@ export default function BigDataProcessingPage() {
               a lake-plus-warehouse architecture where raw data lands in a lake and a curated,
               query-optimized layer is derived into a warehouse.
             </p>
-          </section>
+            <FlowContinue nextId="real-world" label="Real-World Examples" />
+          </FlowStep>
 
-          <section id="real-world">
-            <h2>Real-World Examples</h2>
+          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
             <ul>
               <li><strong>Apache Spark &amp; Apache Flink</strong> — widely used engines for both batch and stream processing, with Flink built stream-first and Spark historically batch-first before adding Structured Streaming.</li>
               <li><strong>Hadoop MapReduce</strong> — the original open-source implementation of the MapReduce model, historically the backbone of large-scale batch processing before Spark became the more common default.</li>
@@ -384,16 +386,16 @@ export default function BigDataProcessingPage() {
               <li><strong>Amazon S3 with Redshift or Snowflake</strong> — a common architecture pairing S3 as the raw data lake with Redshift or Snowflake as the structured, query-optimized data warehouse layer built on top of it.</li>
               <li><strong>Kafka Streams</strong> — a library for building real-time stream processing applications directly on top of Kafka topics, without needing a separate processing cluster.</li>
             </ul>
-          </section>
+            <FlowContinue nextId="interview-questions" label="Interview Questions" />
+          </FlowStep>
 
-          <section id="interview-questions">
-            <h2>Interview Questions</h2>
+          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
             <p>Click a question to reveal the answer.</p>
             <QA items={qaItems} />
-          </section>
+            <FlowContinue nextId="code" label="Code & Output" />
+          </FlowStep>
 
-          <section id="code">
-            <h2>Code &amp; Output</h2>
+          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
             <p>
               A simplified, deterministic MapReduce-style word count over three fixed text strings.
               The map step splits each string into individual words with a count of 1; the reduce
@@ -401,7 +403,7 @@ export default function BigDataProcessingPage() {
               The output is identical across all four languages.
             </p>
             <CodeTerminal snippets={snippets} />
-          </section>
+          </FlowStep>
 
           <PageNav
             prev={{ label: 'API & Communication Patterns', href: '/pages/distributed-systems/api-communication-patterns' }}

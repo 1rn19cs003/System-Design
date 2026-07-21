@@ -6,6 +6,10 @@ import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
 import QA from '@/components/QA';
 import CodeTerminal from '@/components/CodeTerminal';
+import FlowStep from '@/components/FlowStep';
+import FlowContinue from '@/components/FlowContinue';
+
+const TOTAL_STEPS = 6;
 
 export const metadata = {
   title: 'Architectural Patterns — System Design Architectures',
@@ -251,8 +255,7 @@ export default function ArchitecturalPatternsPage() {
             pure instance of one.
           </p>
 
-          <section id="plain-english">
-            <h2>In Plain English</h2>
+          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
             <p>
               Imagine three different ways to run a restaurant kitchen. <strong>Serverless</strong> is
               like a shared commercial kitchen you only pay for by the hour you actually cook in —
@@ -289,11 +292,10 @@ export default function ArchitecturalPatternsPage() {
                 </p>
               </Callout>
             </TwoCol>
-          </section>
+            <FlowContinue nextId="theory" label="Theory & Diagrams" />
+          </FlowStep>
 
-          <section id="theory">
-            <h2>Theory &amp; Diagrams</h2>
-
+          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
             <h3>Serverless architecture</h3>
             <p>
               In a serverless architecture, you deploy individual functions rather than a running
@@ -406,10 +408,10 @@ export default function ArchitecturalPatternsPage() {
               />
               <figcaption>Not a ladder to climb — a set of tools, most systems use several at once</figcaption>
             </figure>
-          </section>
+            <FlowContinue nextId="trade-offs" label="Trade-offs" />
+          </FlowStep>
 
-          <section id="trade-offs">
-            <h2>Trade-offs</h2>
+          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
             <TwoCol>
               <Callout kind="good" title="✓ Reach for serverless / event-driven when">
                 <ul>
@@ -443,10 +445,10 @@ export default function ArchitecturalPatternsPage() {
               from decoupling versus which ones just need a normal API call — and why P2P is rarely
               chosen for typical backend services despite its resilience story.
             </p>
-          </section>
+            <FlowContinue nextId="real-world" label="Real-World Examples" />
+          </FlowStep>
 
-          <section id="real-world">
-            <h2>Real-World Examples</h2>
+          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
             <ul>
               <li><strong>AWS Lambda, Vercel Functions, Cloudflare Workers</strong> — the major serverless compute platforms, each with different cold-start characteristics (Cloudflare Workers, built on V8 isolates rather than containers, has near-zero cold starts compared to container-based Lambda).</li>
               <li><strong>Netflix and Uber&apos;s event-driven backends</strong> — both run large parts of their platforms on Kafka, publishing domain events (a stream started, a trip completed) that dozens of independent downstream services consume for recommendations, billing, analytics, and fraud detection.</li>
@@ -454,16 +456,16 @@ export default function ArchitecturalPatternsPage() {
               <li><strong>Blockchain networks</strong> (Bitcoin, Ethereum) — P2P networks where every full node maintains and verifies its own copy of the ledger and gossips new transactions/blocks to its peers, with consensus rules (not a central authority) determining the agreed-upon state.</li>
               <li><strong>Skype&apos;s original architecture</strong> — early Skype routed voice calls through a P2P network of &quot;supernodes&quot; (ordinary users&apos; machines with enough bandwidth) rather than centralized servers, which is part of why it scaled so cheaply early on; Microsoft later moved it to centralized, cloud-hosted infrastructure for reliability and control.</li>
             </ul>
-          </section>
+            <FlowContinue nextId="interview-questions" label="Interview Questions" />
+          </FlowStep>
 
-          <section id="interview-questions">
-            <h2>Interview Questions</h2>
+          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
             <p>Click a question to reveal the answer.</p>
             <QA items={qaItems} />
-          </section>
+            <FlowContinue nextId="code" label="Code & Output" />
+          </FlowStep>
 
-          <section id="code">
-            <h2>Code &amp; Output</h2>
+          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
             <p>
               A minimal, deterministic simulation of an event-driven system: a fixed list of 3
               events is &quot;published&quot; to a topic, and two independent subscribers — an
@@ -473,7 +475,7 @@ export default function ArchitecturalPatternsPage() {
               identical across all four languages.
             </p>
             <CodeTerminal snippets={snippets} />
-          </section>
+          </FlowStep>
 
           <PageNav
             prev={{ label: 'Big Data Processing', href: '/pages/distributed-systems/big-data-processing' }}

@@ -6,6 +6,10 @@ import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
 import QA from '@/components/QA';
 import CodeTerminal from '@/components/CodeTerminal';
+import FlowStep from '@/components/FlowStep';
+import FlowContinue from '@/components/FlowContinue';
+
+const TOTAL_STEPS = 6;
 
 export const metadata = {
   title: 'Observability & Security — System Design Architectures',
@@ -269,8 +273,7 @@ export default function ObservabilitySecurityPage() {
             JWTs, RBAC, and TLS, the mechanisms that decide who gets to do what.
           </p>
 
-          <section id="plain-english">
-            <h2>In Plain English</h2>
+          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
             <p>
               Think of running a large building. <strong>Logging</strong> is the building&apos;s
               written incident log — every notable event, timestamped, so you can look back and
@@ -308,11 +311,10 @@ export default function ObservabilitySecurityPage() {
                 </p>
               </Callout>
             </TwoCol>
-          </section>
+            <FlowContinue nextId="theory" label="Theory & Diagrams" />
+          </FlowStep>
 
-          <section id="theory">
-            <h2>Theory &amp; Diagrams</h2>
-
+          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
             <h3>Logging</h3>
             <p>
               Logging records discrete events as they happen — a request came in, a payment failed,
@@ -448,10 +450,10 @@ export default function ObservabilitySecurityPage() {
               shared symmetric session key, and switch to that faster symmetric encryption for the
               rest of the connection.
             </p>
-          </section>
+            <FlowContinue nextId="trade-offs" label="Trade-offs" />
+          </FlowStep>
 
-          <section id="trade-offs">
-            <h2>Trade-offs</h2>
+          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
             <TwoCol>
               <Callout kind="good" title="✓ Reach for JWT-based stateless auth when">
                 <ul>
@@ -485,10 +487,10 @@ export default function ObservabilitySecurityPage() {
               a deliberate practice rather than just &quot;waiting for things to break in production
               anyway.&quot;
             </p>
-          </section>
+            <FlowContinue nextId="real-world" label="Real-World Examples" />
+          </FlowStep>
 
-          <section id="real-world">
-            <h2>Real-World Examples</h2>
+          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
             <ul>
               <li><strong>Netflix&apos;s Chaos Monkey / Simian Army</strong> — randomly terminates production instances (and simulates broader failures like an entire availability zone going down) to continuously verify the platform&apos;s redundancy actually holds up.</li>
               <li><strong>Datadog, Grafana, Prometheus</strong> — the dominant monitoring and dashboarding stack for tracking metrics like the four golden signals and driving alerting rules in production.</li>
@@ -497,16 +499,16 @@ export default function ObservabilitySecurityPage() {
               <li><strong>Auth0 and Firebase Auth</strong> — managed authentication services that issue JWTs as stateless session tokens, letting client apps and backend APIs verify a user&apos;s identity without a shared session database.</li>
               <li><strong>AWS IAM</strong> — a production-scale RBAC (and more broadly, policy-based) system: permissions are defined in policies, attached to roles, and users or services assume roles to gain exactly the access those policies grant.</li>
             </ul>
-          </section>
+            <FlowContinue nextId="interview-questions" label="Interview Questions" />
+          </FlowStep>
 
-          <section id="interview-questions">
-            <h2>Interview Questions</h2>
+          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
             <p>Click a question to reveal the answer.</p>
             <QA items={qaItems} />
-          </section>
+            <FlowContinue nextId="code" label="Code & Output" />
+          </FlowStep>
 
-          <section id="code">
-            <h2>Code &amp; Output</h2>
+          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
             <p>
               A minimal, deterministic RBAC permission check: a fixed set of roles (viewer, editor,
               admin, guest) each with a fixed list of permissions, a fixed mapping of users to roles,
@@ -515,7 +517,7 @@ export default function ObservabilitySecurityPage() {
               identical across all four languages.
             </p>
             <CodeTerminal snippets={snippets} />
-          </section>
+          </FlowStep>
 
           <PageNav
             prev={{ label: 'Architectural Patterns', href: '/pages/distributed-systems/architectural-patterns' }}

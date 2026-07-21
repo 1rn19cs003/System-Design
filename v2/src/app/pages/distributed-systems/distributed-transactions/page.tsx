@@ -6,6 +6,10 @@ import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
 import QA from '@/components/QA';
 import CodeTerminal from '@/components/CodeTerminal';
+import FlowStep from '@/components/FlowStep';
+import FlowContinue from '@/components/FlowContinue';
+
+const TOTAL_STEPS = 6;
 
 export const metadata = {
   title: 'Distributed Transactions & State — System Design Architectures',
@@ -247,8 +251,7 @@ export default function DistributedTransactionsPage() {
             tracking and resolving conflicting writes after the fact (vector clocks, CRDTs).
           </p>
 
-          <section id="plain-english">
-            <h2>In Plain English</h2>
+          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
             <p>
               Imagine booking a vacation that requires a flight, a hotel, and a rental car, each
               booked through a different company. There is no single &quot;undo everything&quot;
@@ -287,11 +290,10 @@ export default function DistributedTransactionsPage() {
                 </p>
               </Callout>
             </TwoCol>
-          </section>
+            <FlowContinue nextId="theory" label="Theory & Diagrams" />
+          </FlowStep>
 
-          <section id="theory">
-            <h2>Theory &amp; Diagrams</h2>
-
+          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
             <h3>Two-Phase Commit (2PC)</h3>
             <p>
               2PC makes a multi-node write atomic by introducing a coordinator that drives two
@@ -414,10 +416,10 @@ export default function DistributedTransactionsPage() {
               />
               <figcaption>The merge function itself guarantees convergence — there's no separate conflict-resolution step</figcaption>
             </figure>
-          </section>
+            <FlowContinue nextId="trade-offs" label="Trade-offs" />
+          </FlowStep>
 
-          <section id="trade-offs">
-            <h2>Trade-offs</h2>
+          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
             <TwoCol>
               <Callout kind="good" title="✓ Reach for 2PC/3PC-style atomic protocols when">
                 <ul>
@@ -452,10 +454,10 @@ export default function DistributedTransactionsPage() {
               action — and to explain when you&apos;d choose choreography vs. orchestration as the
               number of steps grows.
             </p>
-          </section>
+            <FlowContinue nextId="real-world" label="Real-World Examples" />
+          </FlowStep>
 
-          <section id="real-world">
-            <h2>Real-World Examples</h2>
+          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
             <ul>
               <li><strong>Stripe and e-commerce order flows</strong> — a checkout that reserves inventory, charges a card, and creates a shipment is a textbook SAGA: each step is its own local transaction, and a failed payment or shipment triggers explicit compensations like releasing the inventory hold or issuing a refund.</li>
               <li><strong>Google Docs &amp; Figma</strong> — collaborative editors use CRDT-like or Operational Transformation approaches so that concurrent edits from multiple users (or from a user who was briefly offline) merge automatically into a consistent document without a central lock on every keystroke.</li>
@@ -463,16 +465,16 @@ export default function DistributedTransactionsPage() {
               <li><strong>CockroachDB &amp; Spanner-style distributed SQL databases</strong> — implement cross-shard transactions using a two-phase-commit-style protocol under the hood, layered with additional mechanisms (like Spanner&apos;s TrueTime) to provide strong consistency guarantees across shards.</li>
               <li><strong>Redis CRDTs (Active-Active / CRDB)</strong> — Redis Enterprise&apos;s active-active geo-replication uses CRDTs for common data types so multiple regions can accept writes simultaneously and converge without conflict, even across a wide-area network with high latency.</li>
             </ul>
-          </section>
+            <FlowContinue nextId="interview-questions" label="Interview Questions" />
+          </FlowStep>
 
-          <section id="interview-questions">
-            <h2>Interview Questions</h2>
+          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
             <p>Click a question to reveal the answer.</p>
             <QA items={qaItems} />
-          </section>
+            <FlowContinue nextId="code" label="Code & Output" />
+          </FlowStep>
 
-          <section id="code">
-            <h2>Code &amp; Output</h2>
+          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
             <p>
               A deterministic simulation of a G-Counter CRDT. Replica 1 increments its own slot three
               times while offline; Replica 2 increments its own slot five times while offline. When
@@ -481,7 +483,7 @@ export default function DistributedTransactionsPage() {
               or conflict resolution required.
             </p>
             <CodeTerminal snippets={snippets} />
-          </section>
+          </FlowStep>
 
           <PageNav
             prev={{ label: 'Consensus & Coordination', href: '/pages/distributed-systems/consensus-coordination' }}
