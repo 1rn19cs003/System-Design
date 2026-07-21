@@ -1,0 +1,71 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="scArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="scArrowGood" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+    <marker id="scArrowBad" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="18" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2d2f33">SAGA choreography — event-driven, no central coordinator</text>
+
+  <rect x="30" y="45" width="140" height="46" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="100" y="64" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2f8f4e">Inventory Service</text>
+  <text x="100" y="79" text-anchor="middle" font-size="8.5" fill="#2f8f4e">reserves stock ✓</text>
+
+  <rect x="280" y="45" width="140" height="46" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="350" y="64" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2f8f4e">Payment Service</text>
+  <text x="350" y="79" text-anchor="middle" font-size="8.5" fill="#2f8f4e">charges card ✓</text>
+
+  <rect x="530" y="45" width="140" height="46" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="600" y="64" text-anchor="middle" font-size="9.5" font-weight="600" fill="#c0392b">Shipping Service</text>
+  <text x="600" y="79" text-anchor="middle" font-size="8.5" fill="#c0392b">creates shipment ✕ fails</text>
+
+  <line x1="20" y1="140" x2="680" y2="140" stroke="#6a7178" stroke-width="1.1" stroke-dasharray="4,3"/>
+  <text x="350" y="132" text-anchor="middle" font-size="8.5" fill="#6a7178">event bus / topics — every service only knows which events it reacts to</text>
+
+  <circle cx="100" cy="140" r="4" fill="#3b6ea5"/>
+  <circle cx="350" cy="140" r="4" fill="#3b6ea5"/>
+  <circle cx="600" cy="140" r="4" fill="#3b6ea5"/>
+
+  <line x1="100" y1="91" x2="100" y2="136" stroke="#2f8f4e" stroke-width="1.3" marker-end="url(#scArrowGood)"/>
+  <text x="102" y="112" font-size="7.5" fill="#2f8f4e">publishes</text>
+  <text x="102" y="122" font-size="7.5" fill="#2f8f4e">InventoryReserved</text>
+
+  <line x1="105" y1="145" x2="345" y2="185" stroke="#3b6ea5" stroke-width="1.2" stroke-dasharray="3,3" marker-end="url(#scArrow)"/>
+  <text x="200" y="175" text-anchor="middle" font-size="8" fill="#6a7178">Payment subscribes &amp; reacts</text>
+
+  <line x1="350" y1="91" x2="350" y2="136" stroke="#2f8f4e" stroke-width="1.3" marker-end="url(#scArrowGood)"/>
+  <text x="352" y="112" font-size="7.5" fill="#2f8f4e">publishes</text>
+  <text x="352" y="122" font-size="7.5" fill="#2f8f4e">PaymentCharged</text>
+
+  <line x1="355" y1="145" x2="595" y2="185" stroke="#3b6ea5" stroke-width="1.2" stroke-dasharray="3,3" marker-end="url(#scArrow)"/>
+  <text x="470" y="175" text-anchor="middle" font-size="8" fill="#6a7178">Shipping subscribes &amp; reacts</text>
+
+  <line x1="600" y1="91" x2="600" y2="136" stroke="#c0392b" stroke-width="1.3" marker-end="url(#scArrowBad)"/>
+  <text x="602" y="112" font-size="7.5" fill="#c0392b">publishes</text>
+  <text x="602" y="122" font-size="7.5" fill="#c0392b">ShipmentFailed</text>
+
+  <rect x="280" y="225" width="140" height="46" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="350" y="244" text-anchor="middle" font-size="9.5" font-weight="600" fill="#c0392b">Payment Service</text>
+  <text x="350" y="259" text-anchor="middle" font-size="8.5" fill="#c0392b">reacts: refund charge</text>
+
+  <rect x="30" y="225" width="140" height="46" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="100" y="244" text-anchor="middle" font-size="9.5" font-weight="600" fill="#c0392b">Inventory Service</text>
+  <text x="100" y="259" text-anchor="middle" font-size="8.5" fill="#c0392b">reacts: release stock</text>
+
+  <line x1="595" y1="145" x2="360" y2="222" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="3,3" marker-end="url(#scArrowBad)"/>
+  <text x="500" y="195" text-anchor="middle" font-size="8" fill="#c0392b">Payment subscribes to ShipmentFailed</text>
+
+  <line x1="280" y1="248" x2="170" y2="248" stroke="#c0392b" stroke-width="1.3" stroke-dasharray="3,3" marker-end="url(#scArrowBad)"/>
+  <text x="225" y="240" text-anchor="middle" font-size="7.5" fill="#c0392b">publishes PaymentRefunded</text>
+
+  <rect x="20" y="285" width="660" height="28" rx="6" fill="#f4f6f8" stroke="#6a7178" stroke-width="1.1"/>
+  <text x="350" y="303" text-anchor="middle" font-size="9" fill="#6a7178">No service calls another directly, and no single place holds the whole workflow — compare with the orchestrator diagram above</text>
+
+  <title>SAGA choreography: each service reacts to events published by the previous service with no central orchestrator; a shipment failure event cascades backward through Payment and Inventory's own event handlers to trigger compensations</title>
+</svg>

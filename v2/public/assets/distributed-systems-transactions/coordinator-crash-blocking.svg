@@ -1,0 +1,70 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="ccArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="ccArrowAck" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="18" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2d2f33">What happens when the coordinator crashes right after collecting votes</text>
+
+  <line x1="350" y1="45" x2="350" y2="150" stroke="#6a7178" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="120" y1="45" x2="120" y2="310" stroke="#6a7178" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="580" y1="45" x2="580" y2="310" stroke="#6a7178" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <rect x="290" y="30" width="120" height="30" rx="6" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="350" y="49" text-anchor="middle" font-size="9.5" font-weight="700" fill="#ffffff">Coordinator</text>
+
+  <rect x="60" y="30" width="120" height="30" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="120" y="49" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2d2f33">Participant 1</text>
+  <rect x="520" y="30" width="120" height="30" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="580" y="49" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2d2f33">Participant 2</text>
+
+  <line x1="335" y1="60" x2="140" y2="95" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#ccArrow)"/>
+  <line x1="365" y1="60" x2="565" y2="95" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#ccArrow)"/>
+  <text x="350" y="80" text-anchor="middle" font-size="9" fill="#6a7178">t0: PREPARE</text>
+
+  <rect x="55" y="100" width="130" height="42" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="120" y="118" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2d2f33">t1: votes YES</text>
+  <text x="120" y="132" text-anchor="middle" font-size="8.5" fill="#2d2f33">acquires lock, logs it</text>
+
+  <rect x="515" y="100" width="130" height="42" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="580" y="118" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2d2f33">t1: votes YES</text>
+  <text x="580" y="132" text-anchor="middle" font-size="8.5" fill="#2d2f33">acquires lock, logs it</text>
+
+  <line x1="140" y1="100" x2="335" y2="70" stroke="#2f8f4e" stroke-width="1.1" stroke-dasharray="3,3" marker-end="url(#ccArrowAck)"/>
+  <line x1="565" y1="100" x2="365" y2="70" stroke="#2f8f4e" stroke-width="1.1" stroke-dasharray="3,3" marker-end="url(#ccArrowAck)"/>
+
+  <circle cx="350" cy="150" r="16" fill="#fdedec" stroke="#c0392b" stroke-width="1.6"/>
+  <line x1="343" y1="143" x2="357" y2="157" stroke="#c0392b" stroke-width="2.4"/>
+  <line x1="357" y1="143" x2="343" y2="157" stroke="#c0392b" stroke-width="2.4"/>
+  <text x="350" y="178" text-anchor="middle" font-size="9.5" font-weight="700" fill="#c0392b">t2: COORDINATOR CRASHES</text>
+  <text x="350" y="192" text-anchor="middle" font-size="8" fill="#c0392b">before sending commit / abort</text>
+
+  <rect x="108" y="204" width="24" height="16" rx="3" fill="none" stroke="#c0392b" stroke-width="2"/>
+  <path d="M112,204 v-6 a8,8 0 0 1 16,0 v6" fill="none" stroke="#c0392b" stroke-width="2"/>
+
+  <rect x="568" y="204" width="24" height="16" rx="3" fill="none" stroke="#c0392b" stroke-width="2"/>
+  <path d="M572,204 v-6 a8,8 0 0 1 16,0 v6" fill="none" stroke="#c0392b" stroke-width="2"/>
+
+  <rect x="45" y="225" width="150" height="58" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="120" y="243" text-anchor="middle" font-size="9" font-weight="700" fill="#c0392b">t3...tN: BLOCKED</text>
+  <text x="120" y="257" text-anchor="middle" font-size="8" fill="#c0392b">lock still held</text>
+  <text x="120" y="270" text-anchor="middle" font-size="8" fill="#c0392b">can't commit or abort alone</text>
+
+  <rect x="505" y="225" width="150" height="58" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="580" y="243" text-anchor="middle" font-size="9" font-weight="700" fill="#c0392b">t3...tN: BLOCKED</text>
+  <text x="580" y="257" text-anchor="middle" font-size="8" fill="#c0392b">lock still held</text>
+  <text x="580" y="270" text-anchor="middle" font-size="8" fill="#c0392b">can't commit or abort alone</text>
+
+  <rect x="215" y="238" width="270" height="34" rx="6" fill="#f4f6f8" stroke="#6a7178" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="350" y="259" text-anchor="middle" font-size="8.5" fill="#6a7178">duration unknown: seconds to hours</text>
+
+  <rect x="200" y="292" width="300" height="40" rx="8" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="350" y="308" text-anchor="middle" font-size="9" font-weight="700" fill="#2f8f4e">tN: coordinator recovers, reads its</text>
+  <text x="350" y="321" text-anchor="middle" font-size="9" font-weight="700" fill="#2f8f4e">durable log, resends the original decision</text>
+
+  <title>Coordinator crash between prepare and commit: both participants voted yes, acquired locks, and are now blocked indefinitely — unable to safely commit or abort on their own — until the coordinator restarts and reads its own durable log to resend the original decision</title>
+</svg>

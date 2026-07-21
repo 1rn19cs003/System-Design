@@ -1,0 +1,48 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="etArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="etArrowAck" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="20" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2d2f33">Election timeout, step by step (3-node cluster, term 5)</text>
+
+  <line x1="120" y1="55" x2="120" y2="300" stroke="#6a7178" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="350" y1="55" x2="350" y2="300" stroke="#6a7178" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="580" y1="55" x2="580" y2="300" stroke="#6a7178" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <rect x="65" y="30" width="110" height="30" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="120" y="49" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2d2f33">Node X — follower</text>
+  <rect x="295" y="30" width="110" height="30" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="350" y="49" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2d2f33">Node Y — follower</text>
+  <rect x="525" y="30" width="110" height="30" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="580" y="49" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2d2f33">Node Z — follower</text>
+
+  <rect x="55" y="78" width="130" height="34" rx="6" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="120" y="97" text-anchor="middle" font-size="9" font-weight="700" fill="#ffffff">t=150ms: timeout fires</text>
+  <text x="120" y="122" text-anchor="middle" font-size="8" fill="#6a7178">no heartbeat since t=0 → becomes candidate</text>
+
+  <rect x="55" y="135" width="130" height="26" rx="6" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="120" y="152" text-anchor="middle" font-size="8.5" font-weight="700" fill="#ffffff">Candidate, term 5</text>
+
+  <line x1="130" y1="160" x2="345" y2="188" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#etArrow)"/>
+  <line x1="130" y1="160" x2="575" y2="188" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#etArrow)"/>
+  <text x="330" y="175" text-anchor="middle" font-size="8.5" fill="#6a7178">RequestVote(term=5)</text>
+
+  <line x1="345" y1="195" x2="130" y2="222" stroke="#2f8f4e" stroke-width="1.3" stroke-dasharray="3,3" marker-end="url(#etArrowAck)"/>
+  <line x1="575" y1="195" x2="130" y2="222" stroke="#2f8f4e" stroke-width="1.3" stroke-dasharray="3,3" marker-end="url(#etArrowAck)"/>
+  <text x="330" y="215" text-anchor="middle" font-size="8.5" fill="#2f8f4e">VoteGranted</text>
+
+  <rect x="45" y="228" width="150" height="42" rx="8" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.5"/>
+  <text x="120" y="246" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f8f4e">LEADER, term 5</text>
+  <text x="120" y="260" text-anchor="middle" font-size="8" fill="#2f8f4e">3/3 votes (self + 2)</text>
+
+  <rect x="45" y="282" width="610" height="46" rx="6" fill="#f4f6f8" stroke="#6a7178" stroke-width="1.2"/>
+  <text x="350" y="299" text-anchor="middle" font-size="9" fill="#6a7178">Timeouts are randomized per node (e.g. 150-300ms) on purpose: if two followers timed out at the same</text>
+  <text x="350" y="313" text-anchor="middle" font-size="9" fill="#6a7178">instant, votes could split with no majority, forcing the term to increment and the election to restart.</text>
+
+  <title>Election timeout sequence: a follower's timer expires with no heartbeat received, it becomes a candidate for the new term, requests votes from its peers, and becomes leader once it collects a majority</title>
+</svg>

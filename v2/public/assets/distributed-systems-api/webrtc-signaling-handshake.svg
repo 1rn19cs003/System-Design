@@ -1,0 +1,47 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="wrArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="wrArrowGood" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">1. Signaling: server brokers the handshake</text>
+
+  <circle cx="80" cy="90" r="38" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.6"/>
+  <text x="80" y="95" text-anchor="middle" font-size="11" fill="#2d2f33">Peer A</text>
+
+  <rect x="290" y="55" width="120" height="65" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="350" y="82" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">Signaling</text>
+  <text x="350" y="97" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">Server</text>
+
+  <circle cx="620" cy="90" r="38" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.6"/>
+  <text x="620" y="95" text-anchor="middle" font-size="11" fill="#2d2f33">Peer B</text>
+
+  <path d="M118,80 C 180,55 240,55 288,72" fill="none" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#wrArrow)"/>
+  <path d="M412,72 C 460,55 520,55 582,80" fill="none" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#wrArrow)"/>
+  <path d="M582,105 C 520,130 460,130 412,110" fill="none" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#wrArrow)"/>
+  <path d="M288,110 C 240,130 180,130 118,105" fill="none" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#wrArrow)"/>
+  <text x="350" y="145" text-anchor="middle" font-size="9" fill="#6a7178">SDP offer/answer + ICE candidates relayed both directions through the server</text>
+
+  <line x1="20" y1="180" x2="680" y2="180" stroke="#6a7178" stroke-width="1" stroke-dasharray="2,4"/>
+
+  <text x="350" y="205" text-anchor="middle" font-size="12" font-weight="700" fill="#2f8f4e">2. Direct peer-to-peer — server is out of the media path</text>
+
+  <circle cx="80" cy="270" r="38" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.6"/>
+  <text x="80" y="275" text-anchor="middle" font-size="11" fill="#2d2f33">Peer A</text>
+
+  <rect x="290" y="245" width="120" height="55" rx="8" fill="#eaf1f8" stroke="#6a7178" stroke-width="1.2" opacity="0.6"/>
+  <text x="350" y="268" text-anchor="middle" font-size="9" fill="#6a7178">Signaling</text>
+  <text x="350" y="281" text-anchor="middle" font-size="8" fill="#6a7178">no longer in path</text>
+
+  <circle cx="620" cy="270" r="38" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.6"/>
+  <text x="620" y="275" text-anchor="middle" font-size="11" fill="#2d2f33">Peer B</text>
+
+  <path d="M118,270 C 300,320 400,320 582,270" fill="none" stroke="#2f8f4e" stroke-width="2.2" marker-end="url(#wrArrowGood)"/>
+  <text x="350" y="312" text-anchor="middle" font-size="9" fill="#2f8f4e">audio / video / data flow directly between browsers, not through your servers</text>
+
+  <title>WebRTC handshake in two phases: first a signaling server relays SDP offer/answer and ICE candidates between Peer A and Peer B so they can discover a reachable path to each other; once that negotiation completes, the two peers establish a direct connection and media/data flows browser-to-browser, with the signaling server no longer in the path</title>
+</svg>

@@ -320,6 +320,30 @@ export default function DistributedTransactionsPage() {
               <figcaption>Every participant must agree before anyone commits — which is exactly what makes a coordinator crash so dangerous</figcaption>
             </figure>
 
+            <p>
+              In practice the coordinator doesn&apos;t just vanish and reappear cleanly — recovery
+              depends entirely on what it managed to write to durable storage before it went down.
+              A correctly built coordinator persists its decision (commit or abort) to a
+              write-ahead log <em>before</em> sending the first commit message to any participant,
+              so that when it restarts it can read that log and simply resend the same decision to
+              every participant, rather than trying to re-decide anything. The common production
+              pitfall is skipping or delaying that durable write to save latency: if the
+              coordinator crashes before the decision is safely on disk, there is genuinely no way
+              to know what it would have decided, and participants are left relying on a
+              timeout-and-escalate runbook — often a paged on-call engineer manually deciding
+              whether to force-commit or force-abort each stuck transaction, which is exactly the
+              operational cost 2PC is infamous for.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-transactions/coordinator-crash-blocking.svg"
+                alt="A detailed timeline showing the coordinator crashing after both participants voted yes and acquired locks, leaving both participants blocked holding their locks for an unknown duration until the coordinator recovers and resends its durable decision"
+              />
+              <figcaption>Both participants are stuck holding locks the instant the coordinator disappears mid-decision</figcaption>
+            </figure>
+
             <h3>Three-Phase Commit (3PC)</h3>
             <p>
               3PC addresses 2PC&apos;s blocking problem by splitting the second phase in two: after
@@ -360,6 +384,29 @@ export default function DistributedTransactionsPage() {
                 alt="A saga orchestrator calling reserve inventory, then charge payment, then create shipment which fails; the orchestrator then runs compensating actions in reverse order, refunding the payment and releasing the inventory"
               />
               <figcaption>Nothing is undone atomically — each compensation is its own explicit, semantically reversing action</figcaption>
+            </figure>
+
+            <p>
+              The example above is orchestration, where a dedicated service explicitly drives the
+              workflow. <strong>Choreography</strong> reaches the same end state a different way:
+              there&apos;s no dedicated saga service at all — each participant simply publishes an
+              event when it finishes its own step, and whichever other services care about that
+              event react to it independently. The failure path becomes a chain reaction: a
+              ShipmentFailed event is consumed by the Payment service&apos;s own event handler,
+              which issues a refund and publishes PaymentRefunded, which the Inventory
+              service&apos;s handler in turn consumes to release its hold. This keeps every service
+              fully decoupled from the others, but it comes at a real debugging cost — there is no
+              single place to look to see the whole saga&apos;s state, only a trail of events
+              scattered across every service&apos;s own logs.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-transactions/saga-choreography.svg"
+                alt="Three services — Inventory, Payment, and Shipping — publishing and reacting to each other's events directly through an event bus with no central coordinator; a shipment failure event cascades backward through Payment and Inventory's own handlers to trigger compensations"
+              />
+              <figcaption>No central coordinator — just services reacting to each other&apos;s events, for better and for worse</figcaption>
             </figure>
 
             <h3>Vector clocks</h3>

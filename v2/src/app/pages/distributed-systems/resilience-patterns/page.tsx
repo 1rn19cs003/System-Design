@@ -439,6 +439,74 @@ export default function ResiliencePatternsPage() {
               <figcaption>Half-open is the controlled, low-risk way to test whether a dependency has actually recovered</figcaption>
             </figure>
 
+            <p>
+              A subtlety worth internalizing: the failure threshold and the reset timeout are two
+              separate knobs that trade off in opposite directions. A low failure threshold trips
+              the breaker fast, which protects the dependency quickly but also means a handful of
+              unlucky, unrelated blips (a single slow garbage-collection pause, one dropped packet)
+              can trip it on otherwise-healthy traffic — that&apos;s a self-inflicted availability
+              hit, not a real outage. A short reset timeout, on the other hand, sends trial traffic
+              back too soon, before a genuinely overloaded service has actually recovered, so the
+              trial call fails, the breaker reopens, and you&apos;ve gained nothing but an extra
+              round trip of latency on top of the outage. In production, breakers are usually tuned
+              against rate-based failure counts (e.g. &quot;50% of the last 20 calls failed&quot;)
+              rather than raw consecutive-failure counts, precisely so a couple of stray errors in an
+              otherwise-healthy stream don&apos;t trip the breaker on their own.
+            </p>
+
+            <h3>Retry storms vs. backoff and jitter</h3>
+            <p>
+              Retries are often the thing that turns a brief blip into a full outage, and the
+              mechanism is worth spelling out precisely. If every client retries failed calls after
+              exactly the same fixed delay, then all of them retry at the same moment — and if the
+              downstream service was already struggling, that synchronized wave of retries lands on
+              top of the previous wave that hasn&apos;t even finished processing yet. Each retry
+              round adds more concurrent load than the last, because it&apos;s the sum of new
+              traffic plus every previous round&apos;s retries, so the service that might have
+              recovered from a transient blip instead gets pushed further into overload. This is the
+              exact failure mode a naive &quot;just add a retry&quot; fix can create on its own.
+              <strong> Exponential backoff</strong> (doubling the delay after each failed attempt)
+              spreads a single client&apos;s retries out over time instead of hammering immediately;{' '}
+              <strong>jitter</strong> (adding a small random offset to that delay) staggers different
+              clients away from each other so they stop retrying in lockstep. Without jitter, even
+              exponential backoff can leave every client synchronized on the same schedule if they
+              all failed at the same instant — jitter is what actually breaks the synchronization,
+              not the exponential curve by itself.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-resilience/retry-storm-vs-backoff-jitter.svg"
+                alt="Two scenarios: naive fixed-interval retries with no jitter stack on top of each other and drive load far past service capacity, while exponential backoff with jitter spreads retries out over widening randomized gaps so load stays under capacity"
+              />
+              <figcaption>The fix for a retry storm isn&apos;t "retry less" — it&apos;s "retry spread out, not synchronized"</figcaption>
+            </figure>
+
+            <h3>Bulkheads</h3>
+            <p>
+              A bulkhead isolates the resources one dependency consumes — most commonly a thread
+              pool or connection pool — so that exhausting the resources used to call one dependency
+              can&apos;t starve calls to a completely unrelated dependency. Without this isolation, a
+              common production failure mode looks like: a service has one shared thread pool for
+              all outbound calls, one downstream dependency (say, a recommendations service) starts
+              responding slowly, calls to it pile up holding threads from the shared pool, and once
+              that pool is exhausted, requests that only needed to call a completely healthy
+              payments or inventory service also fail — not because those services are unhealthy,
+              but because there are no threads left to make the call at all. Giving each dependency
+              its own dedicated pool means a slow dependency can only ever exhaust its own pool, and
+              every other code path keeps working normally.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-resilience/bulkhead-pattern.svg"
+                alt="Service A calling three downstream dependencies through three separate thread pools; the Recommendations pool is fully exhausted by a slow Recommendations service, but the separate Payments and Inventory pools remain healthy and unaffected"
+              />
+              <figcaption>One shared thread pool means one slow dependency can starve requests that never even call it</figcaption>
+            </figure>
+
             <h3>Sidecar pattern</h3>
             <p>
               A sidecar is a separate helper process deployed alongside a service instance — typically

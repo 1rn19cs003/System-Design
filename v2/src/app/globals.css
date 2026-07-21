@@ -234,6 +234,30 @@ nav.sidebar a.toc.active {
   color: var(--accent);
 }
 
+/* Active page / active group highlighting in the full-site accordion nav */
+nav.sidebar a.top-link.active-page,
+nav.sidebar a.toc-link.active-page {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  position: relative;
+}
+
+nav.sidebar a.toc-link.active-page::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+nav.sidebar details.group > summary.active-group {
+  color: var(--accent);
+}
+
 /* ---------- Main content ---------- */
 main.content {
   flex: 1;
@@ -874,22 +898,24 @@ footer.site-footer {
 .flow-step:not(:last-of-type)::after {
   content: "";
   position: absolute;
-  left: 34px;
+  left: 32px;
   bottom: -18px;
-  width: 2px;
+  width: 1.5px;
   height: 18px;
   background: var(--border);
 }
 
 .flow-details {
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .flow-details[open] {
-  border-color: var(--accent);
+  border-color: rgba(59, 110, 165, 0.35);
+  box-shadow: 0 2px 10px rgba(59, 110, 165, 0.06);
 }
 
 .flow-summary {
@@ -897,9 +923,9 @@ footer.site-footer {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  background: var(--sidebar-bg);
+  gap: 12px;
+  padding: 14px 18px;
+  background: #fff;
   transition: background 0.15s ease;
 }
 
@@ -908,89 +934,112 @@ footer.site-footer {
 }
 
 .flow-summary:hover {
-  background: var(--accent-soft);
+  background: #fafbfc;
+}
+
+.flow-summary:hover .flow-badge {
+  border-color: var(--accent);
 }
 
 .flow-details[open] > .flow-summary {
-  background: var(--accent-soft);
+  background: #fff;
+  border-bottom: 1px solid var(--border);
 }
 
 .flow-badge {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: #fff;
-  border: 2px solid var(--accent);
-  color: var(--accent);
-  font-weight: 700;
-  font-size: 14px;
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12.5px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .flow-details[open] .flow-badge {
   background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
 }
 
 .flow-summary-text {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: baseline;
+  gap: 10px;
   min-width: 0;
 }
 
 .flow-summary-title {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14.5px;
+  font-weight: 600;
   color: var(--text);
+  letter-spacing: -0.005em;
 }
 
 .flow-summary-sub {
-  font-size: 11px;
+  font-size: 10.5px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--muted);
+  opacity: 0.75;
 }
 
 .flow-chevron {
   flex-shrink: 0;
-  color: var(--accent);
-  font-size: 13px;
-  transition: transform 0.15s ease;
+  color: var(--muted);
+  font-size: 11px;
+  transition: transform 0.2s ease, color 0.15s ease;
 }
 
 .flow-details[open] > .flow-summary .flow-chevron {
+  color: var(--accent);
   transform: rotate(90deg);
 }
 
 .flow-body {
-  padding: 22px 22px 26px;
-  border-top: 1px solid var(--border);
+  padding: 20px 22px 24px;
+  animation: flow-body-in 0.18s ease;
+}
+
+@keyframes flow-body-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .flow-continue {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 20px;
-  padding: 10px 18px;
-  border: none;
+  margin-top: 18px;
+  padding: 9px 16px;
+  border: 1px solid rgba(59, 110, 165, 0.3);
   border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
 
 .flow-continue:hover {
-  background: #2f5a87;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
   transform: translateX(2px);
 }
 

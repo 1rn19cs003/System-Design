@@ -1,0 +1,52 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="tbArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="tbArrowGood" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+    <marker id="tbArrowBad" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Token bucket at the API gateway — capacity 10, refill 2 tokens/sec</text>
+
+  <line x1="260" y1="35" x2="260" y2="70" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#tbArrow)"/>
+  <text x="330" y="50" text-anchor="middle" font-size="9" fill="#6a7178">tokens added continuously at a fixed rate</text>
+
+  <path d="M210,75 L310,75 L295,180 Q290,195 260,195 Q230,195 225,180 Z" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.6"/>
+  <circle cx="240" cy="100" r="8" fill="#f4b942" stroke="#c98d0e" stroke-width="1"/>
+  <circle cx="262" cy="100" r="8" fill="#f4b942" stroke="#c98d0e" stroke-width="1"/>
+  <circle cx="284" cy="100" r="8" fill="#f4b942" stroke="#c98d0e" stroke-width="1"/>
+  <circle cx="240" cy="120" r="8" fill="#f4b942" stroke="#c98d0e" stroke-width="1"/>
+  <circle cx="262" cy="120" r="8" fill="#f4b942" stroke="#c98d0e" stroke-width="1"/>
+  <circle cx="284" cy="120" r="8" fill="#f4b942" stroke="#c98d0e" stroke-width="1"/>
+  <circle cx="250" cy="140" r="8" fill="#f4b942" stroke="#c98d0e" stroke-width="1"/>
+  <circle cx="272" cy="140" r="8" fill="#f4b942" stroke="#c98d0e" stroke-width="1"/>
+  <text x="260" y="215" text-anchor="middle" font-size="9" fill="#6a7178">8 tokens currently available</text>
+
+  <text x="60" y="95" text-anchor="middle" font-size="10" fill="#2d2f33">Req 1</text>
+  <line x1="20" y1="100" x2="205" y2="90" stroke="#2f8f4e" stroke-width="1.3" marker-end="url(#tbArrowGood)"/>
+
+  <text x="60" y="125" text-anchor="middle" font-size="10" fill="#2d2f33">Req 2</text>
+  <line x1="20" y1="130" x2="205" y2="105" stroke="#2f8f4e" stroke-width="1.3" marker-end="url(#tbArrowGood)"/>
+
+  <text x="60" y="255" text-anchor="middle" font-size="10" fill="#2d2f33">Req 3 (bucket empty)</text>
+  <line x1="100" y1="250" x2="230" y2="200" stroke="#c0392b" stroke-width="1.3" marker-end="url(#tbArrowBad)"/>
+
+  <rect x="450" y="70" width="200" height="55" rx="8" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="550" y="93" text-anchor="middle" font-size="10" font-weight="700" fill="#2f8f4e">200 OK</text>
+  <text x="550" y="109" text-anchor="middle" font-size="8" fill="#2f8f4e">token consumed, request forwarded to backend</text>
+  <line x1="315" y1="95" x2="445" y2="95" stroke="#2f8f4e" stroke-width="1.3" marker-end="url(#tbArrowGood)"/>
+
+  <rect x="450" y="200" width="200" height="55" rx="8" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="550" y="223" text-anchor="middle" font-size="10" font-weight="700" fill="#c0392b">429 Too Many Requests</text>
+  <text x="550" y="239" text-anchor="middle" font-size="8" fill="#c0392b">rejected at the gateway — never reaches any backend service</text>
+  <line x1="300" y1="200" x2="445" y2="225" stroke="#c0392b" stroke-width="1.3" marker-end="url(#tbArrowBad)"/>
+
+  <text x="350" y="295" text-anchor="middle" font-size="9.5" fill="#6a7178">Enforced once, centrally, at the gateway — instead of every backend service implementing its own limiter</text>
+
+  <title>Token bucket rate limiting: a bucket holds up to 10 tokens, refilled continuously at a fixed rate; each incoming request consumes one token and is forwarded to the backend, but once the bucket is empty further requests are rejected with 429 Too Many Requests at the gateway itself, before ever reaching a backend service</title>
+</svg>

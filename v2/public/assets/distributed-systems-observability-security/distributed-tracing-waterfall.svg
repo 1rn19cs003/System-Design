@@ -1,0 +1,41 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="dtArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="15" width="660" height="30" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.2"/>
+  <text x="350" y="35" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2d2f33">trace_id = 7f3a9c... propagated in a header on every downstream call</text>
+
+  <text x="20" y="72" font-size="8.5" font-weight="600" fill="#2d2f33">API Gateway</text>
+  <rect x="140" y="60" width="500" height="20" rx="4" fill="#3b6ea5"/>
+  <text x="650" y="75" font-size="7" fill="#3b6ea5" text-anchor="end" transform="translate(0,0)"></text>
+  <text x="145" y="74" font-size="7" fill="#ffffff">span: 0-420ms (waits on everything below)</text>
+
+  <text x="20" y="107" font-size="8.5" font-weight="600" fill="#2d2f33">Auth Service</text>
+  <rect x="150" y="95" width="60" height="20" rx="4" fill="#2f8f4e"/>
+  <text x="180" y="109" font-size="6.5" text-anchor="middle" fill="#ffffff">30ms</text>
+
+  <text x="20" y="142" font-size="8.5" font-weight="600" fill="#2d2f33">Order Service</text>
+  <rect x="215" y="130" width="280" height="20" rx="4" fill="#3b6ea5"/>
+  <text x="355" y="144" font-size="6.5" text-anchor="middle" fill="#ffffff">span: 90-370ms</text>
+
+  <text x="20" y="177" font-size="8.5" font-weight="600" fill="#2d2f33">Payment Service</text>
+  <rect x="230" y="165" width="240" height="20" rx="4" fill="#c0392b"/>
+  <text x="350" y="179" font-size="6.5" text-anchor="middle" fill="#ffffff">span: 105-345ms — slowest hop</text>
+
+  <text x="20" y="212" font-size="8.5" font-weight="600" fill="#2d2f33">Fraud Check (ext. API)</text>
+  <rect x="260" y="200" width="190" height="20" rx="4" fill="#c0392b" opacity="0.85"/>
+  <text x="355" y="214" font-size="6.5" text-anchor="middle" fill="#ffffff">120-300ms — the real bottleneck</text>
+
+  <line x1="140" y1="60" x2="140" y2="230" stroke="#6a7178" stroke-width="0.6" stroke-dasharray="2,3"/>
+  <line x1="640" y1="60" x2="640" y2="230" stroke="#6a7178" stroke-width="0.6" stroke-dasharray="2,3"/>
+  <text x="140" y="242" text-anchor="middle" font-size="7" fill="#6a7178">t=0ms</text>
+  <text x="640" y="242" text-anchor="middle" font-size="7" fill="#6a7178">t=420ms</text>
+
+  <text x="350" y="270" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2d2f33">One trace, four spans — the waterfall shows exactly which hop owns the latency.</text>
+  <text x="350" y="288" text-anchor="middle" font-size="10.5" fill="#6a7178">Without a shared trace ID, this is four separate log files and a guess.</text>
+
+  <title>Distributed tracing waterfall: a single request's trace ID propagates across API Gateway, Auth, Order, and Payment services, each rendered as a span bar on a shared timeline, revealing that a third-party fraud-check call inside Payment Service is the actual latency bottleneck</title>
+</svg>

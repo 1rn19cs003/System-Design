@@ -326,6 +326,31 @@ export default function ArchitecturalPatternsPage() {
               <figcaption>Instances scale to zero and back — the price is a cold-start tax on the first request to a fresh one</figcaption>
             </figure>
 
+            <p>
+              Concretely, a cold start is three sequential costs stacked before your code ever runs: the
+              platform has to <strong>provision a container</strong> (allocate compute, pull or mount
+              the deployment package), then <strong>initialize the language runtime</strong> (start the
+              JVM, the Python interpreter, the Node.js process), then execute your own{' '}
+              <strong>top-level initialization code</strong> — opening a database connection pool,
+              loading a config file, instantiating an SDK client — before it can finally hand your
+              handler function the actual request. A warm invocation skips all three and goes straight
+              to handling the request, which is why the same endpoint can respond in 15ms on one call
+              and 800ms+ on the next if the platform happened to spin up a fresh instance for it. The
+              production pitfall this causes is invisible p99 latency spikes that don&apos;t reproduce
+              in a load test: a load test keeps instances warm through sustained traffic, while real
+              user traffic that&apos;s bursty or has long idle gaps keeps triggering fresh cold starts
+              that never show up until the feature is already live.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-architecture/cold-start-timeline.svg"
+                alt="A cold invocation pays container provisioning, runtime init, and application init-code time before handling the request, while a warm invocation on a reused instance skips straight to handling the request"
+              />
+              <figcaption>Same request-handling cost either way — the entire difference is the setup paid before it</figcaption>
+            </figure>
+
             <h3>Event-driven architecture</h3>
             <p>
               This site&apos;s HLD Message Queues page already covers the mechanics of publish/subscribe
@@ -355,6 +380,34 @@ export default function ArchitecturalPatternsPage() {
                 alt="Contrast between a direct-call architecture where a service must call each downstream consumer individually, and an event-driven architecture where a service publishes one event to a broker and independent subscribers each consume it on their own"
               />
               <figcaption>The publisher writes to a topic once — it never needs to know who, or how many, are listening</figcaption>
+            </figure>
+
+            <p>
+              There are two distinct styles of coordinating an event-driven flow, and interviews often
+              probe whether you know the difference. <strong>Choreography</strong> is the fully
+              decentralized style: every service subscribes directly to the events it cares about and
+              decides its own reaction, with no service directing the others — an{' '}
+              <code>OrderPlaced</code> event might be independently picked up by an inventory service
+              (reserve stock), a payment service (charge the card), and a shipping service (schedule a
+              pickup), none of which call each other or know the others exist.{' '}
+              <strong>Orchestration</strong> keeps a central coordinator that explicitly calls each
+              service in sequence and tracks the overall workflow&apos;s state. Choreography maximizes
+              decoupling but makes the overall business process harder to see in one place — the
+              actual production pitfall is that when payment fails after inventory has already
+              reserved stock, nothing automatically undoes the reservation, because no single service
+              has visibility into the whole flow; someone has to explicitly build a compensating
+              action (listening for a <code>PaymentFailed</code> event and releasing the reserved
+              stock) rather than relying on a rollback the way a single database transaction would give
+              you for free.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-architecture/event-choreography.svg"
+                alt="Order Service publishes one OrderPlaced event to a broker, and Inventory, Payment, and Shipping services each independently subscribe and react without calling each other directly, with no central orchestrator coordinating the sequence"
+              />
+              <figcaption>Choreography: every service reacts on its own — no conductor, and no free rollback if one step fails</figcaption>
             </figure>
 
             <h3>Peer-to-peer (P2P) architecture</h3>

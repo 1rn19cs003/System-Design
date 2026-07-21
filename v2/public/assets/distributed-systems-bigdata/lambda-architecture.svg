@@ -1,0 +1,52 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="laArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="laArrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+    <marker id="laArrowGold" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#b8860b"/>
+    </marker>
+  </defs>
+
+  <rect x="270" y="15" width="160" height="42" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="350" y="33" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2d2f33">New data</text>
+  <text x="350" y="47" text-anchor="middle" font-size="7.5" fill="#6a7178">e.g. append-only event log</text>
+
+  <line x1="300" y1="57" x2="150" y2="95" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#laArrow)"/>
+  <line x1="400" y1="57" x2="550" y2="95" stroke="#b8860b" stroke-width="1.2" marker-end="url(#laArrowGold)"/>
+
+  <rect x="40" y="100" width="220" height="55" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="150" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Batch layer</text>
+  <text x="150" y="137" text-anchor="middle" font-size="7.5" fill="#eaf1f8">recomputes over ALL data</text>
+  <text x="150" y="149" text-anchor="middle" font-size="7.5" fill="#eaf1f8">periodically — exact, slow</text>
+
+  <rect x="440" y="100" width="220" height="55" rx="8" fill="#fdf6e3" stroke="#b8860b" stroke-width="1.5"/>
+  <text x="550" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#8a6600">Speed layer</text>
+  <text x="550" y="137" text-anchor="middle" font-size="7.5" fill="#8a6600">processes only recent data</text>
+  <text x="550" y="149" text-anchor="middle" font-size="7.5" fill="#8a6600">in real time — approximate, fast</text>
+
+  <line x1="150" y1="155" x2="150" y2="185" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#laArrow)"/>
+  <line x1="550" y1="155" x2="550" y2="185" stroke="#b8860b" stroke-width="1.2" marker-end="url(#laArrowGold)"/>
+
+  <rect x="40" y="190" width="220" height="42" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="150" y="209" text-anchor="middle" font-size="9" font-weight="600" fill="#2f8f4e">Batch views</text>
+  <text x="150" y="222" text-anchor="middle" font-size="7.5" fill="#2f8f4e">precomputed, complete, correct</text>
+
+  <rect x="440" y="190" width="220" height="42" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.3"/>
+  <text x="550" y="209" text-anchor="middle" font-size="9" font-weight="600" fill="#c0392b">Real-time views</text>
+  <text x="550" y="222" text-anchor="middle" font-size="7.5" fill="#c0392b">covers the gap batch hasn't reached yet</text>
+
+  <line x1="180" y1="232" x2="300" y2="262" stroke="#2f8f4e" stroke-width="1.2" marker-end="url(#laArrowGreen)"/>
+  <line x1="520" y1="232" x2="400" y2="262" stroke="#c0392b" stroke-width="1.2" marker-end="url(#laArrow)"/>
+
+  <rect x="260" y="265" width="180" height="50" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="350" y="286" text-anchor="middle" font-size="10" font-weight="700" fill="#2d2f33">Serving layer</text>
+  <text x="350" y="301" text-anchor="middle" font-size="7.5" fill="#6a7178">merges batch + real-time on query</text>
+
+  <text x="350" y="335" text-anchor="middle" font-size="10.5" fill="#6a7178">A query result = the exact batch view, patched with whatever real-time view has seen since.</text>
+
+  <title>Lambda architecture: new data flows into both a batch layer (recomputes exact views over all data periodically) and a speed layer (processes only recent data in real time, approximate), and a serving layer merges both views to answer queries with both correctness and low latency</title>
+</svg>

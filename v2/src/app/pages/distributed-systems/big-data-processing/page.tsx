@@ -269,6 +269,31 @@ export default function BigDataProcessingPage() {
               <figcaption>Process it all at once on a schedule, or process each record the moment it shows up</figcaption>
             </figure>
 
+            <p>
+              In production, most teams don&apos;t actually pick one or the other — they run both,
+              which is what the <strong>Lambda architecture</strong> formalizes. New data is written
+              to both a <strong>batch layer</strong>, which periodically recomputes exact, complete
+              views over the entire dataset, and a <strong>speed layer</strong>, which processes only
+              the data that has arrived since the last batch run and produces approximate real-time
+              views immediately. A <strong>serving layer</strong> answers queries by merging both:
+              the batch view for everything the batch layer has already caught up to, patched with
+              the speed layer&apos;s view of whatever has happened since. This gets you both
+              correctness (the batch layer eventually corrects any approximation the speed layer
+              made) and low latency (you never wait for the next batch run to see recent data) — at
+              the real cost of having to write and maintain the same business logic twice, once for
+              each layer, which is why some teams accept a simpler variant (Kappa architecture) that
+              runs everything through a single stream-processing layer instead.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-bigdata/lambda-architecture.svg"
+                alt="New data feeds both a batch layer that recomputes exact views over all data periodically and a speed layer that processes only recent data in real time, with a serving layer merging both views to answer queries"
+              />
+              <figcaption>Batch gets you correctness eventually; speed gets you an answer right now — serving merges both</figcaption>
+            </figure>
+
             <h3>ETL pipelines</h3>
             <p>
               An <strong>ETL</strong> pipeline moves data from where it's produced to where it can be
@@ -314,6 +339,31 @@ export default function BigDataProcessingPage() {
                 alt="Two mappers independently split their input text into (word, 1) pairs, a shuffle-and-sort step groups all pairs by word key across the cluster, and reducers sum the counts for each key to produce the final word frequencies"
               />
               <figcaption>Map splits and transforms in parallel; shuffle regroups by key; reduce aggregates each group</figcaption>
+            </figure>
+
+            <p>
+              A stream processor can&apos;t rely on a one-off shuffle step the way MapReduce does,
+              because the input never ends — so it needs a standing unit of parallelism instead. That
+              unit is the <strong>partition</strong>. A Kafka-style topic is split into a fixed number
+              of partitions at creation time, and each partition is consumed by exactly one instance
+              within a given consumer group at a time, which is what lets multiple consumer instances
+              process a topic in parallel without stepping on each other&apos;s messages. This is also
+              the mechanism&apos;s hard ceiling: a consumer group can scale out to at most as many
+              active consumers as there are partitions — a topic with 4 partitions caps out at 4
+              usefully-busy consumers, and a 5th instance simply sits idle with nothing assigned. The
+              common production mistake is under-provisioning partition count early on and then
+              discovering, once traffic grows, that repartitioning an existing topic is disruptive and
+              can reorder or duplicate in-flight messages for consumers relying on partition-level
+              ordering.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-bigdata/kafka-partition-scaling.svg"
+                alt="A Kafka-style topic with 4 partitions, each owned by exactly one consumer instance in a consumer group; a 5th consumer instance sits idle because there is no partition left to assign it"
+              />
+              <figcaption>Partitions are the unit of parallelism, not consumers — a 5th consumer with no partition left just idles</figcaption>
             </figure>
 
             <h3>Data lakes vs. data warehouses</h3>

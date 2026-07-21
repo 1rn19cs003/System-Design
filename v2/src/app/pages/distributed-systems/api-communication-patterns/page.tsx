@@ -321,6 +321,34 @@ export default function ApiCommunicationPatternsPage() {
               latency of relaying every frame through your own infrastructure.
             </p>
 
+            <p>
+              The handshake itself has two distinct phases, and mixing them up is a common source of
+              confusion. Phase one is pure signaling: the two peers exchange <strong>SDP</strong>{' '}
+              (Session Description Protocol) offers and answers describing what media/codecs they
+              support, plus a set of <strong>ICE</strong> candidates — possible network paths
+              (local IP, public IP discovered via a STUN server, or a relayed path through a TURN
+              server as a last resort) where each peer might be reachable. None of this negotiation
+              carries actual audio or video; it&apos;s purely metadata relayed through the signaling
+              server, which can be a plain WebSocket or even a REST endpoint you already run. Phase
+              two only begins once ICE candidate pairs are tested and a working path is found: the
+              peers open a direct connection over whichever candidate path succeeded, and every
+              subsequent audio, video, or data-channel packet flows over that path without touching
+              your server again. The practical failure mode to know: on restrictive corporate
+              networks or behind symmetric NATs, no direct path can be found at all, and WebRTC falls
+              back to relaying media through a TURN server — at that point you&apos;re paying the
+              bandwidth cost you were trying to avoid, just via a different relay than your own
+              application server.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-api/webrtc-signaling-handshake.svg"
+                alt="Phase one: a signaling server relays SDP offer/answer and ICE candidates between two peers. Phase two: once negotiation completes, the peers connect directly and audio/video/data flows browser-to-browser with the signaling server out of the path"
+              />
+              <figcaption>The signaling server brokers the introduction, then gets out of the way entirely</figcaption>
+            </figure>
+
             <h3>Webhooks</h3>
             <p>
               A webhook inverts the usual client-initiates-every-request model: instead of your
@@ -333,6 +361,46 @@ export default function ApiCommunicationPatternsPage() {
               and handle the sender potentially retrying delivery if your endpoint doesn&apos;t
               acknowledge in time.
             </p>
+
+            <p>
+              What actually goes wrong with webhooks in production is almost always on the receiving
+              end: your endpoint is briefly down for a deploy, or your handler throws before it
+              finishes processing, so the sender never gets an acknowledgment. A well-built sender
+              (Stripe, GitHub) treats that as a delivery failure and retries with backoff over a
+              window that can stretch to hours or days — which means your endpoint must be{' '}
+              <strong>idempotent</strong> for exactly the same reason a payment API is: you will
+              receive the same event more than once, and processing it twice (e.g. crediting an
+              account twice for one payment event) is a real bug, not a hypothetical. The other
+              production trap is verifying events at all — a webhook URL is, by definition, a public
+              endpoint, so without checking the sender&apos;s signature (a hash computed over the raw
+              payload using a shared secret) anyone who discovers the URL can POST a forged event and
+              have your system act on it as if it came from the real provider.
+            </p>
+
+            <h3>Rate limiting</h3>
+            <p>
+              Rate limiting caps how much load a single client, API key, or IP can place on a
+              service over time, and it&apos;s one of the concerns an API gateway centralizes rather
+              than leaving to individual services. The most common algorithm is the{' '}
+              <strong>token bucket</strong>: a bucket holds up to some maximum number of tokens,
+              tokens are added back at a fixed rate (say, 2 per second up to a cap of 10), and each
+              incoming request consumes one token to proceed. As long as tokens are available,
+              requests pass through immediately — including short bursts, since a client that has
+              been quiet can accumulate a full bucket and spend it all at once. Once the bucket is
+              empty, further requests are rejected outright (typically with an HTTP 429) without ever
+              reaching a backend service. This is why rate limiting belongs at the gateway rather
+              than in each service: a bad client can be stopped once, at the edge, instead of every
+              backend having to independently defend itself against the same abusive traffic pattern.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-api/token-bucket-rate-limiting.svg"
+                alt="A token bucket with capacity 10 refilling at 2 tokens per second; requests that find an available token are forwarded to the backend with 200 OK, while a request arriving when the bucket is empty is rejected at the gateway with 429 Too Many Requests"
+              />
+              <figcaption>Bursts are fine as long as tokens are available — the bucket, not a fixed rate, is what's actually enforced</figcaption>
+            </figure>
             <FlowContinue nextId="trade-offs" label="Trade-offs" />
           </FlowStep>
 

@@ -1,0 +1,45 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="ecArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="20" width="140" height="42" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="90" y="45" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2d2f33">Order Service</text>
+
+  <rect x="280" y="20" width="140" height="42" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="350" y="39" text-anchor="middle" font-size="9.5" font-weight="700" fill="#ffffff">Event: OrderPlaced</text>
+  <text x="350" y="53" text-anchor="middle" font-size="7.5" fill="#eaf1f8">published to broker/topic</text>
+
+  <line x1="160" y1="41" x2="278" y2="41" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#ecArrow)"/>
+
+  <line x1="350" y1="62" x2="140" y2="120" stroke="#3b6ea5" stroke-width="1.1" marker-end="url(#ecArrow)"/>
+  <line x1="350" y1="62" x2="350" y2="120" stroke="#3b6ea5" stroke-width="1.1" marker-end="url(#ecArrow)"/>
+  <line x1="350" y1="62" x2="560" y2="120" stroke="#3b6ea5" stroke-width="1.1" marker-end="url(#ecArrow)"/>
+
+  <rect x="60" y="125" width="160" height="55" rx="8" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="140" y="147" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f8f4e">Inventory Service</text>
+  <text x="140" y="163" text-anchor="middle" font-size="7.5" fill="#2f8f4e">reacts on its own:</text>
+  <text x="140" y="175" text-anchor="middle" font-size="7.5" fill="#2f8f4e">reserves stock</text>
+
+  <rect x="270" y="125" width="160" height="55" rx="8" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="350" y="147" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f8f4e">Payment Service</text>
+  <text x="350" y="163" text-anchor="middle" font-size="7.5" fill="#2f8f4e">reacts on its own:</text>
+  <text x="350" y="175" text-anchor="middle" font-size="7.5" fill="#2f8f4e">charges the card</text>
+
+  <rect x="480" y="125" width="160" height="55" rx="8" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="560" y="147" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f8f4e">Shipping Service</text>
+  <text x="560" y="163" text-anchor="middle" font-size="7.5" fill="#2f8f4e">reacts on its own:</text>
+  <text x="560" y="175" text-anchor="middle" font-size="7.5" fill="#2f8f4e">schedules a carrier pickup</text>
+
+  <line x1="220" y1="200" x2="270" y2="200" stroke="#c0392b" stroke-width="1.1" stroke-dasharray="3,3"/>
+  <line x1="430" y1="200" x2="480" y2="200" stroke="#c0392b" stroke-width="1.1" stroke-dasharray="3,3"/>
+  <text x="350" y="215" text-anchor="middle" font-size="8" fill="#c0392b" font-weight="700">no service calls another directly — each only knows the event shape, not who else is listening</text>
+
+  <rect x="150" y="245" width="400" height="50" rx="8" fill="#fdedec" stroke="#c0392b" stroke-width="1.3" stroke-dasharray="3,2"/>
+  <text x="350" y="266" text-anchor="middle" font-size="9" font-weight="700" fill="#c0392b">If Payment fails downstream...</text>
+  <text x="350" y="282" text-anchor="middle" font-size="7.5" fill="#c0392b">Order Service never finds out synchronously — it must watch for a PaymentFailed event too</text>
+
+  <title>Event-driven choreography: Order Service publishes one OrderPlaced event to a broker, and Inventory, Payment, and Shipping services each independently subscribe and react without any of them calling each other directly, with no central orchestrator coordinating the sequence</title>
+</svg>

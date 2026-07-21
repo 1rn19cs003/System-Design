@@ -294,6 +294,28 @@ export default function ConsensusCoordinationPage() {
               <figcaption>A majority, not unanimity, is what makes the system fault-tolerant</figcaption>
             </figure>
 
+            <p>
+              The reason a majority quorum matters so much in production is exactly what it
+              prevents: <strong>split-brain</strong>. If a network partition splits a cluster into
+              two groups that can each talk internally but not to each other, a badly designed
+              system could let both sides elect their own leader — and now two nodes are
+              independently accepting writes that will permanently diverge. A majority-based
+              protocol makes this structurally impossible: at most one side of any partition can
+              contain more than half the nodes, so only that side can ever collect enough votes to
+              elect a leader. The minority side — even if every one of its remaining nodes is
+              perfectly healthy — is mathematically unable to reach quorum and must correctly sit
+              idle, refusing to elect a leader or accept writes, until the partition heals.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-consensus/split-brain-partition.svg"
+                alt="A network partition splitting five nodes into a majority group of three, which reaches quorum and elects a leader, and a minority group of two, which cannot reach quorum and correctly refuses to elect a leader"
+              />
+              <figcaption>Only one side of a partition can ever have a majority — the math itself prevents two leaders</figcaption>
+            </figure>
+
             <h3>Consensus algorithms: Raft and Paxos</h3>
             <p>
               Once a leader exists, <strong>consensus algorithms</strong> like Raft and Paxos define
@@ -312,6 +334,30 @@ export default function ConsensusCoordinationPage() {
                 alt="A leader replicating a log entry to three followers; two acknowledge quickly and the entry is committed on reaching a majority, while a third, slow follower has not yet responded"
               />
               <figcaption>The entry is safely committed the instant a majority acknowledges — the slow follower catches up later</figcaption>
+            </figure>
+
+            <p>
+              The trigger for a new election is a <strong>randomized</strong> timeout, not a fixed
+              one, and that randomization is doing real work. Every follower resets a timer
+              whenever it hears a heartbeat from the current leader; if the timer expires with no
+              heartbeat, the follower increments the term number, votes for itself, and requests
+              votes from its peers. If every node used the exact same timeout duration, a leader
+              failure would cause every follower to become a candidate in the same instant,
+              splitting the vote so no candidate reaches a majority — and because they&apos;d all
+              time out again after the same fixed interval, the cluster could livelock through
+              repeated split elections. Randomizing each node&apos;s timeout window (e.g. 150 to
+              300ms) means one follower almost always fires first and wins the election before the
+              others even become candidates — a subtle mechanism that&apos;s easy to gloss over but
+              is the actual reason Raft elections converge quickly in practice.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-consensus/election-timeout-sequence.svg"
+                alt="A sequence diagram showing a follower's election timeout firing, the node becoming a candidate and sending RequestVote to two peers, receiving VoteGranted from both, and becoming leader with a 3 of 3 majority"
+              />
+              <figcaption>One randomized timer firing first is what turns a follower into a leader within a single round</figcaption>
             </figure>
 
             <h3>Gossip protocols</h3>

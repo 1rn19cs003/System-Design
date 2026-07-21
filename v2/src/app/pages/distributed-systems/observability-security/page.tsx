@@ -354,6 +354,35 @@ export default function ObservabilitySecurityPage() {
               <figcaption>Logs, metrics, and traces are different lenses on the same underlying system behavior</figcaption>
             </figure>
 
+            <h3>Distributed tracing</h3>
+            <p>
+              Logs and metrics tell you a service is slow; they rarely tell you which of the several
+              services a single request touched is actually responsible. <strong>Distributed
+              tracing</strong> solves this by generating a unique <strong>trace ID</strong> the moment
+              a request enters the system, then propagating that same ID through every downstream
+              call — in an HTTP header, a message-queue attribute, whatever the transport is — so every
+              service the request touches can tag its own logs and timing data with it. Each
+              service&apos;s unit of work is recorded as a <strong>span</strong>: a start time, an end
+              time, and metadata about what happened, nested or sequenced under the parent span that
+              called it. Stitching every span sharing a trace ID back together produces a waterfall
+              view of the entire request — exactly how much of the total latency each hop consumed,
+              and, critically, how much of a slow service&apos;s own span was actually spent waiting on
+              something further downstream rather than its own logic. The common pitfall in practice is
+              partial adoption: if even one service in the call chain doesn&apos;t propagate the
+              incoming trace header (a common oversight when a new service is bolted on quickly), the
+              trace breaks at that hop and you're back to manually correlating timestamps across
+              disconnected logs for that segment.
+            </p>
+
+            <figure>
+              <img
+                className="diagram-img"
+                src="/assets/distributed-systems-observability-security/distributed-tracing-waterfall.svg"
+                alt="A single request's trace ID propagates across API Gateway, Auth, Order, and Payment services, each rendered as a span bar on a shared timeline, revealing that a third-party fraud-check call inside Payment Service is the actual latency bottleneck"
+              />
+              <figcaption>One trace ID, four spans — the waterfall shows exactly which hop, or which call inside a hop, owns the latency</figcaption>
+            </figure>
+
             <h3>Chaos engineering</h3>
             <p>
               Chaos engineering is the practice of deliberately injecting failure into a production
@@ -421,6 +450,24 @@ export default function ObservabilitySecurityPage() {
               />
               <figcaption>Readable, not secret — the signature is what makes it trustworthy, not the encoding</figcaption>
             </figure>
+
+            <p>
+              The full token lifecycle is what actually resolves the tension between statelessness and
+              revocation: a JWT-based system typically issues a short-lived <strong>access
+              token</strong> (often 5-15 minutes) alongside a longer-lived <strong>refresh
+              token</strong> stored separately and more securely. The access token is what gets sent
+              with every request and verified statelessly; when it expires, the client presents the
+              refresh token to a dedicated endpoint to get a new access token, without forcing the user
+              to log in again. This keeps the &quot;stolen token stays valid until it expires&quot;
+              exposure window small (minutes, not days) while still avoiding a database check on every
+              single request — only the occasional refresh call touches a stateful store, which is
+              exactly where revocation becomes possible again, since the server can maintain a
+              refresh-token blocklist without giving up statelessness for the far more frequent access
+              token checks. A common production mistake is treating the JWT payload as if it were
+              confidential: it&apos;s only base64-encoded, not encrypted, so anyone holding the token
+              can read the claims directly — putting a password or another secret in the payload
+              instead of just an opaque user ID and a signature is a real, recurring bug.
+            </p>
 
             <h3>RBAC (Role-Based Access Control)</h3>
             <p>

@@ -1,0 +1,44 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="rsArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <line x1="350" y1="20" x2="350" y2="270" stroke="#6a7178" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <text x="175" y="28" text-anchor="middle" font-size="12.5" font-weight="700" fill="#c0392b">Naive retries (fixed interval, no jitter)</text>
+  <text x="525" y="28" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2f8f4e">Retries with exponential backoff + jitter</text>
+
+  <line x1="30" y1="160" x2="330" y2="160" stroke="#6a7178" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="34" y="152" font-size="8.5" fill="#6a7178">service capacity</text>
+
+  <rect x="55" y="220" width="30" height="40" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.2"/>
+  <rect x="100" y="185" width="30" height="75" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.2"/>
+  <rect x="145" y="120" width="30" height="140" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <rect x="190" y="90" width="30" height="170" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <rect x="235" y="70" width="30" height="190" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <rect x="280" y="60" width="30" height="200" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="70" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">t0</text>
+  <text x="115" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">t1</text>
+  <text x="160" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">t2</text>
+  <text x="205" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">t3</text>
+  <text x="250" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">t4</text>
+  <text x="295" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">t5</text>
+  <text x="175" y="295" text-anchor="middle" font-size="9" fill="#c0392b">every client retries at the same interval — retries pile on retries, service never recovers</text>
+
+  <line x1="390" y1="160" x2="670" y2="160" stroke="#6a7178" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="394" y="152" font-size="8.5" fill="#6a7178">service capacity</text>
+
+  <rect x="400" y="220" width="26" height="40" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.2"/>
+  <rect x="440" y="230" width="26" height="30" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.2"/>
+  <rect x="495" y="215" width="26" height="45" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.2"/>
+  <rect x="575" y="200" width="26" height="60" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.2"/>
+  <text x="413" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">retry 1</text>
+  <text x="453" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">+jitter</text>
+  <text x="508" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">retry 2</text>
+  <text x="588" y="275" text-anchor="middle" font-size="7.5" fill="#6a7178">retry 3</text>
+  <text x="525" y="295" text-anchor="middle" font-size="9" fill="#2f8f4e">gaps double each retry, jitter staggers clients — load stays under capacity, service recovers</text>
+
+  <title>Two scenarios of a struggling downstream service under client retries: naive fixed-interval retries with no jitter cause every client to retry in lockstep, stacking retries on top of retries until load far exceeds capacity and the service never gets a chance to recover; exponential backoff with jitter spreads retries out over widening, randomized gaps so load stays under capacity and the service can recover</title>
+</svg>
