@@ -1,0 +1,39 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="vcArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <text x="150" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Node 1 (writes locally)</text>
+  <text x="550" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Node 2 (writes locally, offline)</text>
+
+  <line x1="150" y1="45" x2="150" y2="260" stroke="#6a7178" stroke-width="1.2"/>
+  <line x1="550" y1="45" x2="550" y2="260" stroke="#6a7178" stroke-width="1.2"/>
+
+  <circle cx="150" cy="80" r="6" fill="#3b6ea5"/>
+  <text x="170" y="84" font-size="9.5" fill="#2d2f33">write X → clock {N1:1, N2:0}</text>
+
+  <circle cx="150" cy="150" r="6" fill="#3b6ea5"/>
+  <text x="170" y="154" font-size="9.5" fill="#2d2f33">write Y → clock {N1:2, N2:0}</text>
+
+  <circle cx="550" cy="80" r="6" fill="#3b6ea5"/>
+  <text x="330" y="84" font-size="9.5" fill="#2d2f33">write Z → clock {N1:0, N2:1}</text>
+
+  <line x1="150" y1="30" x2="550" y2="30" stroke="#eaf1f8" stroke-width="0"/>
+  <text x="350" y="115" text-anchor="middle" font-size="9" fill="#6a7178">no message exchanged — nodes are partitioned / offline</text>
+  <line x1="200" y1="112" x2="500" y2="112" stroke="#6a7178" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <rect x="250" y="185" width="200" height="60" rx="8" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="350" y="205" text-anchor="middle" font-size="10" font-weight="700" fill="#c0392b">Conflict detected on sync</text>
+  <text x="350" y="221" text-anchor="middle" font-size="8.5" fill="#c0392b">{N1:2, N2:0} vs {N1:0, N2:1}</text>
+  <text x="350" y="235" text-anchor="middle" font-size="8.5" fill="#c0392b">neither clock dominates the other</text>
+
+  <line x1="150" y1="160" x2="290" y2="188" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#vcArrow)"/>
+  <line x1="550" y1="90" x2="410" y2="188" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#vcArrow)"/>
+
+  <text x="350" y="280" text-anchor="middle" font-size="10" fill="#6a7178">A vector clock is a per-node counter map. If clock A's counters are all ≥ clock B's, A happened after B.</text>
+  <text x="350" y="296" text-anchor="middle" font-size="10" fill="#6a7178">If neither dominates the other, the writes are concurrent — a real conflict the application must resolve.</text>
+
+  <title>Vector clocks: each node keeps a counter per node it knows about; comparing two vector clocks reveals whether one write causally preceded another or whether they were concurrent and conflicting</title>
+</svg>

@@ -20,6 +20,7 @@ export default function Header() {
           <Link href="/#hld-section">HLD</Link>
           <Link href="/#lld-section">LLD</Link>
           <Link href="/#patterns-section">Design Patterns</Link>
+          <Link href="/pages/distributed-systems">Distributed Systems</Link>
           <Link href="/pages/case-studies">Case Studies</Link>
           <Link href="/pages/reference">Reference</Link>
         </nav>

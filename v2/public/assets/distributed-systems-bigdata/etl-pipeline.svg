@@ -1,0 +1,49 @@
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="etlArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="40" width="90" height="34" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.2"/>
+  <text x="65" y="61" text-anchor="middle" font-size="8.5" fill="#2d2f33">Postgres DB</text>
+  <rect x="20" y="84" width="90" height="34" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.2"/>
+  <text x="65" y="105" text-anchor="middle" font-size="8.5" fill="#2d2f33">App logs</text>
+  <rect x="20" y="128" width="90" height="34" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.2"/>
+  <text x="65" y="149" text-anchor="middle" font-size="8.5" fill="#2d2f33">3rd-party API</text>
+
+  <line x1="112" y1="57" x2="150" y2="95" stroke="#3b6ea5" stroke-width="1.1" marker-end="url(#etlArrow)"/>
+  <line x1="112" y1="101" x2="150" y2="100" stroke="#3b6ea5" stroke-width="1.1" marker-end="url(#etlArrow)"/>
+  <line x1="112" y1="145" x2="150" y2="105" stroke="#3b6ea5" stroke-width="1.1" marker-end="url(#etlArrow)"/>
+
+  <rect x="155" y="75" width="90" height="55" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.6"/>
+  <text x="200" y="98" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Extract</text>
+  <text x="200" y="114" text-anchor="middle" font-size="7.5" fill="#eaf1f8">pull from sources</text>
+
+  <line x1="245" y1="102" x2="290" y2="102" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#etlArrow)"/>
+
+  <rect x="295" y="75" width="90" height="55" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.6"/>
+  <text x="340" y="98" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Transform</text>
+  <text x="340" y="114" text-anchor="middle" font-size="7.5" fill="#eaf1f8">clean, join, reshape</text>
+
+  <line x1="385" y1="102" x2="430" y2="102" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#etlArrow)"/>
+
+  <rect x="435" y="75" width="90" height="55" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.6"/>
+  <text x="480" y="98" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Load</text>
+  <text x="480" y="114" text-anchor="middle" font-size="7.5" fill="#eaf1f8">write to destination</text>
+
+  <line x1="525" y1="102" x2="570" y2="102" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#etlArrow)"/>
+
+  <rect x="575" y="75" width="105" height="55" rx="8" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.5"/>
+  <text x="627" y="98" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f8f4e">Warehouse</text>
+  <text x="627" y="114" text-anchor="middle" font-size="7.5" fill="#2f8f4e">ready for analytics</text>
+
+  <rect x="200" y="170" width="325" height="40" rx="6" fill="#fdf6ec" stroke="#c9922e" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="362" y="185" text-anchor="middle" font-size="8.5" font-weight="700" fill="#8a6a1f">ELT variant</text>
+  <text x="362" y="200" text-anchor="middle" font-size="8" fill="#8a6a1f">load raw data first, then transform inside the warehouse itself</text>
+
+  <text x="350" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2f33">ETL cleans data before it lands; ELT lands it raw and lets the warehouse's</text>
+  <text x="350" y="268" text-anchor="middle" font-size="11" fill="#6a7178">compute power do the transformation, trading upfront structure for faster ingestion.</text>
+
+  <title>ETL pipeline: multiple source systems (a database, application logs, a third-party API) feed into an extract step, then a transform step that cleans and reshapes the data, then a load step that writes it into a data warehouse; a variant ELT box shows the modern approach of loading raw data first and transforming inside the warehouse</title>
+</svg>

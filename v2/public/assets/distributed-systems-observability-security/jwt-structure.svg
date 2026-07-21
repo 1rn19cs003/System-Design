@@ -1,0 +1,29 @@
+<svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <text x="350" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">A JWT is three base64url segments joined by dots</text>
+
+  <rect x="30" y="55" width="200" height="60" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="130" y="78" text-anchor="middle" font-size="10.5" font-weight="700" fill="#3b6ea5">HEADER</text>
+  <text x="130" y="95" text-anchor="middle" font-size="8" fill="#2d2f33">alg: HS256</text>
+  <text x="130" y="108" text-anchor="middle" font-size="8" fill="#2d2f33">typ: JWT</text>
+
+  <text x="240" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#6a7178">.</text>
+
+  <rect x="250" y="55" width="200" height="60" rx="6" fill="#fdf6e3" stroke="#b8860b" stroke-width="1.4"/>
+  <text x="350" y="78" text-anchor="middle" font-size="10.5" font-weight="700" fill="#8a6600">PAYLOAD</text>
+  <text x="350" y="95" text-anchor="middle" font-size="8" fill="#2d2f33">sub: "user_42", role: "admin"</text>
+  <text x="350" y="108" text-anchor="middle" font-size="8" fill="#2d2f33">exp: 1735689600 (claims)</text>
+
+  <text x="460" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#6a7178">.</text>
+
+  <rect x="470" y="55" width="200" height="60" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="570" y="78" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2f8f4e">SIGNATURE</text>
+  <text x="570" y="95" text-anchor="middle" font-size="8" fill="#2d2f33">HMAC(header + payload,</text>
+  <text x="570" y="108" text-anchor="middle" font-size="8" fill="#2d2f33">server's secret key)</text>
+
+  <text x="350" y="160" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2f33">Anyone can read the header and payload — they're just base64, not encrypted.</text>
+  <text x="350" y="180" text-anchor="middle" font-size="11" fill="#6a7178">Only a server holding the secret key can produce a signature that verifies correctly,</text>
+  <text x="350" y="198" text-anchor="middle" font-size="11" fill="#6a7178">which is what lets any node validate the token with no database lookup — pure math, no shared state.</text>
+  <text x="350" y="222" text-anchor="middle" font-size="10" fill="#c0392b">Trade-off: a leaked or compromised token stays valid until it expires — there's no central place to revoke it early.</text>
+
+  <title>JWT structure: header.payload.signature — the header and payload are readable base64 (not encrypted), while the signature is an HMAC over both using the server's secret key, letting any node verify the token without a database lookup</title>
+</svg>

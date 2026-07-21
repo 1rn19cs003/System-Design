@@ -66,6 +66,18 @@ export default function HomePage() {
               <span className="cat-meta">1 topic ready →</span>
             </Link>
 
+            <Link className="category-card" id="distributed-systems-section" href="/pages/distributed-systems">
+              <span className="cat-icon">DS</span>
+              <h3>Distributed Systems</h3>
+              <p>
+                Consensus &amp; coordination, distributed transactions, resilience patterns, API
+                design, big data processing, architectural patterns, and observability &amp;
+                security — the concepts that separate a design that works on one machine from one
+                that survives production.
+              </p>
+              <span className="cat-meta">7 topics ready →</span>
+            </Link>
+
             <Link className="category-card" id="case-studies-section" href="/pages/case-studies">
               <span className="cat-icon">CS</span>
               <h3>Case Studies</h3>
@@ -131,6 +143,16 @@ export default function HomePage() {
               <p>
                 Theory, UML diagram, when to use it, real-world examples, interview questions, and
                 working code in four languages.
+              </p>
+            </div>
+            <div className="card">
+              <span className="tag">Distributed Systems &middot; Start here</span>
+              <h3>
+                <Link href="/pages/distributed-systems/consensus-coordination">Consensus &amp; Coordination →</Link>
+              </h3>
+              <p>
+                How a cluster of independent nodes agrees on one truth — heartbeats, leader
+                election, Raft/Paxos-style consensus, and gossip protocols.
               </p>
             </div>
             <div className="card">

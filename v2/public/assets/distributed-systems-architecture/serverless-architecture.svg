@@ -1,0 +1,45 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="svArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="120" width="90" height="50" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="65" y="150" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2d2f33">Client</text>
+
+  <rect x="160" y="120" width="120" height="50" rx="6" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="220" y="142" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">API Gateway</text>
+  <text x="220" y="157" text-anchor="middle" font-size="8" fill="#eaf1f8">routes the request</text>
+
+  <rect x="330" y="30" width="105" height="45" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3" stroke-dasharray="3,2"/>
+  <text x="382" y="50" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2f8f4e">Function</text>
+  <text x="382" y="64" text-anchor="middle" font-size="7.5" fill="#2f8f4e">spun up on demand</text>
+
+  <rect x="330" y="90" width="105" height="45" rx="6" fill="#fdf6e3" stroke="#b8860b" stroke-width="1.3" stroke-dasharray="3,2"/>
+  <text x="382" y="108" text-anchor="middle" font-size="9.5" font-weight="600" fill="#8a6600">Function</text>
+  <text x="382" y="121" text-anchor="middle" font-size="7.5" fill="#8a6600">cold start ~200-1000ms</text>
+
+  <rect x="330" y="150" width="105" height="45" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3" stroke-dasharray="3,2"/>
+  <text x="382" y="168" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2f8f4e">Function</text>
+  <text x="382" y="181" text-anchor="middle" font-size="7.5" fill="#2f8f4e">warm instance, reused</text>
+
+  <rect x="330" y="210" width="105" height="45" rx="6" fill="#f4f6f8" stroke="#6a7178" stroke-width="1.3" stroke-dasharray="3,2"/>
+  <text x="382" y="228" text-anchor="middle" font-size="9.5" font-weight="600" fill="#6a7178">Function</text>
+  <text x="382" y="241" text-anchor="middle" font-size="7.5" fill="#6a7178">terminated after idle</text>
+
+  <rect x="530" y="115" width="120" height="60" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="590" y="140" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2d2f33">Managed DB</text>
+  <text x="590" y="156" text-anchor="middle" font-size="8" fill="#6a7178">e.g. DynamoDB</text>
+
+  <line x1="110" y1="145" x2="158" y2="145" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#svArrow)"/>
+  <line x1="280" y1="135" x2="328" y2="65" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#svArrow)"/>
+  <line x1="280" y1="140" x2="328" y2="115" stroke="#b8860b" stroke-width="1.2" marker-end="url(#svArrow)"/>
+  <line x1="280" y1="150" x2="328" y2="172" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#svArrow)"/>
+  <line x1="435" y1="145" x2="528" y2="145" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#svArrow)"/>
+
+  <text x="350" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2f33">Each request can spin up its own ephemeral function instance — billed per invocation, not per idle hour.</text>
+  <text x="350" y="307" text-anchor="middle" font-size="11" fill="#b8860b">A brand-new (cold) instance pays a one-time startup tax before it can run your code.</text>
+
+  <title>Serverless architecture: client calls an API Gateway, which routes to ephemeral function instances that scale to zero and back, with a cold-start penalty on the first invocation of a new instance, backed by a managed database</title>
+</svg>

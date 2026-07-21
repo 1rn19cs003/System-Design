@@ -1,0 +1,40 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <text x="175" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Round 1 — one node knows the update</text>
+
+  <circle cx="70" cy="90" r="24" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="70" y="95" text-anchor="middle" font-size="9" fill="#ffffff">A</text>
+  <circle cx="150" cy="60" r="24" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="150" y="65" text-anchor="middle" font-size="9" fill="#2d2f33">B</text>
+  <circle cx="220" cy="110" r="24" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="220" y="115" text-anchor="middle" font-size="9" fill="#2d2f33">C</text>
+  <circle cx="120" cy="150" r="24" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="120" y="155" text-anchor="middle" font-size="9" fill="#2d2f33">D</text>
+  <circle cx="60" cy="170" r="0" fill="none"/>
+
+  <line x1="90" y1="80" x2="128" y2="65" stroke="#3b6ea5" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <text x="105" y="65" text-anchor="middle" font-size="7.5" fill="#6a7178">tells B</text>
+
+  <text x="525" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Round 3 — the whole cluster knows</text>
+
+  <circle cx="420" cy="90" r="22" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="420" y="95" text-anchor="middle" font-size="8.5" fill="#ffffff">A</text>
+  <circle cx="490" cy="60" r="22" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="490" y="65" text-anchor="middle" font-size="8.5" fill="#ffffff">B</text>
+  <circle cx="560" cy="100" r="22" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="560" y="105" text-anchor="middle" font-size="8.5" fill="#ffffff">C</text>
+  <circle cx="460" cy="150" r="22" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="460" y="155" text-anchor="middle" font-size="8.5" fill="#ffffff">D</text>
+  <circle cx="620" cy="150" r="22" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="620" y="155" text-anchor="middle" font-size="8.5" fill="#ffffff">E</text>
+
+  <line x1="438" y1="80" x2="472" y2="68" stroke="#3b6ea5" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="500" y1="80" x2="545" y2="90" stroke="#3b6ea5" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="435" y1="108" x2="450" y2="132" stroke="#3b6ea5" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="545" y1="115" x2="605" y2="140" stroke="#3b6ea5" stroke-width="1" stroke-dasharray="2,2"/>
+
+  <text x="350" y="230" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2f33">Each round, every node that knows the update shares it with a few random peers.</text>
+  <text x="350" y="250" text-anchor="middle" font-size="11" fill="#6a7178">Information spreads exponentially, like a rumor or an infection — no central coordinator</text>
+  <text x="350" y="268" text-anchor="middle" font-size="11" fill="#6a7178">is needed, and the protocol tolerates individual nodes being down or unreachable.</text>
+
+  <title>Gossip protocol: nodes periodically exchange state with a random subset of peers, spreading information epidemic-style through the cluster without a central coordinator</title>
+</svg>

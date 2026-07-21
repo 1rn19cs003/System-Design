@@ -1,0 +1,44 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="oaArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="oaArrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="140" width="100" height="45" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="70" y="167" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">User</text>
+
+  <rect x="180" y="140" width="110" height="45" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="235" y="167" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">Your App</text>
+
+  <rect x="350" y="60" width="140" height="50" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="420" y="82" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Auth Provider</text>
+  <text x="420" y="98" text-anchor="middle" font-size="8" fill="#eaf1f8">Google / GitHub</text>
+
+  <rect x="350" y="220" width="140" height="50" rx="8" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="420" y="242" text-anchor="middle" font-size="10" font-weight="700" fill="#2f8f4e">Resource API</text>
+  <text x="420" y="258" text-anchor="middle" font-size="8" fill="#2f8f4e">e.g. user's profile data</text>
+
+  <line x1="120" y1="155" x2="178" y2="155" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#oaArrow)"/>
+  <text x="149" y="145" text-anchor="middle" font-size="7.5" fill="#6a7178">1. click "Sign in with..."</text>
+
+  <line x1="290" y1="150" x2="348" y2="100" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#oaArrow)"/>
+  <text x="330" y="115" text-anchor="middle" font-size="7.5" fill="#6a7178">2. redirect to provider</text>
+
+  <line x1="420" y1="60" x2="90" y2="140" stroke="#3b6ea5" stroke-width="1.1" stroke-dasharray="3,3" marker-end="url(#oaArrow)"/>
+  <text x="220" y="95" text-anchor="middle" font-size="7.5" fill="#6a7178">3. user logs in directly with provider (app never sees password)</text>
+
+  <line x1="360" y1="105" x2="270" y2="145" stroke="#2f8f4e" stroke-width="1.3" marker-end="url(#oaArrowGreen)"/>
+  <text x="345" y="140" text-anchor="middle" font-size="7.5" fill="#2f8f4e">4. token issued</text>
+
+  <line x1="290" y1="180" x2="360" y2="222" stroke="#2f8f4e" stroke-width="1.3" marker-end="url(#oaArrowGreen)"/>
+  <text x="290" y="205" text-anchor="middle" font-size="7.5" fill="#2f8f4e">5. app calls API with token</text>
+
+  <text x="350" y="310" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2d2f33">Your app receives a scoped token, never the user's password.</text>
+  <text x="350" y="326" text-anchor="middle" font-size="10.5" fill="#6a7178">The token proves limited, revocable access — not the user's identity credentials.</text>
+
+  <title>OAuth 2.0 flow: the user is redirected to an auth provider (Google/GitHub), logs in directly with the provider, a token is issued back to your app, and your app calls the resource API using that token without ever seeing the user's password</title>
+</svg>

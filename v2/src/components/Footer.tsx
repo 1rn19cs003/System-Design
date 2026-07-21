@@ -106,6 +106,7 @@ export default function Footer({ sectionColumn, wide, homeColumns }: FooterProps
           <Link href="/#hld-section">Browse HLD</Link>
           <Link href="/#lld-section">Browse LLD</Link>
           <Link href="/#patterns-section">Browse Patterns</Link>
+          <Link href="/pages/distributed-systems">Distributed Systems</Link>
           <a
             href="#"
             className="back-to-top"

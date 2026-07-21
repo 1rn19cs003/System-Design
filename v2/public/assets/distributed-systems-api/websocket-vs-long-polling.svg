@@ -1,0 +1,64 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="wsArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+    <marker id="lpArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <text x="175" y="24" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2d2f33">WebSocket — one persistent connection</text>
+
+  <circle cx="60" cy="90" r="22" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="60" y="94" text-anchor="middle" font-size="8.5" fill="#2d2f33">Client</text>
+  <circle cx="290" cy="90" r="22" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="290" y="94" text-anchor="middle" font-size="8.5" fill="#2d2f33">Server</text>
+
+  <line x1="82" y1="82" x2="268" y2="82" stroke="#2f8f4e" stroke-width="2" marker-end="url(#wsArrow)"/>
+  <line x1="268" y1="98" x2="82" y2="98" stroke="#2f8f4e" stroke-width="2" marker-end="url(#wsArrow)"/>
+  <text x="175" y="70" text-anchor="middle" font-size="8" fill="#2f8f4e">single handshake, then full-duplex —</text>
+  <text x="175" y="115" text-anchor="middle" font-size="8" fill="#2f8f4e">either side pushes data anytime, no re-request</text>
+
+  <rect x="20" y="140" width="310" height="34" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.2"/>
+  <text x="175" y="161" text-anchor="middle" font-size="9" fill="#2f8f4e">connection stays open — near-zero per-message overhead</text>
+
+  <line x1="350" y1="20" x2="350" y2="320" stroke="#d8dde2" stroke-width="1"/>
+
+  <text x="525" y="24" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2d2f33">Long Polling — repeated held-open requests</text>
+
+  <circle cx="410" cy="60" r="20" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="410" y="64" text-anchor="middle" font-size="8" fill="#2d2f33">Client</text>
+  <circle cx="640" cy="60" r="20" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="640" y="64" text-anchor="middle" font-size="8" fill="#2d2f33">Server</text>
+
+  <line x1="430" y1="55" x2="620" y2="55" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#lpArrow)"/>
+  <line x1="620" y1="65" x2="430" y2="65" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#lpArrow)" stroke-dasharray="3,3"/>
+  <text x="525" y="45" text-anchor="middle" font-size="7.5" fill="#6a7178">request 1 (held open until data or timeout)</text>
+
+  <circle cx="410" cy="120" r="20" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="410" y="124" text-anchor="middle" font-size="8" fill="#2d2f33">Client</text>
+  <circle cx="640" cy="120" r="20" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="640" y="124" text-anchor="middle" font-size="8" fill="#2d2f33">Server</text>
+
+  <line x1="430" y1="115" x2="620" y2="115" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#lpArrow)"/>
+  <line x1="620" y1="125" x2="430" y2="125" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#lpArrow)" stroke-dasharray="3,3"/>
+  <text x="525" y="105" text-anchor="middle" font-size="7.5" fill="#6a7178">request 2 (a fresh HTTP request each time)</text>
+
+  <circle cx="410" cy="180" r="20" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="410" y="184" text-anchor="middle" font-size="8" fill="#2d2f33">Client</text>
+  <circle cx="640" cy="180" r="20" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="640" y="184" text-anchor="middle" font-size="8" fill="#2d2f33">Server</text>
+
+  <line x1="430" y1="175" x2="620" y2="175" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#lpArrow)"/>
+  <line x1="620" y1="185" x2="430" y2="185" stroke="#3b6ea5" stroke-width="1.2" marker-end="url(#lpArrow)" stroke-dasharray="3,3"/>
+  <text x="525" y="165" text-anchor="middle" font-size="7.5" fill="#6a7178">request 3 (repeats, each with new HTTP headers)</text>
+
+  <rect x="390" y="215" width="280" height="34" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.2"/>
+  <text x="525" y="236" text-anchor="middle" font-size="9" fill="#c0392b">repeated connection setup + header overhead per cycle</text>
+
+  <text x="350" y="300" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2f33">WebSockets trade a slightly heavier upgrade handshake for a cheap, always-open channel;</text>
+  <text x="350" y="318" text-anchor="middle" font-size="11" fill="#6a7178">long polling only needs plain HTTP, at the cost of re-opening a connection on every cycle.</text>
+
+  <title>WebSocket versus long polling: WebSocket opens one persistent full-duplex connection that either side can push through at any time, while long polling repeats a cycle of held-open HTTP requests, each paying fresh connection and header overhead</title>
+</svg>

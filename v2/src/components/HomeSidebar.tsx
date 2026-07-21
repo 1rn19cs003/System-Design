@@ -80,6 +80,20 @@ const GROUPS: Group[] = [
     ],
   },
   {
+    id: 'distributed-systems',
+    label: 'Distributed Systems',
+    overviewHref: '/pages/distributed-systems',
+    links: [
+      { label: 'Consensus & Coordination', href: '/pages/distributed-systems/consensus-coordination' },
+      { label: 'Distributed Transactions', href: '/pages/distributed-systems/distributed-transactions' },
+      { label: 'Resilience Patterns', href: '/pages/distributed-systems/resilience-patterns' },
+      { label: 'API & Communication', href: '/pages/distributed-systems/api-communication-patterns' },
+      { label: 'Big Data Processing', href: '/pages/distributed-systems/big-data-processing' },
+      { label: 'Architectural Patterns', href: '/pages/distributed-systems/architectural-patterns' },
+      { label: 'Observability & Security', href: '/pages/distributed-systems/observability-security' },
+    ],
+  },
+  {
     id: 'case-studies',
     label: 'Case Studies',
     overviewHref: '/pages/case-studies',

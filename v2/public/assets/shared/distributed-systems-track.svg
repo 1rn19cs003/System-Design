@@ -1,0 +1,44 @@
+<svg viewBox="0 0 1040 360" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <text x="520" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#2d2f33">Seven topics — no required order, but grouped by what problem they solve</text>
+
+  <rect x="20" y="50" width="230" height="120" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="135" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Consensus &amp; Coordination</text>
+  <text x="135" y="96" text-anchor="middle" font-size="9.5" fill="#6a7178">heartbeats, leader election,</text>
+  <text x="135" y="110" text-anchor="middle" font-size="9.5" fill="#6a7178">Raft/Paxos, gossip protocol</text>
+
+  <rect x="270" y="50" width="230" height="120" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="385" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Distributed Transactions</text>
+  <text x="385" y="96" text-anchor="middle" font-size="9.5" fill="#6a7178">2PC, 3PC, SAGA,</text>
+  <text x="385" y="110" text-anchor="middle" font-size="9.5" fill="#6a7178">vector clocks, CRDTs</text>
+
+  <rect x="520" y="50" width="230" height="120" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="635" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Resilience Patterns</text>
+  <text x="635" y="96" text-anchor="middle" font-size="9.5" fill="#6a7178">circuit breaker, sidecar,</text>
+  <text x="635" y="110" text-anchor="middle" font-size="9.5" fill="#6a7178">service mesh, cascading failure</text>
+
+  <rect x="770" y="50" width="250" height="120" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="895" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">API &amp; Communication</text>
+  <text x="895" y="96" text-anchor="middle" font-size="9.5" fill="#6a7178">gateways, idempotency, REST vs</text>
+  <text x="895" y="110" text-anchor="middle" font-size="9.5" fill="#6a7178">GraphQL, WebSockets, webhooks</text>
+
+  <rect x="20" y="200" width="230" height="120" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="135" y="226" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Big Data Processing</text>
+  <text x="135" y="246" text-anchor="middle" font-size="9.5" fill="#6a7178">batch vs stream, ETL,</text>
+  <text x="135" y="260" text-anchor="middle" font-size="9.5" fill="#6a7178">MapReduce, lakes vs warehouses</text>
+
+  <rect x="270" y="200" width="230" height="120" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="385" y="226" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Architectural Patterns</text>
+  <text x="385" y="246" text-anchor="middle" font-size="9.5" fill="#6a7178">serverless, event-driven,</text>
+  <text x="385" y="260" text-anchor="middle" font-size="9.5" fill="#6a7178">peer-to-peer</text>
+
+  <rect x="520" y="200" width="230" height="120" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="635" y="226" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Observability &amp; Security</text>
+  <text x="635" y="246" text-anchor="middle" font-size="9.5" fill="#eaf1f8">logging, monitoring, chaos eng,</text>
+  <text x="635" y="260" text-anchor="middle" font-size="9.5" fill="#eaf1f8">OAuth/JWT, RBAC, TLS</text>
+
+  <text x="895" y="230" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6a7178">Every topic here assumes</text>
+  <text x="895" y="248" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6a7178">Core Principles + HLD Fundamentals</text>
+  <text x="895" y="266" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6a7178">— start there first if you haven't</text>
+
+  <title>The seven Distributed Systems topics: Consensus and Coordination, Distributed Transactions, Resilience Patterns, API and Communication, Big Data Processing, Architectural Patterns, Observability and Security</title>
+</svg>

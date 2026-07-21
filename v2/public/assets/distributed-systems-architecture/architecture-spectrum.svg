@@ -1,0 +1,40 @@
+<svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="specArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6a7178"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Centralized ← → Distributed</text>
+
+  <line x1="40" y1="120" x2="660" y2="120" stroke="#6a7178" stroke-width="1.3" marker-end="url(#specArrow)"/>
+
+  <circle cx="65" cy="120" r="6" fill="#3b6ea5"/>
+  <text x="65" y="100" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2d2f33">Monolith</text>
+  <text x="65" y="145" text-anchor="middle" font-size="7.5" fill="#6a7178">one deployable unit</text>
+
+  <circle cx="180" cy="120" r="6" fill="#3b6ea5"/>
+  <text x="180" y="100" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2d2f33">Client-Server</text>
+  <text x="180" y="145" text-anchor="middle" font-size="7.5" fill="#6a7178">one server, many clients</text>
+
+  <circle cx="300" cy="120" r="6" fill="#3b6ea5"/>
+  <text x="300" y="100" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2d2f33">Microservices</text>
+  <text x="300" y="145" text-anchor="middle" font-size="7.5" fill="#6a7178">many owned services</text>
+
+  <circle cx="420" cy="120" r="6" fill="#3b6ea5"/>
+  <text x="420" y="100" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2d2f33">Serverless</text>
+  <text x="420" y="145" text-anchor="middle" font-size="7.5" fill="#6a7178">provider-managed functions</text>
+
+  <circle cx="540" cy="120" r="6" fill="#3b6ea5"/>
+  <text x="540" y="100" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2d2f33">Event-Driven</text>
+  <text x="540" y="145" text-anchor="middle" font-size="7.5" fill="#6a7178">decoupled via broker</text>
+
+  <circle cx="640" cy="120" r="6" fill="#3b6ea5"/>
+  <text x="637" y="100" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2d2f33">P2P</text>
+  <text x="637" y="145" text-anchor="middle" font-size="7.5" fill="#6a7178">no central authority</text>
+
+  <text x="350" y="200" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2f33">Moving right generally trades simplicity for independent scalability and resilience.</text>
+  <text x="350" y="220" text-anchor="middle" font-size="11" fill="#6a7178">Most real systems mix several of these shapes rather than picking exactly one.</text>
+
+  <title>A spectrum from centralized to distributed architectures: Monolith, Client-Server, Microservices, Serverless, Event-Driven, and Peer-to-Peer, with more distributed shapes generally trading simplicity for independent scalability and resilience</title>
+</svg>

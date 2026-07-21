@@ -1,0 +1,39 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="cbArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="cbArrowBad" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#c0392b"/>
+    </marker>
+    <marker id="cbArrowGood" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f8f4e"/>
+    </marker>
+  </defs>
+
+  <circle cx="120" cy="150" r="60" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.8"/>
+  <text x="120" y="145" text-anchor="middle" font-size="12" font-weight="700" fill="#2f8f4e">CLOSED</text>
+  <text x="120" y="162" text-anchor="middle" font-size="8.5" fill="#2f8f4e">calls flow through</text>
+
+  <circle cx="580" cy="150" r="60" fill="#fdedec" stroke="#c0392b" stroke-width="1.8"/>
+  <text x="580" y="145" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b">OPEN</text>
+  <text x="580" y="162" text-anchor="middle" font-size="8.5" fill="#c0392b">calls short-circuited</text>
+
+  <circle cx="350" cy="270" r="55" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.8"/>
+  <text x="350" y="266" text-anchor="middle" font-size="11" font-weight="700" fill="#2d2f33">HALF-OPEN</text>
+  <text x="350" y="282" text-anchor="middle" font-size="8" fill="#2d2f33">one trial call allowed</text>
+
+  <path d="M180,130 C 300,95 400,95 520,130" fill="none" stroke="#c0392b" stroke-width="1.4" marker-end="url(#cbArrowBad)"/>
+  <text x="350" y="90" text-anchor="middle" font-size="9.5" fill="#c0392b">failure threshold reached (N consecutive failures)</text>
+
+  <path d="M540,205 C 480,240 420,255 400,250" fill="none" stroke="#3b6ea5" stroke-width="1.4" marker-end="url(#cbArrow)"/>
+  <text x="490" y="235" text-anchor="middle" font-size="9" fill="#6a7178">timeout expires</text>
+
+  <path d="M300,250 C 240,220 180,195 155,175" fill="none" stroke="#2f8f4e" stroke-width="1.4" marker-end="url(#cbArrowGood)"/>
+  <text x="215" y="215" text-anchor="middle" font-size="9" fill="#2f8f4e">trial call succeeds</text>
+
+  <path d="M400,255 C 460,215 500,180 530,165" fill="none" stroke="#c0392b" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#cbArrowBad)"/>
+  <text x="490" y="195" text-anchor="middle" font-size="9" fill="#c0392b">trial call fails</text>
+
+  <title>Circuit breaker state machine: closed allows calls through and counts failures; enough consecutive failures trips it open, short-circuiting calls; after a timeout it moves to half-open to test one trial call, going back to closed on success or open on failure</title>
+</svg>

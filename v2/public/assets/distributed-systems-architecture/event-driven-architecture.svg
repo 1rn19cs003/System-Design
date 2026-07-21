@@ -1,0 +1,49 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="edArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="edArrowBad" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+
+  <text x="175" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Direct call (tightly coupled)</text>
+  <rect x="90" y="50" width="100" height="42" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="140" y="76" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2d2f33">Order Service</text>
+  <rect x="90" y="120" width="100" height="38" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.3"/>
+  <text x="140" y="143" text-anchor="middle" font-size="9" fill="#c0392b">Email Service</text>
+  <rect x="220" y="120" width="100" height="38" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.3"/>
+  <text x="270" y="143" text-anchor="middle" font-size="9" fill="#c0392b">Analytics Service</text>
+  <line x1="120" y1="92" x2="135" y2="118" stroke="#c0392b" stroke-width="1.2" marker-end="url(#edArrowBad)"/>
+  <line x1="160" y1="92" x2="255" y2="118" stroke="#c0392b" stroke-width="1.2" marker-end="url(#edArrowBad)"/>
+  <text x="140" y="185" text-anchor="middle" font-size="8.5" fill="#c0392b">caller must know every</text>
+  <text x="140" y="198" text-anchor="middle" font-size="8.5" fill="#c0392b">consumer and call each directly</text>
+
+  <line x1="360" y1="20" x2="360" y2="320" stroke="#dfe3e8" stroke-width="1"/>
+
+  <text x="530" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Event-driven (loosely coupled)</text>
+  <rect x="450" y="50" width="100" height="42" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="500" y="76" text-anchor="middle" font-size="9.5" font-weight="600" fill="#2d2f33">Order Service</text>
+  <text x="500" y="102" text-anchor="middle" font-size="7.5" fill="#6a7178">publishes "OrderPlaced"</text>
+
+  <line x1="500" y1="92" x2="500" y2="128" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#edArrow)"/>
+
+  <rect x="420" y="130" width="160" height="42" rx="8" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="500" y="147" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Event Broker / Topic</text>
+  <text x="500" y="163" text-anchor="middle" font-size="8" fill="#eaf1f8">(Kafka, SNS, etc.)</text>
+
+  <line x1="470" y1="172" x2="420" y2="205" stroke="#2f8f4e" stroke-width="1.2" marker-end="url(#edArrow)"/>
+  <line x1="530" y1="172" x2="590" y2="205" stroke="#2f8f4e" stroke-width="1.2" marker-end="url(#edArrow)"/>
+
+  <rect x="340" y="210" width="110" height="38" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="395" y="233" text-anchor="middle" font-size="9" fill="#2f8f4e">Email Notifier</text>
+  <rect x="550" y="210" width="110" height="38" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="605" y="233" text-anchor="middle" font-size="9" fill="#2f8f4e">Analytics Logger</text>
+
+  <text x="530" y="280" text-anchor="middle" font-size="8.5" fill="#6a7178">Order Service never knows who's listening —</text>
+  <text x="530" y="294" text-anchor="middle" font-size="8.5" fill="#6a7178">each subscriber consumes the same event independently,</text>
+  <text x="530" y="308" text-anchor="middle" font-size="8.5" fill="#6a7178">and new subscribers can be added with zero changes upstream.</text>
+
+  <title>Event-driven architecture contrasted with direct calls: the Order Service publishes an OrderPlaced event to a broker, and the Email Notifier and Analytics Logger each consume it independently without the publisher calling them directly</title>
+</svg>

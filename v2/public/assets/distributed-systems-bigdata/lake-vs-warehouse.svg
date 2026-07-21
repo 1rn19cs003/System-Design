@@ -1,0 +1,41 @@
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <text x="175" y="24" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2d2f33">Data Lake — raw, any format, schema-on-read</text>
+
+  <rect x="30" y="50" width="290" height="150" rx="10" fill="#f4f6f8" stroke="#6a7178" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <rect x="50" y="65" width="70" height="26" rx="4" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="85" y="82" text-anchor="middle" font-size="7.5" fill="#2d2f33">JSON logs</text>
+  <rect x="130" y="65" width="70" height="26" rx="4" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="165" y="82" text-anchor="middle" font-size="7.5" fill="#2d2f33">CSV exports</text>
+  <rect x="210" y="65" width="80" height="26" rx="4" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="250" y="82" text-anchor="middle" font-size="7.5" fill="#2d2f33">images/video</text>
+  <rect x="50" y="100" width="70" height="26" rx="4" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="85" y="117" text-anchor="middle" font-size="7.5" fill="#2d2f33">Parquet</text>
+  <rect x="130" y="100" width="70" height="26" rx="4" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="165" y="117" text-anchor="middle" font-size="7.5" fill="#2d2f33">raw text</text>
+  <rect x="210" y="100" width="80" height="26" rx="4" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="250" y="117" text-anchor="middle" font-size="7.5" fill="#2d2f33">sensor streams</text>
+  <text x="175" y="155" text-anchor="middle" font-size="9" fill="#6a7178">no upfront structure required —</text>
+  <text x="175" y="170" text-anchor="middle" font-size="9" fill="#6a7178">structure is applied only when a query</text>
+  <text x="175" y="185" text-anchor="middle" font-size="9" fill="#6a7178">reads the data (schema-on-read)</text>
+
+  <text x="175" y="225" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">Cheap, flexible storage at any scale —</text>
+  <text x="175" y="242" text-anchor="middle" font-size="10" fill="#6a7178">good for ML training data, archival, raw event capture</text>
+
+  <line x1="350" y1="20" x2="350" y2="280" stroke="#d8dde2" stroke-width="1"/>
+
+  <text x="525" y="24" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2d2f33">Data Warehouse — structured, schema-on-write</text>
+
+  <rect x="380" y="50" width="290" height="150" rx="10" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <rect x="400" y="65" width="240" height="26" rx="4" fill="#ffffff" stroke="#2f8f4e" stroke-width="1"/>
+  <text x="520" y="82" text-anchor="middle" font-size="8" fill="#2d2f33">orders (order_id, user_id, total, ts)</text>
+  <rect x="400" y="100" width="240" height="26" rx="4" fill="#ffffff" stroke="#2f8f4e" stroke-width="1"/>
+  <text x="520" y="117" text-anchor="middle" font-size="8" fill="#2d2f33">users (user_id, name, signup_date)</text>
+  <text x="520" y="155" text-anchor="middle" font-size="9" fill="#2f8f4e">strict, predefined schema —</text>
+  <text x="520" y="170" text-anchor="middle" font-size="9" fill="#2f8f4e">every row is validated and typed</text>
+  <text x="520" y="185" text-anchor="middle" font-size="9" fill="#2f8f4e">before it's written (schema-on-write)</text>
+
+  <text x="525" y="225" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">Optimized for fast analytical queries —</text>
+  <text x="525" y="242" text-anchor="middle" font-size="10" fill="#6a7178">good for dashboards, BI reports, structured SQL analytics</text>
+
+  <title>Data lake versus data warehouse: a data lake stores raw, unstructured data of any format cheaply with structure applied only at query time (schema-on-read), while a data warehouse enforces a strict predefined schema on write and is optimized for fast structured analytical queries</title>
+</svg>

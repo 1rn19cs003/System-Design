@@ -1,0 +1,45 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <text x="175" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">Client-server: one central point</text>
+
+  <rect x="140" y="60" width="70" height="70" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="175" y="99" text-anchor="middle" font-size="9" fill="#2d2f33">Peer</text>
+  <rect x="40" y="180" width="70" height="45" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="75" y="206" text-anchor="middle" font-size="8.5" fill="#2d2f33">Peer</text>
+  <rect x="240" y="180" width="70" height="45" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="275" y="206" text-anchor="middle" font-size="8.5" fill="#2d2f33">Peer</text>
+  <rect x="140" y="230" width="70" height="45" rx="6" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="175" y="256" text-anchor="middle" font-size="8.5" fill="#ffffff">SERVER</text>
+
+  <line x1="175" y1="130" x2="175" y2="228" stroke="#c0392b" stroke-width="1.3" stroke-dasharray="4,3"/>
+  <line x1="75" y1="180" x2="150" y2="255" stroke="#c0392b" stroke-width="1.3" stroke-dasharray="4,3"/>
+  <line x1="275" y1="180" x2="200" y2="255" stroke="#c0392b" stroke-width="1.3" stroke-dasharray="4,3"/>
+  <text x="175" y="295" text-anchor="middle" font-size="8.5" fill="#c0392b">server down = whole network down</text>
+
+  <line x1="380" y1="20" x2="380" y2="300" stroke="#dfe3e8" stroke-width="1"/>
+
+  <text x="540" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#2d2f33">P2P: no central authority, full mesh</text>
+
+  <circle cx="540" cy="70" r="26" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="540" y="75" text-anchor="middle" font-size="9" fill="#2d2f33">Node</text>
+  <circle cx="450" cy="140" r="26" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="450" y="145" text-anchor="middle" font-size="9" fill="#2d2f33">Node</text>
+  <circle cx="630" cy="140" r="26" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="630" y="145" text-anchor="middle" font-size="9" fill="#2d2f33">Node</text>
+  <circle cx="480" cy="230" r="26" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="480" y="235" text-anchor="middle" font-size="9" fill="#2d2f33">Node</text>
+  <circle cx="600" cy="230" r="26" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="600" y="235" text-anchor="middle" font-size="9" fill="#2d2f33">Node</text>
+
+  <line x1="540" y1="70" x2="450" y2="140" stroke="#2f8f4e" stroke-width="1.1"/>
+  <line x1="540" y1="70" x2="630" y2="140" stroke="#2f8f4e" stroke-width="1.1"/>
+  <line x1="450" y1="140" x2="630" y2="140" stroke="#2f8f4e" stroke-width="1.1"/>
+  <line x1="450" y1="140" x2="480" y2="230" stroke="#2f8f4e" stroke-width="1.1"/>
+  <line x1="630" y1="140" x2="600" y2="230" stroke="#2f8f4e" stroke-width="1.1"/>
+  <line x1="480" y1="230" x2="600" y2="230" stroke="#2f8f4e" stroke-width="1.1"/>
+  <line x1="540" y1="70" x2="480" y2="230" stroke="#2f8f4e" stroke-width="1.1"/>
+  <line x1="540" y1="70" x2="600" y2="230" stroke="#2f8f4e" stroke-width="1.1"/>
+
+  <text x="540" y="290" text-anchor="middle" font-size="8.5" fill="#2f8f4e">every node is both client and server — no single point of failure</text>
+
+  <title>Peer-to-peer versus client-server: in client-server every peer depends on one central server, while in P2P every node connects directly to other nodes acting as both client and server, so no single node's failure takes down the network</title>
+</svg>
