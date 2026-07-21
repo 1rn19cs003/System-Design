@@ -4,331 +4,14 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import QA from '@/components/QA';
-import CodeTerminal from '@/components/CodeTerminal';
 import FlowStep from '@/components/FlowStep';
 import FlowContinue from '@/components/FlowContinue';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 4;
 
 export const metadata = {
   title: 'Resilience Patterns — System Design Architectures',
 };
-
-const OUTPUT = `Threshold: 3 consecutive failures trip the breaker. Reset window: 3 calls while open before a trial.
-Call 1: FAIL | state: CLOSED | ALLOWED (call attempted, failed)
-Call 2: FAIL | state: CLOSED | ALLOWED (call attempted, failed)
-Call 3: FAIL | state: CLOSED -> OPEN | ALLOWED (call attempted, failed, threshold reached)
-Call 4: FAIL | state: OPEN | SHORT-CIRCUITED (no call attempted)
-Call 5: FAIL | state: OPEN | SHORT-CIRCUITED (no call attempted)
-Call 6: SUCCESS | state: OPEN -> HALF_OPEN -> CLOSED | ALLOWED (trial call)
-Call 7: SUCCESS | state: CLOSED | ALLOWED (call attempted, succeeded)
-Call 8: SUCCESS | state: CLOSED | ALLOWED (call attempted, succeeded)
-Final state: CLOSED`;
-
-const snippets = {
-  java: {
-    code: `import java.util.*;
-
-public class CircuitBreakerDemo {
-    enum State { CLOSED, OPEN, HALF_OPEN }
-
-    static class CircuitBreaker {
-        final int failureThreshold;
-        final int resetAfterCalls; // simplified: "timeout" modeled as a call count, for determinism
-        State state = State.CLOSED;
-        int consecutiveFailures = 0;
-        int callsSinceOpened = 0;
-
-        CircuitBreaker(int failureThreshold, int resetAfterCalls) {
-            this.failureThreshold = failureThreshold;
-            this.resetAfterCalls = resetAfterCalls;
-        }
-
-        // Returns [outcome, pathTaken] describing what happened for this call.
-        String[] call(boolean wouldSucceed) {
-            State before = state;
-            State mid = state;
-            if (state == State.OPEN) {
-                callsSinceOpened++;
-                if (callsSinceOpened >= resetAfterCalls) {
-                    state = State.HALF_OPEN;
-                    mid = State.HALF_OPEN;
-                } else {
-                    return new String[]{"SHORT-CIRCUITED (no call attempted)", pathStr(before, mid, state)};
-                }
-            }
-            String outcome = attempt(wouldSucceed);
-            return new String[]{outcome, pathStr(before, mid, state)};
-        }
-
-        private String attempt(boolean wouldSucceed) {
-            if (wouldSucceed) {
-                if (state == State.HALF_OPEN) {
-                    state = State.CLOSED;
-                    consecutiveFailures = 0;
-                    return "ALLOWED (trial call)";
-                }
-                consecutiveFailures = 0;
-                return "ALLOWED (call attempted, succeeded)";
-            } else {
-                consecutiveFailures++;
-                if (consecutiveFailures >= failureThreshold) {
-                    state = State.OPEN;
-                    callsSinceOpened = 0;
-                    return "ALLOWED (call attempted, failed, threshold reached)";
-                }
-                return "ALLOWED (call attempted, failed)";
-            }
-        }
-
-        private String pathStr(State a, State b, State c) {
-            if (a == b && b == c) return a.toString();
-            if (a == b) return a + " -> " + c;
-            return a + " -> " + b + " -> " + c;
-        }
-    }
-
-    public static void main(String[] args) {
-        boolean[] results = {false, false, false, false, false, true, true, true};
-        System.out.println("Threshold: 3 consecutive failures trip the breaker. Reset window: 3 calls while open before a trial.");
-        CircuitBreaker cb = new CircuitBreaker(3, 3);
-        for (int i = 0; i < results.length; i++) {
-            String[] res = cb.call(results[i]);
-            String label = results[i] ? "SUCCESS" : "FAIL";
-            System.out.println("Call " + (i + 1) + ": " + label + " | state: " + res[1] + " | " + res[0]);
-        }
-        System.out.println("Final state: " + cb.state);
-    }
-}`,
-    output: OUTPUT,
-  },
-  python: {
-    code: `class CircuitBreaker:
-    # Simplified breaker: "timeout" is modeled as a fixed number of
-    # calls while OPEN, so the demo stays deterministic.
-    def __init__(self, failure_threshold, reset_after_calls):
-        self.failure_threshold = failure_threshold
-        self.reset_after_calls = reset_after_calls
-        self.state = "CLOSED"
-        self.consecutive_failures = 0
-        self.calls_since_opened = 0
-
-    def call(self, would_succeed):
-        before = self.state
-        mid = self.state
-        if self.state == "OPEN":
-            self.calls_since_opened += 1
-            if self.calls_since_opened >= self.reset_after_calls:
-                self.state = "HALF_OPEN"
-                mid = "HALF_OPEN"
-            else:
-                return "SHORT-CIRCUITED (no call attempted)", self._path(before, mid, self.state)
-        outcome = self._attempt(would_succeed)
-        return outcome, self._path(before, mid, self.state)
-
-    def _attempt(self, would_succeed):
-        if would_succeed:
-            if self.state == "HALF_OPEN":
-                self.state = "CLOSED"
-                self.consecutive_failures = 0
-                return "ALLOWED (trial call)"
-            self.consecutive_failures = 0
-            return "ALLOWED (call attempted, succeeded)"
-        else:
-            self.consecutive_failures += 1
-            if self.consecutive_failures >= self.failure_threshold:
-                self.state = "OPEN"
-                self.calls_since_opened = 0
-                return "ALLOWED (call attempted, failed, threshold reached)"
-            return "ALLOWED (call attempted, failed)"
-
-    @staticmethod
-    def _path(a, b, c):
-        if a == b == c:
-            return a
-        if a == b:
-            return f"{a} -> {c}"
-        return f"{a} -> {b} -> {c}"
-
-
-results = [False, False, False, False, False, True, True, True]
-print("Threshold: 3 consecutive failures trip the breaker. Reset window: 3 calls while open before a trial.")
-cb = CircuitBreaker(3, 3)
-for i, would_succeed in enumerate(results, start=1):
-    outcome, path = cb.call(would_succeed)
-    label = "SUCCESS" if would_succeed else "FAIL"
-    print(f"Call {i}: {label} | state: {path} | {outcome}")
-print(f"Final state: {cb.state}")`,
-    output: OUTPUT,
-  },
-  javascript: {
-    code: `class CircuitBreaker {
-  // Simplified breaker: "timeout" is modeled as a fixed number of
-  // calls while OPEN, so the demo stays deterministic.
-  constructor(failureThreshold, resetAfterCalls) {
-    this.failureThreshold = failureThreshold;
-    this.resetAfterCalls = resetAfterCalls;
-    this.state = "CLOSED";
-    this.consecutiveFailures = 0;
-    this.callsSinceOpened = 0;
-  }
-
-  call(wouldSucceed) {
-    const before = this.state;
-    let mid = this.state;
-    if (this.state === "OPEN") {
-      this.callsSinceOpened++;
-      if (this.callsSinceOpened >= this.resetAfterCalls) {
-        this.state = "HALF_OPEN";
-        mid = "HALF_OPEN";
-      } else {
-        return ["SHORT-CIRCUITED (no call attempted)", this.path(before, mid, this.state)];
-      }
-    }
-    const outcome = this.attempt(wouldSucceed);
-    return [outcome, this.path(before, mid, this.state)];
-  }
-
-  attempt(wouldSucceed) {
-    if (wouldSucceed) {
-      if (this.state === "HALF_OPEN") {
-        this.state = "CLOSED";
-        this.consecutiveFailures = 0;
-        return "ALLOWED (trial call)";
-      }
-      this.consecutiveFailures = 0;
-      return "ALLOWED (call attempted, succeeded)";
-    } else {
-      this.consecutiveFailures++;
-      if (this.consecutiveFailures >= this.failureThreshold) {
-        this.state = "OPEN";
-        this.callsSinceOpened = 0;
-        return "ALLOWED (call attempted, failed, threshold reached)";
-      }
-      return "ALLOWED (call attempted, failed)";
-    }
-  }
-
-  path(a, b, c) {
-    if (a === b && b === c) return a;
-    if (a === b) return \`\${a} -> \${c}\`;
-    return \`\${a} -> \${b} -> \${c}\`;
-  }
-}
-
-const results = [false, false, false, false, false, true, true, true];
-console.log("Threshold: 3 consecutive failures trip the breaker. Reset window: 3 calls while open before a trial.");
-const cb = new CircuitBreaker(3, 3);
-results.forEach((wouldSucceed, i) => {
-  const [outcome, path] = cb.call(wouldSucceed);
-  const label = wouldSucceed ? "SUCCESS" : "FAIL";
-  console.log(\`Call \${i + 1}: \${label} | state: \${path} | \${outcome}\`);
-});
-console.log(\`Final state: \${cb.state}\`);`,
-    output: OUTPUT,
-  },
-  cpp: {
-    code: `#include <iostream>
-#include <vector>
-#include <string>
-
-class CircuitBreaker {
-public:
-    // Simplified breaker: "timeout" is modeled as a fixed number of
-    // calls while OPEN, so the demo stays deterministic.
-    CircuitBreaker(int failureThreshold, int resetAfterCalls)
-        : failureThreshold(failureThreshold), resetAfterCalls(resetAfterCalls) {}
-
-    std::string state = "CLOSED";
-
-    std::pair<std::string, std::string> call(bool wouldSucceed) {
-        std::string before = state;
-        std::string mid = state;
-        if (state == "OPEN") {
-            callsSinceOpened++;
-            if (callsSinceOpened >= resetAfterCalls) {
-                state = "HALF_OPEN";
-                mid = "HALF_OPEN";
-            } else {
-                return {"SHORT-CIRCUITED (no call attempted)", path(before, mid, state)};
-            }
-        }
-        std::string outcome = attempt(wouldSucceed);
-        return {outcome, path(before, mid, state)};
-    }
-
-private:
-    int failureThreshold;
-    int resetAfterCalls;
-    int consecutiveFailures = 0;
-    int callsSinceOpened = 0;
-
-    std::string attempt(bool wouldSucceed) {
-        if (wouldSucceed) {
-            if (state == "HALF_OPEN") {
-                state = "CLOSED";
-                consecutiveFailures = 0;
-                return "ALLOWED (trial call)";
-            }
-            consecutiveFailures = 0;
-            return "ALLOWED (call attempted, succeeded)";
-        } else {
-            consecutiveFailures++;
-            if (consecutiveFailures >= failureThreshold) {
-                state = "OPEN";
-                callsSinceOpened = 0;
-                return "ALLOWED (call attempted, failed, threshold reached)";
-            }
-            return "ALLOWED (call attempted, failed)";
-        }
-    }
-
-    static std::string path(const std::string& a, const std::string& b, const std::string& c) {
-        if (a == b && b == c) return a;
-        if (a == b) return a + " -> " + c;
-        return a + " -> " + b + " -> " + c;
-    }
-};
-
-int main() {
-    std::vector<bool> results = {false, false, false, false, false, true, true, true};
-    std::cout << "Threshold: 3 consecutive failures trip the breaker. Reset window: 3 calls while open before a trial." << std::endl;
-    CircuitBreaker cb(3, 3);
-    for (size_t i = 0; i < results.size(); i++) {
-        auto [outcome, path] = cb.call(results[i]);
-        std::string label = results[i] ? "SUCCESS" : "FAIL";
-        std::cout << "Call " << (i + 1) << ": " << label << " | state: " << path << " | " << outcome << std::endl;
-    }
-    std::cout << "Final state: " << cb.state << std::endl;
-    return 0;
-}`,
-    output: OUTPUT,
-  },
-};
-
-const qaItems = [
-  {
-    q: "What are the three circuit breaker states, and why does half-open need to exist at all — why not just go straight from open back to closed?",
-    a: "A circuit breaker has three states: closed (calls flow through normally, failures are counted), open (calls are short-circuited immediately without touching the downstream service, protecting both the caller and the already-struggling dependency), and half-open (a small number of trial calls are allowed through to test whether the dependency has recovered). Half-open exists because going straight from open back to closed would mean blindly resuming full traffic to a service that might still be down — if it's still failing, you'd immediately re-trip the breaker after dumping a full load of retries on it, which is exactly the thundering-herd problem you were trying to avoid. Half-open lets the breaker test recovery with a small, controlled trial before committing to full traffic again.",
-  },
-  {
-    q: "How is a circuit breaker different from just adding retries with backoff?",
-    a: "Retries and circuit breakers solve different problems and are normally used together, not as alternatives. A retry is a per-call decision: \"this specific request failed, try it again (perhaps with backoff),\" and it still hits the downstream service every time, which is fine for transient blips but actively harmful when the service is genuinely down or overloaded — retries just add more load to a struggling system. A circuit breaker is a cross-call, stateful decision: it watches the failure rate over many calls and, once it crosses a threshold, stops sending traffic to the dependency entirely for a period, protecting both the caller's resources (threads, connections) and the downstream service from being hit with a wave of retries while it's trying to recover.",
-  },
-  {
-    q: "What does a bulkhead actually protect against, and how does the name relate to its function?",
-    a: "The name comes from a ship's bulkheads — physical partitions that divide the hull into separate watertight compartments, so a hull breach in one compartment floods only that section instead of sinking the entire ship. In software, a bulkhead means isolating resource pools (thread pools, connection pools, semaphores) per dependency, so that if calls to one slow or failing downstream service exhaust their allotted pool, requests to unrelated dependencies still have their own separate pool of threads/connections available and keep working normally. Without bulkheads, a single shared thread pool means one bad dependency can starve every other code path in the service, turning a partial outage into a total one.",
-  },
-  {
-    q: "Walk through how a cascading failure actually propagates from one slow service to a full outage.",
-    a: "It starts with one service (say, C) becoming slow — not necessarily down, just responding much more slowly than usual. Its callers (B) are making synchronous calls to C and, without a timeout or with too generous a timeout, their request-handling threads sit blocked waiting on C's response. Because B has a finite thread or connection pool, enough concurrent slow calls to C exhaust that pool entirely, so B can no longer serve any request — including ones that don't depend on C at all. B's callers (A) now experience the same thing one level up: their calls to B start timing out or hanging, exhausting A's own thread pool. This repeats at each layer of the call graph, and what began as one component being slow becomes a full outage across every service that transitively depends on it. Timeouts, retries with exponential backoff and jitter, bulkheads, and circuit breakers each interrupt this chain at a different point — timeouts and circuit breakers stop calls from hanging or continuing to a known-bad dependency, and bulkheads stop one dependency's exhaustion from starving unrelated request paths.",
-  },
-  {
-    q: "What's the distinction between a sidecar and a service mesh?",
-    a: "A sidecar is a single deployment pattern: a helper process (a proxy, a logging agent, a metrics collector) deployed alongside one service instance, typically in the same pod, intercepting that instance's network traffic without requiring any change to the service's own code. A service mesh is the larger system built on top of that pattern: it's the combination of a sidecar proxy attached to every service in the fleet (the \"data plane\") plus a central control plane that configures all of those sidecars uniformly — pushing routing rules, mTLS certificates, and retry/timeout policy to every proxy at once. In short, a sidecar is the building block; a service mesh (like Istio or Linkerd) is the fleet-wide system of sidecars plus centralized control that makes cross-cutting networking concerns consistent across every service, instead of each team configuring retries and TLS independently per service.",
-  },
-];
 
 export default function ResiliencePatternsPage() {
   return (
@@ -344,8 +27,6 @@ export default function ResiliencePatternsPage() {
             { id: 'theory', label: 'Theory & Diagrams' },
             { id: 'trade-offs', label: 'Trade-offs' },
             { id: 'real-world', label: 'Real-World Examples' },
-            { id: 'interview-questions', label: 'Interview Questions' },
-            { id: 'code', label: 'Code & Output' },
           ]}
         />
 
@@ -454,6 +135,22 @@ export default function ResiliencePatternsPage() {
               otherwise-healthy stream don&apos;t trip the breaker on their own.
             </p>
 
+            <h4>Advantages of the Circuit Breaker pattern</h4>
+            <ul>
+              <li><strong>Fail fast instead of hanging:</strong> once the breaker is open, callers get an immediate failure instead of waiting out a full timeout on every single request, which keeps the caller's own latency predictable even while the dependency is down.</li>
+              <li><strong>Protects a struggling dependency from pile-on traffic:</strong> short-circuiting calls means a service that's already failing doesn't also have to process (and fail) a continued flood of requests on top of whatever caused it to degrade in the first place.</li>
+              <li><strong>Automatic recovery detection:</strong> the half-open state tests recovery with a small trial batch on its own schedule, so no human has to watch a dashboard and manually flip traffic back on once a dependency comes back.</li>
+              <li><strong>Contains blast radius:</strong> combined with timeouts, it stops one dependency's failure from exhausting the caller's own threads or connections, which is usually the first domino in a cascading failure.</li>
+            </ul>
+
+            <h4>Disadvantages of the Circuit Breaker pattern</h4>
+            <ul>
+              <li><strong>Threshold tuning is genuinely hard:</strong> too sensitive and normal transient blips (a GC pause, one dropped packet) trip the breaker and cause a self-inflicted outage; too lenient and it doesn't protect anything before the dependency is already in serious trouble.</li>
+              <li><strong>Adds a new failure mode of its own:</strong> a misconfigured breaker that never resets, or resets too eagerly into a still-unhealthy dependency, can make an outage last longer or flap repeatedly instead of recovering cleanly.</li>
+              <li><strong>State needs to live somewhere:</strong> in a horizontally scaled service, each instance can have its own breaker state unless you centralize it, so different instances may make different open/closed decisions about the same dependency at the same time.</li>
+              <li><strong>Doesn't fix the underlying problem:</strong> a circuit breaker only contains the blast radius of a failing dependency — it does nothing to actually make that dependency healthy again.</li>
+            </ul>
+
             <h3>Retry storms vs. backoff and jitter</h3>
             <p>
               Retries are often the thing that turns a brief blip into a full outage, and the
@@ -506,6 +203,22 @@ export default function ResiliencePatternsPage() {
               />
               <figcaption>One shared thread pool means one slow dependency can starve requests that never even call it</figcaption>
             </figure>
+
+            <h4>Advantages of the Bulkhead pattern</h4>
+            <ul>
+              <li><strong>Failure isolation:</strong> one dependency exhausting its own pool can never starve calls to a completely unrelated, healthy dependency, unlike a shared pool where every code path shares the same fate.</li>
+              <li><strong>Predictable degradation:</strong> when something does go wrong, only the feature that depends on the struggling service degrades — the rest of the application keeps working exactly as before.</li>
+              <li><strong>Pairs naturally with circuit breakers:</strong> each bulkheaded pool can have its own breaker, so the blast radius of both the resource exhaustion and the failure detection stay scoped to one dependency at a time.</li>
+              <li><strong>Makes capacity planning explicit:</strong> giving each dependency a fixed pool size forces you to reason about how much concurrency each one actually needs, instead of one shared pool masking that question.</li>
+            </ul>
+
+            <h4>Disadvantages of the Bulkhead pattern</h4>
+            <ul>
+              <li><strong>Resource overhead:</strong> reserving separate pools per dependency means some capacity sits idle for a low-traffic dependency instead of being available to a busier one, which a single shared pool would have handled more efficiently.</li>
+              <li><strong>Sizing every pool is extra operational work:</strong> each dependency's pool needs its own capacity number, and getting it wrong (too small) can throttle a healthy dependency even though the service as a whole has spare capacity elsewhere.</li>
+              <li><strong>More moving parts to monitor:</strong> instead of watching one thread pool's utilization, you now need per-dependency visibility into every pool, or you can miss one quietly saturating while dashboards show healthy aggregate numbers.</li>
+              <li><strong>Doesn't help if the exhausted resource is shared lower down:</strong> if every pool ultimately bottlenecks on the same database connection limit or CPU, isolating threads at the application layer doesn't fully contain the failure.</li>
+            </ul>
 
             <h3>Sidecar pattern</h3>
             <p>
@@ -590,20 +303,74 @@ export default function ResiliencePatternsPage() {
           </FlowStep>
 
           <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
-            <TwoCol>
-              <Callout kind="good" title="✓ Circuit breakers and bulkheads are worth the complexity when">
-                <ul>
-                  <li>A dependency call is synchronous and on a critical request path, where a hang or failure can consume caller resources or block unrelated requests.</li>
-                  <li>The dependency has a realistic chance of degrading independently of the caller (a different team, different deploy cadence, different failure domain).</li>
-                </ul>
-              </Callout>
-              <Callout kind="bad" title="✕ Be careful about over-applying resilience machinery when">
-                <ul>
-                  <li>Thresholds are set too aggressively — a breaker that trips on normal transient blips reduces your own availability instead of protecting it.</li>
-                  <li>You add retries on top of a circuit breaker without backoff/jitter, which can itself generate the retry storm that overwhelms a recovering dependency.</li>
-                </ul>
-              </Callout>
-            </TwoCol>
+            <p>
+              Circuit breakers and bulkheads solve the same broad problem — stop one failing
+              dependency from taking down everything else — but they attack it from different angles.
+              Here&apos;s how they actually compare, and when to reach for each.
+            </p>
+
+            <h3>Difference Between Circuit Breaker and Bulkhead</h3>
+            <table className="estimate-table">
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>Circuit Breaker</th>
+                  <th>Bulkhead</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>What it protects against</td>
+                  <td>Repeatedly calling a dependency that is already failing or degraded</td>
+                  <td>One dependency&apos;s resource usage starving calls to unrelated dependencies</td>
+                </tr>
+                <tr>
+                  <td>Mechanism</td>
+                  <td>Tracks failure rate over time, trips a state machine (closed/open/half-open)</td>
+                  <td>Allocates a fixed, separate resource pool (threads/connections) per dependency</td>
+                </tr>
+                <tr>
+                  <td>Overhead</td>
+                  <td>Low — a counter and a state check per call</td>
+                  <td>Moderate — reserved capacity per dependency can sit idle when unused</td>
+                </tr>
+                <tr>
+                  <td>Failure behavior</td>
+                  <td>Fails fast (short-circuits) once the threshold trips, no call attempted</td>
+                  <td>Degrades gracefully — the affected pool saturates, other pools keep serving</td>
+                </tr>
+                <tr>
+                  <td>Configuration complexity</td>
+                  <td>Two coupled knobs (failure threshold, reset timeout) that trade off against each other</td>
+                  <td>One knob per dependency (pool size), but multiplied across every dependency you isolate</td>
+                </tr>
+                <tr>
+                  <td>Scalability concern</td>
+                  <td>State is per-instance unless centralized, so instances can disagree on breaker state</td>
+                  <td>Pool sizing must account for total instance count, or aggregate capacity is wrong</td>
+                </tr>
+                <tr>
+                  <td>Typical use case</td>
+                  <td>A single flaky downstream API that occasionally goes fully unhealthy</td>
+                  <td>A service that calls several independent dependencies (payments, inventory, recommendations)</td>
+                </tr>
+                <tr>
+                  <td>Real system example</td>
+                  <td>Netflix Hystrix wrapping each dependency call with a breaker</td>
+                  <td>Hystrix&apos;s own thread-pool-per-dependency isolation, used alongside its breakers</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Why Choose Circuit Breaker Over Bulkhead (or use both)?</h3>
+            <ol>
+              <li><strong>Fail fast on a known-bad dependency:</strong> a breaker stops calls the instant a dependency is confirmed unhealthy, rather than just limiting how many resources a struggling call can consume. Analogy: it&apos;s like a security guard turning people away at the door of a store that&apos;s already on fire, instead of just capping how many people can be inside at once.</li>
+              <li><strong>Automatic recovery testing:</strong> the half-open state probes recovery on its own schedule, so traffic resumes the moment the dependency is healthy again without a human watching a dashboard. Analogy: it&apos;s like a smoke detector that periodically re-checks the air instead of requiring someone to manually walk back in and check.</li>
+              <li><strong>Cheaper to run at scale:</strong> a breaker is just a counter and a state check, with no reserved capacity sitting idle. Analogy: it&apos;s a light switch you flip off, versus a bulkhead's dedicated hallway that has to exist whether or not anyone's using it right now.</li>
+              <li><strong>Bulkheads are what stop the bleeding when you don't have a breaker yet:</strong> isolating pools protects unrelated request paths even before you've built failure-rate tracking. Analogy: it's the watertight doors on a ship — they contain a flood even if no one has sounded an alarm yet.</li>
+              <li><strong>In practice, you rarely choose one — you layer both:</strong> a bulkhead gives each dependency its own pool, and a circuit breaker sits in front of each pool deciding when to stop sending calls into it at all. Analogy: think of a building with fire doors between wings (bulkhead) and a sprinkler system that shuts off gas to a specific wing once smoke is detected there (circuit breaker) — together they contain damage far better than either alone.</li>
+            </ol>
+
             <p style={{ marginTop: 16 }}>
               <strong>What interviewers are listening for:</strong> that you understand these patterns
               compose — a well-designed call to a downstream dependency typically has a timeout, sits
@@ -633,25 +400,6 @@ export default function ResiliencePatternsPage() {
               <li><strong>Thread-pool-per-dependency designs</strong> — a classic bulkhead implementation where each downstream dependency gets its own dedicated, isolated thread pool, so exhausting the pool for one slow dependency can&apos;t starve calls to any other dependency.</li>
               <li><strong>API gateways with rate limiting</strong> — gateways like Kong, Envoy, or a cloud provider's own API gateway enforce per-client and per-route rate limits, which caps how much load any single caller can place on downstream services before a cascading failure even has a chance to start.</li>
             </ul>
-            <FlowContinue nextId="interview-questions" label="Interview Questions" />
-          </FlowStep>
-
-          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
-            <p>Click a question to reveal the answer.</p>
-            <QA items={qaItems} />
-            <FlowContinue nextId="code" label="Code & Output" />
-          </FlowStep>
-
-          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
-            <p>
-              A deterministic circuit breaker simulation. The breaker trips after 3 consecutive
-              failures, short-circuits calls while open, and (to keep the demo deterministic) treats
-              a fixed number of calls while open as the equivalent of a timeout elapsing before moving
-              to half-open. The fixed sequence of 8 calls — 5 failures, then 3 successes — walks
-              through every transition: closed to open, open short-circuiting, open to half-open, and
-              half-open back to closed.
-            </p>
-            <CodeTerminal snippets={snippets} />
           </FlowStep>
 
           <PageNav

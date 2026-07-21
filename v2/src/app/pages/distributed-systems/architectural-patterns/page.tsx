@@ -4,217 +4,14 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import QA from '@/components/QA';
-import CodeTerminal from '@/components/CodeTerminal';
 import FlowStep from '@/components/FlowStep';
 import FlowContinue from '@/components/FlowContinue';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 4;
 
 export const metadata = {
   title: 'Architectural Patterns — System Design Architectures',
 };
-
-const OUTPUT = `[email-notifier] OrderPlaced(order=1001) -> sending confirmation email to user 42
-[analytics-logger] OrderPlaced(order=1001) -> logged event OrderPlaced for order 1001
-[email-notifier] PaymentFailed(order=1001) -> sending payment-failed alert to user 42
-[analytics-logger] PaymentFailed(order=1001) -> logged event PaymentFailed for order 1001
-[email-notifier] OrderShipped(order=1001) -> sending shipping notification to user 42
-[analytics-logger] OrderShipped(order=1001) -> logged event OrderShipped for order 1001
-Both subscribers independently processed all 3 events. Publisher never called either one directly.`;
-
-const snippets = {
-  java: {
-    code: `import java.util.*;
-import java.util.function.Consumer;
-
-public class EventDrivenDemo {
-    record Event(String type, int orderId) {}
-
-    public static void main(String[] args) {
-        List<Event> events = List.of(
-            new Event("OrderPlaced", 1001),
-            new Event("PaymentFailed", 1001),
-            new Event("OrderShipped", 1001)
-        );
-
-        // Two independent subscribers - neither knows the other exists.
-        Consumer<Event> emailNotifier = e -> {
-            String action = switch (e.type()) {
-                case "OrderPlaced" -> "sending confirmation email to user 42";
-                case "PaymentFailed" -> "sending payment-failed alert to user 42";
-                case "OrderShipped" -> "sending shipping notification to user 42";
-                default -> "ignoring unknown event";
-            };
-            System.out.printf("[email-notifier] %s(order=%d) -> %s%n", e.type(), e.orderId(), action);
-        };
-
-        Consumer<Event> analyticsLogger = e ->
-            System.out.printf("[analytics-logger] %s(order=%d) -> logged event %s for order %d%n",
-                e.type(), e.orderId(), e.type(), e.orderId());
-
-        List<Consumer<Event>> subscribers = List.of(emailNotifier, analyticsLogger);
-
-        // Publisher pushes to a topic; it never calls a subscriber directly.
-        for (Event event : events) {
-            for (Consumer<Event> subscriber : subscribers) {
-                subscriber.accept(event);
-            }
-        }
-
-        System.out.println("Both subscribers independently processed all 3 events. Publisher never called either one directly.");
-    }
-}`,
-    output: OUTPUT,
-  },
-  python: {
-    code: `from dataclasses import dataclass
-
-@dataclass
-class Event:
-    type: str
-    order_id: int
-
-events = [
-    Event("OrderPlaced", 1001),
-    Event("PaymentFailed", 1001),
-    Event("OrderShipped", 1001),
-]
-
-# Two independent subscribers - neither knows the other exists.
-def email_notifier(e: Event):
-    actions = {
-        "OrderPlaced": "sending confirmation email to user 42",
-        "PaymentFailed": "sending payment-failed alert to user 42",
-        "OrderShipped": "sending shipping notification to user 42",
-    }
-    action = actions.get(e.type, "ignoring unknown event")
-    print(f"[email-notifier] {e.type}(order={e.order_id}) -> {action}")
-
-def analytics_logger(e: Event):
-    print(f"[analytics-logger] {e.type}(order={e.order_id}) -> logged event {e.type} for order {e.order_id}")
-
-subscribers = [email_notifier, analytics_logger]
-
-# Publisher pushes to a topic; it never calls a subscriber directly.
-for event in events:
-    for subscriber in subscribers:
-        subscriber(event)
-
-print("Both subscribers independently processed all 3 events. Publisher never called either one directly.")`,
-    output: OUTPUT,
-  },
-  javascript: {
-    code: `const events = [
-  { type: "OrderPlaced", orderId: 1001 },
-  { type: "PaymentFailed", orderId: 1001 },
-  { type: "OrderShipped", orderId: 1001 },
-];
-
-// Two independent subscribers - neither knows the other exists.
-function emailNotifier(e) {
-  const actions = {
-    OrderPlaced: "sending confirmation email to user 42",
-    PaymentFailed: "sending payment-failed alert to user 42",
-    OrderShipped: "sending shipping notification to user 42",
-  };
-  const action = actions[e.type] || "ignoring unknown event";
-  console.log(\`[email-notifier] \${e.type}(order=\${e.orderId}) -> \${action}\`);
-}
-
-function analyticsLogger(e) {
-  console.log(\`[analytics-logger] \${e.type}(order=\${e.orderId}) -> logged event \${e.type} for order \${e.orderId}\`);
-}
-
-const subscribers = [emailNotifier, analyticsLogger];
-
-// Publisher pushes to a topic; it never calls a subscriber directly.
-for (const event of events) {
-  for (const subscriber of subscribers) {
-    subscriber(event);
-  }
-}
-
-console.log("Both subscribers independently processed all 3 events. Publisher never called either one directly.");`,
-    output: OUTPUT,
-  },
-  cpp: {
-    code: `#include <iostream>
-#include <vector>
-#include <functional>
-#include <string>
-#include <map>
-
-struct Event {
-    std::string type;
-    int orderId;
-};
-
-int main() {
-    std::vector<Event> events = {
-        {"OrderPlaced", 1001},
-        {"PaymentFailed", 1001},
-        {"OrderShipped", 1001}
-    };
-
-    // Two independent subscribers - neither knows the other exists.
-    auto emailNotifier = [](const Event& e) {
-        std::map<std::string, std::string> actions = {
-            {"OrderPlaced", "sending confirmation email to user 42"},
-            {"PaymentFailed", "sending payment-failed alert to user 42"},
-            {"OrderShipped", "sending shipping notification to user 42"}
-        };
-        std::string action = actions.count(e.type) ? actions[e.type] : "ignoring unknown event";
-        std::cout << "[email-notifier] " << e.type << "(order=" << e.orderId << ") -> " << action << std::endl;
-    };
-
-    auto analyticsLogger = [](const Event& e) {
-        std::cout << "[analytics-logger] " << e.type << "(order=" << e.orderId << ") -> logged event "
-                   << e.type << " for order " << e.orderId << std::endl;
-    };
-
-    std::vector<std::function<void(const Event&)>> subscribers = {emailNotifier, analyticsLogger};
-
-    // Publisher pushes to a topic; it never calls a subscriber directly.
-    for (const auto& event : events) {
-        for (auto& subscriber : subscribers) {
-            subscriber(event);
-        }
-    }
-
-    std::cout << "Both subscribers independently processed all 3 events. Publisher never called either one directly." << std::endl;
-    return 0;
-}`,
-    output: OUTPUT,
-  },
-};
-
-const qaItems = [
-  {
-    q: 'What is a cold start, and when does it actually matter?',
-    a: "A cold start is the extra latency paid the first time a serverless function runs on a fresh instance — the platform has to provision a container, load the runtime, and initialize your code before it can handle the request, which can add anywhere from tens of milliseconds to a couple of seconds depending on runtime and package size. It matters most for latency-sensitive, user-facing endpoints with spiky or infrequent traffic (an API that goes idle between bursts); it matters far less for background jobs, scheduled tasks, or high-traffic endpoints that stay warm because instances are constantly reused.",
-  },
-  {
-    q: 'What are the real trade-offs between event-driven and request-response (direct call) communication?',
-    a: "Request-response is simple to reason about — the caller gets an immediate result or error, and a single stack trace usually shows you the whole path. Event-driven trades that immediacy for loose coupling: a publisher doesn't need to know who's listening, consumers can be added or removed without touching the publisher, and each consumer can scale independently. The cost is that the publisher no longer gets a synchronous answer (did the email actually send? you don't know from the publish call), and the system now has eventual consistency and more moving parts to fail (a broker, retries, dead-letter queues) instead of one HTTP call.",
-  },
-  {
-    q: 'Why are P2P systems hard to keep consistent?',
-    a: "There's no single node holding the authoritative state, so there's nothing to synchronously check a write against the way you'd check a single database. Every node has its own local view, and that view can lag or conflict with other nodes' views depending on which peers it has recently talked to. Reconciling those views requires either a lot of gossip-style propagation and conflict resolution, or accepting a weaker consistency model (eventual consistency) from the outset — you generally can't get single-writer-style strong consistency in a leaderless, fully decentralized system without some coordination layer bolted back on.",
-  },
-  {
-    q: 'When is serverless a poor fit?',
-    a: "Serverless struggles with long-running processes, since most providers cap execution time per invocation (AWS Lambda tops out at 15 minutes) — a video transcoding job or a long batch computation doesn't fit that model well. It's also a poor fit for workloads that need to hold state or a persistent connection in memory between requests (a WebSocket server, an in-memory cache warmed over time, a stateful game server), because each invocation may run on a different, freshly-provisioned instance with no guarantee of reusing prior in-memory state. Predictable, sustained, high-volume traffic is often cheaper on always-on servers too, since per-invocation billing stops being an advantage once you're invoking constantly.",
-  },
-  {
-    q: "How does event-driven architecture change how you debug a single request's path?",
-    a: "In a request-response system, one request maps to one call stack, and a stack trace or a single log file usually tells the whole story. In an event-driven system, a single logical operation (e.g., placing an order) fans out into multiple independent, asynchronously-processed events handled by different services on different schedules — there's no single stack trace spanning all of it. This is why event-driven systems lean heavily on distributed tracing (a correlation/trace ID attached to the original event and propagated through every consumer) and centralized log aggregation — without them, reconstructing 'what happened to this one order' means manually cross-referencing logs across several unrelated services.",
-  },
-  {
-    q: 'How do serverless, event-driven, and P2P relate to microservices and client-server, which this site already covers?',
-    a: "They're not a replacement for those two, they're additional shapes a system can take, and most real systems combine several. Client-server is the baseline relationship almost everything else refines. Microservices split a monolith into independently deployable, independently owned services that still mostly talk over direct request-response calls. Serverless is really about *where* code runs (provider-managed, ephemeral, pay-per-invocation) rather than about how services are decomposed — you can build a microservice's individual endpoints as Lambda functions. Event-driven is about *how* services communicate (through events on a broker rather than direct calls) and is very often layered on top of a microservices decomposition. P2P is the most radical departure — it removes the client/server distinction and any central authority entirely, which is why it's used for narrower use cases (file sharing, blockchain) rather than typical backend systems.",
-  },
-];
 
 export default function ArchitecturalPatternsPage() {
   return (
@@ -230,8 +27,6 @@ export default function ArchitecturalPatternsPage() {
             { id: 'theory', label: 'Theory & Diagrams' },
             { id: 'trade-offs', label: 'Trade-offs' },
             { id: 'real-world', label: 'Real-World Examples' },
-            { id: 'interview-questions', label: 'Interview Questions' },
-            { id: 'code', label: 'Code & Output' },
           ]}
         />
 
@@ -351,6 +146,22 @@ export default function ArchitecturalPatternsPage() {
               <figcaption>Same request-handling cost either way — the entire difference is the setup paid before it</figcaption>
             </figure>
 
+            <h4>Advantages of Serverless Architecture</h4>
+            <ul>
+              <li><strong>No server management:</strong> The cloud provider handles provisioning, patching, and scaling, so your team never touches an OS or a capacity-planning spreadsheet.</li>
+              <li><strong>Pay-per-invocation billing:</strong> You're billed for actual execution time and memory used, not for idle server hours — a function that runs once a day costs almost nothing.</li>
+              <li><strong>Automatic scaling:</strong> A function handling one request a day and one handling a thousand a second both scale up and down without you provisioning anything ahead of time.</li>
+              <li><strong>Faster iteration:</strong> Deploying a single function is a much smaller unit of change than redeploying an entire running service.</li>
+            </ul>
+
+            <h4>Disadvantages of Serverless Architecture</h4>
+            <ul>
+              <li><strong>Cold-start latency:</strong> A fresh instance has to be provisioned and initialized before it can serve its first request, which can add hundreds of milliseconds to seconds of unpredictable latency.</li>
+              <li><strong>Execution time limits:</strong> Most providers cap how long a single invocation may run (AWS Lambda tops out at 15 minutes), ruling out long-running or persistently-stateful workloads.</li>
+              <li><strong>Vendor lock-in:</strong> Functions are often written against a specific provider's runtime, triggers, and tooling, making a later migration to another provider or to self-hosted infrastructure costly.</li>
+              <li><strong>Harder local debugging:</strong> Reproducing the exact provider-managed environment, cold starts, and trigger wiring locally is harder than debugging a normal long-running server process.</li>
+            </ul>
+
             <h3>Event-driven architecture</h3>
             <p>
               This site&apos;s HLD Message Queues page already covers the mechanics of publish/subscribe
@@ -381,6 +192,22 @@ export default function ArchitecturalPatternsPage() {
               />
               <figcaption>The publisher writes to a topic once — it never needs to know who, or how many, are listening</figcaption>
             </figure>
+
+            <h4>Advantages of Event-Driven Architecture</h4>
+            <ul>
+              <li><strong>Loose coupling:</strong> Consumers can be added, removed, or changed without ever touching the publisher's code.</li>
+              <li><strong>Independent scalability:</strong> Each consumer scales its own instance count based on its own load, so a slow consumer never blocks the publisher or other consumers.</li>
+              <li><strong>Resilience to partial failure:</strong> If one consumer goes down, the publisher and every other consumer keep working unaffected, since none of them call each other directly.</li>
+              <li><strong>Natural fit for fan-out:</strong> Adding a tenth downstream service that cares about the same event costs nothing extra on the publisher's side.</li>
+            </ul>
+
+            <h4>Disadvantages of Event-Driven Architecture</h4>
+            <ul>
+              <li><strong>No synchronous confirmation:</strong> The publisher never learns whether a consumer actually succeeded, so it can't return "yes, the email was sent" the way a direct call could.</li>
+              <li><strong>Eventual consistency:</strong> The system as a whole trades immediate consistency for a window in which different services haven't yet caught up with the same fact.</li>
+              <li><strong>Harder debugging:</strong> A single logical operation fans out across services on different schedules, so there's no single stack trace or log file that tells the whole story.</li>
+              <li><strong>More operational surface area:</strong> Broker health, retries, dead-letter queues, and ordering guarantees all become things that can independently break.</li>
+            </ul>
 
             <p>
               There are two distinct styles of coordinating an event-driven flow, and interviews often
@@ -465,20 +292,70 @@ export default function ArchitecturalPatternsPage() {
           </FlowStep>
 
           <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
-            <TwoCol>
-              <Callout kind="good" title="✓ Reach for serverless / event-driven when">
-                <ul>
-                  <li>Workloads are short-lived, bursty, or infrequent — you don&apos;t want to pay for idle capacity (serverless).</li>
-                  <li>You want to add new consumers of an existing data stream without touching the producer, or let each consumer scale independently (event-driven).</li>
-                </ul>
-              </Callout>
-              <Callout kind="bad" title="✕ Avoid them when">
-                <ul>
-                  <li>The workload is long-running, needs a persistent connection, or holds significant in-memory state between calls — serverless execution limits and cold, stateless instances fight you.</li>
-                  <li>You need a synchronous, immediate answer with a single traceable call path — event-driven&apos;s asynchronous, fan-out nature adds debugging overhead you may not need.</li>
-                </ul>
-              </Callout>
-            </TwoCol>
+            <p>
+              Serverless and event-driven solve different problems — where code runs versus how
+              services talk to each other — but interviews usually push on the same question for
+              both: what are you actually trading away for the flexibility they buy you? Here&apos;s
+              how they compare against the alternative each one replaces.
+            </p>
+
+            <h3>Difference Between Serverless Architecture and Event-Driven Architecture</h3>
+            <table className="estimate-table">
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>Serverless Architecture</th>
+                  <th>Event-Driven Architecture</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>What it changes</td>
+                  <td>Where your code physically runs</td>
+                  <td>How services communicate with each other</td>
+                </tr>
+                <tr>
+                  <td>Latency profile</td>
+                  <td>15ms warm, 100ms-2s+ on a cold start</td>
+                  <td>No added compute latency, but no sync confirmation either</td>
+                </tr>
+                <tr>
+                  <td>Cost model</td>
+                  <td>Pay per invocation/execution time</td>
+                  <td>Pay for broker throughput and consumer compute</td>
+                </tr>
+                <tr>
+                  <td>Coupling</td>
+                  <td>N/A — a deployment/runtime concern, not a coupling concern</td>
+                  <td>Loose — publisher never knows who's listening</td>
+                </tr>
+                <tr>
+                  <td>Failure visibility</td>
+                  <td>Invocation either errors or succeeds, visible immediately</td>
+                  <td>Consumer failures are invisible to the publisher by default</td>
+                </tr>
+                <tr>
+                  <td>Operational complexity</td>
+                  <td>Low — no servers to patch, but cold starts and time limits to design around</td>
+                  <td>Higher — broker health, retries, dead-letter queues, ordering</td>
+                </tr>
+                <tr>
+                  <td>Real system example</td>
+                  <td>AWS Lambda behind an API Gateway</td>
+                  <td>Kafka topics feeding independent microservice consumers</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Why Choose Event-Driven Over Direct Request-Response?</h3>
+            <ol>
+              <li><strong>Loose coupling:</strong> A publisher never needs to know who&apos;s listening or how many consumers exist. Analogy: It&apos;s like a radio station broadcasting a signal — it doesn&apos;t need to know how many radios are tuned in.</li>
+              <li><strong>Independent scalability:</strong> Each consumer scales based on its own load, without the publisher having to coordinate capacity for anyone else. Analogy: It&apos;s like a newspaper printing one edition and letting each newsstand decide how many copies it needs, rather than the printer delivering a fixed number to every stand.</li>
+              <li><strong>Resilience to partial failure:</strong> If one consumer goes down, the publisher and every other consumer carry on unaffected. Analogy: It&apos;s like a group chat where one person's phone dies — the conversation continues fine for everyone else.</li>
+              <li><strong>Easy extensibility:</strong> Adding a new consumer of an existing event stream costs nothing on the publisher's side. Analogy: It&apos;s like adding another subscriber to a mailing list — the sender's job doesn't change at all.</li>
+              <li><strong>Natural fit for fan-out workflows:</strong> One event can trigger inventory, payment, and shipping to react independently and in parallel. Analogy: It&apos;s like ringing one bell in a firehouse and having every relevant crew grab their own gear at once, instead of running to notify each one by hand.</li>
+            </ol>
+
             <p style={{ marginTop: 16 }}>
               <strong>What interviewers are listening for:</strong> that you pick the pattern based
               on the actual traffic shape and coupling needs of the problem, not by default — and
@@ -509,25 +386,6 @@ export default function ArchitecturalPatternsPage() {
               <li><strong>Blockchain networks</strong> (Bitcoin, Ethereum) — P2P networks where every full node maintains and verifies its own copy of the ledger and gossips new transactions/blocks to its peers, with consensus rules (not a central authority) determining the agreed-upon state.</li>
               <li><strong>Skype&apos;s original architecture</strong> — early Skype routed voice calls through a P2P network of &quot;supernodes&quot; (ordinary users&apos; machines with enough bandwidth) rather than centralized servers, which is part of why it scaled so cheaply early on; Microsoft later moved it to centralized, cloud-hosted infrastructure for reliability and control.</li>
             </ul>
-            <FlowContinue nextId="interview-questions" label="Interview Questions" />
-          </FlowStep>
-
-          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
-            <p>Click a question to reveal the answer.</p>
-            <QA items={qaItems} />
-            <FlowContinue nextId="code" label="Code & Output" />
-          </FlowStep>
-
-          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
-            <p>
-              A minimal, deterministic simulation of an event-driven system: a fixed list of 3
-              events is &quot;published&quot; to a topic, and two independent subscribers — an
-              email-notifier and an analytics-logger — each process every event on their own,
-              printing what they did. Neither subscriber calls the other, and the publisher never
-              calls either subscriber directly; both simply react to the same event stream. Output is
-              identical across all four languages.
-            </p>
-            <CodeTerminal snippets={snippets} />
           </FlowStep>
 
           <PageNav

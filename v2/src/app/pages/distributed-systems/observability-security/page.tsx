@@ -4,236 +4,14 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import QA from '@/components/QA';
-import CodeTerminal from '@/components/CodeTerminal';
 import FlowStep from '@/components/FlowStep';
 import FlowContinue from '@/components/FlowContinue';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 4;
 
 export const metadata = {
   title: 'Observability & Security — System Design Architectures',
 };
-
-const OUTPUT = `Check 1: can viewer read_report? -> ALLOW (role 'viewer' has 'read_report')
-Check 2: can viewer delete_report? -> DENY (role 'viewer' lacks 'delete_report')
-Check 3: can editor read_report? -> ALLOW (role 'editor' has 'read_report')
-Check 4: can editor write_report? -> ALLOW (role 'editor' has 'write_report')
-Check 5: can editor delete_report? -> DENY (role 'editor' lacks 'delete_report')
-Check 6: can admin delete_report? -> ALLOW (role 'admin' has 'delete_report')
-Check 7: can guest write_report? -> DENY (role 'guest' lacks 'write_report')
-5 of 7 checks allowed, 2 denied.`;
-
-const snippets = {
-  java: {
-    code: `import java.util.*;
-
-public class RbacDemo {
-    public static void main(String[] args) {
-        // Permissions assigned to roles, not directly to users.
-        Map<String, Set<String>> rolePermissions = new LinkedHashMap<>();
-        rolePermissions.put("viewer", Set.of("read_report"));
-        rolePermissions.put("editor", Set.of("read_report", "write_report"));
-        rolePermissions.put("admin", Set.of("read_report", "write_report", "delete_report"));
-        rolePermissions.put("guest", Set.of());
-
-        // Users assigned to roles (a user could hold more than one role in a real system).
-        Map<String, String> userRoles = Map.of(
-            "alice", "viewer",
-            "bob", "editor",
-            "carol", "admin",
-            "dave", "guest"
-        );
-
-        record Check(String user, String action) {}
-        List<Check> checks = List.of(
-            new Check("alice", "read_report"),
-            new Check("alice", "delete_report"),
-            new Check("bob", "read_report"),
-            new Check("bob", "write_report"),
-            new Check("bob", "delete_report"),
-            new Check("carol", "delete_report"),
-            new Check("dave", "write_report")
-        );
-
-        int allowed = 0, denied = 0;
-        int i = 1;
-        for (Check c : checks) {
-            String role = userRoles.get(c.user());
-            boolean can = rolePermissions.getOrDefault(role, Set.of()).contains(c.action());
-            String verdict = can ? "ALLOW" : "DENY";
-            String reason = can
-                ? "role '" + role + "' has '" + c.action() + "'"
-                : "role '" + role + "' lacks '" + c.action() + "'";
-            System.out.printf("Check %d: can %s %s? -> %s (%s)%n", i++, role, c.action(), verdict, reason);
-            if (can) allowed++; else denied++;
-        }
-        System.out.printf("%d of %d checks allowed, %d denied.%n", allowed, checks.size(), denied);
-    }
-}`,
-    output: OUTPUT,
-  },
-  python: {
-    code: `# Permissions assigned to roles, not directly to users.
-role_permissions = {
-    "viewer": {"read_report"},
-    "editor": {"read_report", "write_report"},
-    "admin": {"read_report", "write_report", "delete_report"},
-    "guest": set(),
-}
-
-# Users assigned to roles (a user could hold more than one role in a real system).
-user_roles = {
-    "alice": "viewer",
-    "bob": "editor",
-    "carol": "admin",
-    "dave": "guest",
-}
-
-checks = [
-    ("alice", "read_report"),
-    ("alice", "delete_report"),
-    ("bob", "read_report"),
-    ("bob", "write_report"),
-    ("bob", "delete_report"),
-    ("carol", "delete_report"),
-    ("dave", "write_report"),
-]
-
-def can(user, action):
-    role = user_roles[user]
-    return role, action in role_permissions.get(role, set())
-
-allowed, denied = 0, 0
-for i, (user, action) in enumerate(checks, start=1):
-    role, ok = can(user, action)
-    verdict = "ALLOW" if ok else "DENY"
-    reason = f"role '{role}' has '{action}'" if ok else f"role '{role}' lacks '{action}'"
-    print(f"Check {i}: can {role} {action}? -> {verdict} ({reason})")
-    if ok:
-        allowed += 1
-    else:
-        denied += 1
-
-print(f"{allowed} of {len(checks)} checks allowed, {denied} denied.")`,
-    output: OUTPUT,
-  },
-  javascript: {
-    code: `// Permissions assigned to roles, not directly to users.
-const rolePermissions = {
-  viewer: new Set(["read_report"]),
-  editor: new Set(["read_report", "write_report"]),
-  admin: new Set(["read_report", "write_report", "delete_report"]),
-  guest: new Set(),
-};
-
-// Users assigned to roles (a user could hold more than one role in a real system).
-const userRoles = {
-  alice: "viewer",
-  bob: "editor",
-  carol: "admin",
-  dave: "guest",
-};
-
-const checks = [
-  ["alice", "read_report"],
-  ["alice", "delete_report"],
-  ["bob", "read_report"],
-  ["bob", "write_report"],
-  ["bob", "delete_report"],
-  ["carol", "delete_report"],
-  ["dave", "write_report"],
-];
-
-let allowed = 0;
-let denied = 0;
-
-checks.forEach(([user, action], idx) => {
-  const role = userRoles[user];
-  const ok = (rolePermissions[role] || new Set()).has(action);
-  const verdict = ok ? "ALLOW" : "DENY";
-  const reason = ok ? \`role '\${role}' has '\${action}'\` : \`role '\${role}' lacks '\${action}'\`;
-  console.log(\`Check \${idx + 1}: can \${role} \${action}? -> \${verdict} (\${reason})\`);
-  ok ? allowed++ : denied++;
-});
-
-console.log(\`\${allowed} of \${checks.length} checks allowed, \${denied} denied.\`);`,
-    output: OUTPUT,
-  },
-  cpp: {
-    code: `#include <iostream>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
-
-int main() {
-    // Permissions assigned to roles, not directly to users.
-    std::map<std::string, std::set<std::string>> rolePermissions = {
-        {"viewer", {"read_report"}},
-        {"editor", {"read_report", "write_report"}},
-        {"admin", {"read_report", "write_report", "delete_report"}},
-        {"guest", {}}
-    };
-
-    // Users assigned to roles (a user could hold more than one role in a real system).
-    std::map<std::string, std::string> userRoles = {
-        {"alice", "viewer"}, {"bob", "editor"}, {"carol", "admin"}, {"dave", "guest"}
-    };
-
-    std::vector<std::pair<std::string, std::string>> checks = {
-        {"alice", "read_report"}, {"alice", "delete_report"},
-        {"bob", "read_report"}, {"bob", "write_report"}, {"bob", "delete_report"},
-        {"carol", "delete_report"}, {"dave", "write_report"}
-    };
-
-    int allowed = 0, denied = 0;
-    for (size_t i = 0; i < checks.size(); i++) {
-        std::string user = checks[i].first;
-        std::string action = checks[i].second;
-        std::string role = userRoles[user];
-        bool ok = rolePermissions[role].count(action) > 0;
-        std::string verdict = ok ? "ALLOW" : "DENY";
-        std::string reason = ok
-            ? "role '" + role + "' has '" + action + "'"
-            : "role '" + role + "' lacks '" + action + "'";
-        std::cout << "Check " << (i + 1) << ": can " << role << " " << action << "? -> "
-                   << verdict << " (" << reason << ")" << std::endl;
-        ok ? allowed++ : denied++;
-    }
-    std::cout << allowed << " of " << checks.size() << " checks allowed, " << denied << " denied." << std::endl;
-    return 0;
-}`,
-    output: OUTPUT,
-  },
-};
-
-const qaItems = [
-  {
-    q: 'What exactly is the difference between authentication and authorization?',
-    a: "Authentication answers \"who are you?\" — verifying identity, typically via a password, a token, or a biometric. Authorization answers \"what are you allowed to do?\" — checking whether an already-identified user has permission for a specific action or resource. They're sequential and distinct: a system authenticates you once (you log in), then authorizes every subsequent action against that established identity (can this user delete this report?). Mixing them up is a common interview trip-wire — a 401 Unauthorized response actually means \"you're not authenticated,\" while a 403 Forbidden means \"you're authenticated, but not authorized for this.\"",
-  },
-  {
-    q: 'Why do JWTs enable stateless authentication, and what do you give up for that?',
-    a: "A JWT is self-contained and cryptographically signed — the payload carries the claims (user ID, roles, expiry) directly, and any server holding the shared secret (or public key, for asymmetric signing) can verify the signature and trust the claims without querying a database or session store. That's what makes it stateless: any node in a horizontally-scaled fleet can validate a request with zero shared state or coordination. The trade-off is revocation: since there's no central session record, you can't simply \"delete\" a JWT the way you'd delete a server-side session — a compromised or logged-out token stays valid until it naturally expires, unless you build extra infrastructure (a blocklist, short expiries with refresh tokens) specifically to work around this.",
-  },
-  {
-    q: "What does chaos engineering prove that testing alone doesn't?",
-    a: "Traditional tests verify that code behaves correctly under conditions you thought to write a test for, in an environment that's usually not production. Chaos engineering verifies that a system's actual, production-scale redundancy and failover mechanisms work when a real, unplanned failure happens — because production has scale, traffic patterns, and configuration drift that staging environments rarely replicate exactly. Netflix built Chaos Monkey on the premise that failures are inevitable at scale, so the only way to be confident your failover actually works is to trigger it deliberately, under controlled conditions, before an uncontrolled outage does it for you.",
-  },
-  {
-    q: 'What are the four golden signals of monitoring, and why those four specifically?',
-    a: "Latency (how long requests take), traffic (how much demand the system is under), errors (the rate of failed requests), and saturation (how \"full\" a resource is — CPU, memory, queue depth, connection pool). Together they cover the questions that matter most for spotting user-facing problems early: is it slow, is it getting hit with unusual load, is it actually failing, and is it about to run out of headroom. Most alerting strategies are built by defining thresholds on these four per service rather than trying to monitor every possible metric.",
-  },
-  {
-    q: "Why does TLS matter beyond just \"encrypting traffic\"?",
-    a: "Encryption in transit is the part people default to, but TLS also provides data integrity (a tampering attempt in transit is detected, since the data is authenticated, not just scrambled) and — critically — server authentication: the server presents a certificate, issued by a trusted certificate authority, that cryptographically proves it is who it claims to be. Without that certificate check, encryption alone wouldn't stop a man-in-the-middle attacker from impersonating the real server and relaying (or altering) traffic while still being encrypted end-to-end from the client's perspective — the certificate is what lets the client actually trust who it's encrypting the conversation with.",
-  },
-  {
-    q: 'Concretely, how does the TLS handshake establish a secure connection?',
-    a: "At a conceptual level: the client connects and the server presents its certificate (containing its public key, signed by a CA the client already trusts). The client verifies that certificate chain, then client and server use asymmetric cryptography just long enough to securely agree on a shared symmetric session key — asymmetric crypto is too slow to encrypt an entire session, so it's only used for this initial key exchange. From that point on, both sides encrypt and decrypt traffic using the fast, shared symmetric key, until the connection closes.",
-  },
-];
 
 export default function ObservabilitySecurityPage() {
   return (
@@ -249,8 +27,6 @@ export default function ObservabilitySecurityPage() {
             { id: 'theory', label: 'Theory & Diagrams' },
             { id: 'trade-offs', label: 'Trade-offs' },
             { id: 'real-world', label: 'Real-World Examples' },
-            { id: 'interview-questions', label: 'Interview Questions' },
-            { id: 'code', label: 'Code & Output' },
           ]}
         />
 
@@ -469,6 +245,52 @@ export default function ObservabilitySecurityPage() {
               instead of just an opaque user ID and a signature is a real, recurring bug.
             </p>
 
+            <h4>Advantages of JWT-based Authentication</h4>
+            <ul>
+              <li><strong>Stateless verification:</strong> Any node in a horizontally-scaled fleet can verify a signed token without a database lookup or shared session store.</li>
+              <li><strong>Scales horizontally with zero coordination:</strong> Adding more servers behind a load balancer doesn't require replicating a session store, since every server can validate a token independently.</li>
+              <li><strong>Works naturally across domains/services:</strong> A single token can be presented to multiple independent APIs or microservices without each one needing to share a session backend.</li>
+              <li><strong>Self-contained claims:</strong> The token itself carries the user's roles and expiry, so a service doesn't need a round-trip to know who it's talking to.</li>
+            </ul>
+
+            <h4>Disadvantages of JWT-based Authentication</h4>
+            <ul>
+              <li><strong>Hard to revoke early:</strong> There's no central record to delete, so a compromised token stays valid until it naturally expires unless you build extra infrastructure (a blocklist, short expiries) around it.</li>
+              <li><strong>Payload isn't encrypted:</strong> A JWT's claims are only base64-encoded, not encrypted, so anyone holding the token can read them directly.</li>
+              <li><strong>Token size overhead:</strong> A JWT carrying several claims is larger than a small opaque session ID, adding a little weight to every request that carries it.</li>
+              <li><strong>Stale claims risk:</strong> If a user's role changes mid-session, the token still carries the old role until it's refreshed, unlike a session store that can be updated immediately.</li>
+            </ul>
+
+            <h3>Session-based authentication</h3>
+            <p>
+              The natural counterpart to JWT-based auth is the older, still widely used{' '}
+              <strong>session-based</strong> model. Instead of issuing a self-contained, signed token,
+              the server creates a session record in a shared store (a database or an in-memory cache
+              like Redis) the moment a user logs in, and hands the client back only a small, opaque{' '}
+              <strong>session ID</strong> — usually stored in a cookie. On every subsequent request,
+              the server looks up that session ID in the shared store to find out who the user is and
+              whether the session is still valid. Because the authoritative record lives entirely on
+              the server side, revoking access is immediate: deleting the session record from the
+              store instantly invalidates that session ID everywhere, which is exactly the guarantee
+              JWTs give up in exchange for statelessness.
+            </p>
+
+            <h4>Advantages of Session-based Authentication</h4>
+            <ul>
+              <li><strong>Instant revocation:</strong> Deleting the session record from the store immediately invalidates it — no waiting for an expiry window.</li>
+              <li><strong>Small, opaque identifiers:</strong> A session ID carries no readable claims at all, so there's nothing sensitive to leak if it's intercepted (beyond impersonation itself).</li>
+              <li><strong>Centralized control:</strong> Updating a user's permissions mid-session takes effect on their very next request, since the server looks the record up fresh each time.</li>
+              <li><strong>Simple mental model:</strong> One record, one source of truth, easy to inspect and reason about for a small-to-medium system.</li>
+            </ul>
+
+            <h4>Disadvantages of Session-based Authentication</h4>
+            <ul>
+              <li><strong>Requires shared state:</strong> Every server needs access to the same session store, adding a dependency and a potential bottleneck that stateless JWTs avoid entirely.</li>
+              <li><strong>Extra lookup cost:</strong> Every authenticated request pays a database or cache round-trip to validate the session, unlike a JWT's local signature check.</li>
+              <li><strong>Harder to scale across services:</strong> Sharing one session store across multiple independent APIs or third-party services is more awkward than just passing along a portable token.</li>
+              <li><strong>Session store becomes a single point of failure:</strong> If the shared store goes down, authentication for the entire fleet can go down with it.</li>
+            </ul>
+
             <h3>RBAC (Role-Based Access Control)</h3>
             <p>
               RBAC assigns permissions to <strong>roles</strong> (viewer, editor, admin), and assigns{' '}
@@ -501,20 +323,69 @@ export default function ObservabilitySecurityPage() {
           </FlowStep>
 
           <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
-            <TwoCol>
-              <Callout kind="good" title="✓ Reach for JWT-based stateless auth when">
-                <ul>
-                  <li>You need to verify requests across many horizontally-scaled nodes without a shared session store or extra database round-trip per request.</li>
-                  <li>Tokens are short-lived and paired with a refresh-token flow, keeping the &quot;can&apos;t revoke early&quot; window small.</li>
-                </ul>
-              </Callout>
-              <Callout kind="bad" title="✕ Reach for server-side sessions when">
-                <ul>
-                  <li>Immediate, reliable revocation matters more than statelessness — a banking app that must be able to instantly kill a session on suspected fraud.</li>
-                  <li>You&apos;re fine with the extra lookup cost of checking a session store on every request in exchange for that control.</li>
-                </ul>
-              </Callout>
-            </TwoCol>
+            <p>
+              JWT-based and session-based authentication solve the same problem — remembering that a
+              user already proved who they are — with opposite answers to where the source of truth
+              lives. Here&apos;s how they actually compare, and when to reach for each.
+            </p>
+
+            <h3>Difference Between JWT-based Authentication and Session-based Authentication</h3>
+            <table className="estimate-table">
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>JWT-based Authentication</th>
+                  <th>Session-based Authentication</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Where state lives</td>
+                  <td>Entirely in the signed token itself</td>
+                  <td>Server-side session store (DB or Redis)</td>
+                </tr>
+                <tr>
+                  <td>Per-request cost</td>
+                  <td>Local signature check, no DB round-trip</td>
+                  <td>A store lookup on every request</td>
+                </tr>
+                <tr>
+                  <td>Revocation</td>
+                  <td>Hard — valid until natural expiry unless blocklisted</td>
+                  <td>Instant — delete the session record</td>
+                </tr>
+                <tr>
+                  <td>Horizontal scaling</td>
+                  <td>Trivial — any node can verify independently</td>
+                  <td>Requires a shared store accessible to every node</td>
+                </tr>
+                <tr>
+                  <td>Failure mode</td>
+                  <td>No single point of failure for verification</td>
+                  <td>Session store outage can break auth fleet-wide</td>
+                </tr>
+                <tr>
+                  <td>Typical use case</td>
+                  <td>Public APIs, mobile clients, microservices</td>
+                  <td>Traditional server-rendered web apps, banking-grade revocation needs</td>
+                </tr>
+                <tr>
+                  <td>Real system example</td>
+                  <td>Auth0/Firebase-issued JWTs across a microservices fleet</td>
+                  <td>Classic Express/Django session middleware backed by Redis</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Why Choose JWT-based Authentication Over Session-based?</h3>
+            <ol>
+              <li><strong>Statelessness at scale:</strong> Any server can verify a token with just its signing key, no shared store needed. Analogy: It&apos;s like a concert wristband that any gate staff can check on sight, instead of everyone having to radio a central desk to confirm your ticket.</li>
+              <li><strong>No extra database round-trip:</strong> Verifying a signature is a local, in-memory operation, not a network call. Analogy: It&apos;s like checking a notarized seal on a document yourself, instead of calling the notary's office to confirm it every time.</li>
+              <li><strong>Portable across services:</strong> The same token can be presented to several independent APIs without them sharing a session backend. Analogy: It&apos;s like a passport that any country's border officer can check, rather than each country needing to call your home country to verify you.</li>
+              <li><strong>No single shared dependency:</strong> There's no central session store that, if it goes down, takes authentication down with it for every service. Analogy: It&apos;s like each security checkpoint having its own working badge scanner, instead of all of them depending on one central server that might crash.</li>
+              <li><strong>Simple horizontal scaling:</strong> Adding more servers behind a load balancer needs no coordination step for auth. Analogy: It&apos;s like handing out more copies of the same rulebook to new staff, instead of wiring every new hire into one shared filing cabinet.</li>
+            </ol>
+
             <p style={{ marginTop: 16 }}>
               <strong>What interviewers are listening for:</strong> a clean separation between
               authentication and authorization in your explanation, the specific trade-off JWTs make
@@ -546,24 +417,6 @@ export default function ObservabilitySecurityPage() {
               <li><strong>Auth0 and Firebase Auth</strong> — managed authentication services that issue JWTs as stateless session tokens, letting client apps and backend APIs verify a user&apos;s identity without a shared session database.</li>
               <li><strong>AWS IAM</strong> — a production-scale RBAC (and more broadly, policy-based) system: permissions are defined in policies, attached to roles, and users or services assume roles to gain exactly the access those policies grant.</li>
             </ul>
-            <FlowContinue nextId="interview-questions" label="Interview Questions" />
-          </FlowStep>
-
-          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
-            <p>Click a question to reveal the answer.</p>
-            <QA items={qaItems} />
-            <FlowContinue nextId="code" label="Code & Output" />
-          </FlowStep>
-
-          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
-            <p>
-              A minimal, deterministic RBAC permission check: a fixed set of roles (viewer, editor,
-              admin, guest) each with a fixed list of permissions, a fixed mapping of users to roles,
-              and a function that checks &quot;can this user perform this action?&quot; The demo runs
-              7 fixed checks and prints ALLOW or DENY for each, along with the reason. Output is
-              identical across all four languages.
-            </p>
-            <CodeTerminal snippets={snippets} />
           </FlowStep>
 
           <PageNav

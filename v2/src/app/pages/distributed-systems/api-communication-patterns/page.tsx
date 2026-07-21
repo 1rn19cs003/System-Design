@@ -4,146 +4,14 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import QA from '@/components/QA';
-import CodeTerminal from '@/components/CodeTerminal';
 import FlowStep from '@/components/FlowStep';
 import FlowContinue from '@/components/FlowContinue';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 4;
 
 export const metadata = {
   title: 'API & Communication Patterns — System Design Architectures',
 };
-
-const OUTPUT = `Call 1 (key=idem-001): processing charge... charged $42.00, chargeId=ch_1
-Call 2 (key=idem-001): duplicate key, returning cached result -> chargeId=ch_1
-Call 3 (key=idem-001): duplicate key, returning cached result -> chargeId=ch_1
-Call 4 (key=idem-002): processing charge... charged $17.50, chargeId=ch_2`;
-
-const snippets = {
-  java: {
-    code: `import java.util.*;
-
-public class IdempotencyDemo {
-    static Map<String, String> cache = new LinkedHashMap<>();
-    static int nextChargeId = 1;
-
-    static String charge(String idempotencyKey, double amount) {
-        if (cache.containsKey(idempotencyKey)) {
-            return "duplicate key, returning cached result -> " + cache.get(idempotencyKey);
-        }
-        String chargeId = "ch_" + nextChargeId++;
-        cache.put(idempotencyKey, chargeId);
-        return String.format("processing charge... charged $%.2f, chargeId=%s", amount, chargeId);
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Call 1 (key=idem-001): " + charge("idem-001", 42.00));
-        System.out.println("Call 2 (key=idem-001): " + charge("idem-001", 42.00));
-        System.out.println("Call 3 (key=idem-001): " + charge("idem-001", 42.00));
-        System.out.println("Call 4 (key=idem-002): " + charge("idem-002", 17.50));
-    }
-}`,
-    output: OUTPUT,
-  },
-  python: {
-    code: `cache = {}
-next_charge_id = 1
-
-def charge(idempotency_key, amount):
-    global next_charge_id
-    if idempotency_key in cache:
-        return f"duplicate key, returning cached result -> {cache[idempotency_key]}"
-    charge_id = f"ch_{next_charge_id}"
-    next_charge_id += 1
-    cache[idempotency_key] = charge_id
-    return f"processing charge... charged \${amount:.2f}, chargeId={charge_id}"
-
-print("Call 1 (key=idem-001):", charge("idem-001", 42.00))
-print("Call 2 (key=idem-001):", charge("idem-001", 42.00))
-print("Call 3 (key=idem-001):", charge("idem-001", 42.00))
-print("Call 4 (key=idem-002):", charge("idem-002", 17.50))`,
-    output: OUTPUT,
-  },
-  javascript: {
-    code: `const cache = new Map();
-let nextChargeId = 1;
-
-function charge(idempotencyKey, amount) {
-  if (cache.has(idempotencyKey)) {
-    return \`duplicate key, returning cached result -> \${cache.get(idempotencyKey)}\`;
-  }
-  const chargeId = \`ch_\${nextChargeId++}\`;
-  cache.set(idempotencyKey, chargeId);
-  return \`processing charge... charged $\${amount.toFixed(2)}, chargeId=\${chargeId}\`;
-}
-
-console.log("Call 1 (key=idem-001):", charge("idem-001", 42.00));
-console.log("Call 2 (key=idem-001):", charge("idem-001", 42.00));
-console.log("Call 3 (key=idem-001):", charge("idem-001", 42.00));
-console.log("Call 4 (key=idem-002):", charge("idem-002", 17.50));`,
-    output: OUTPUT,
-  },
-  cpp: {
-    code: `#include <iostream>
-#include <map>
-#include <string>
-#include <iomanip>
-#include <sstream>
-
-std::map<std::string, std::string> cache;
-int nextChargeId = 1;
-
-std::string charge(const std::string& idempotencyKey, double amount) {
-    auto it = cache.find(idempotencyKey);
-    if (it != cache.end()) {
-        return "duplicate key, returning cached result -> " + it->second;
-    }
-    std::string chargeId = "ch_" + std::to_string(nextChargeId++);
-    cache[idempotencyKey] = chargeId;
-    std::ostringstream out;
-    out << "processing charge... charged $" << std::fixed << std::setprecision(2)
-        << amount << ", chargeId=" << chargeId;
-    return out.str();
-}
-
-int main() {
-    std::cout << "Call 1 (key=idem-001): " << charge("idem-001", 42.00) << std::endl;
-    std::cout << "Call 2 (key=idem-001): " << charge("idem-001", 42.00) << std::endl;
-    std::cout << "Call 3 (key=idem-001): " << charge("idem-001", 42.00) << std::endl;
-    std::cout << "Call 4 (key=idem-002): " << charge("idem-002", 17.50) << std::endl;
-    return 0;
-}`,
-    output: OUTPUT,
-  },
-};
-
-const qaItems = [
-  {
-    q: 'Why does idempotency matter specifically because of network retries?',
-    a: "A network failure can happen on either leg of a request: the request itself can be lost before reaching the server, or the response can be lost on the way back after the server already did the work. In the second case, the client has no way to distinguish \"it never arrived\" from \"it arrived and succeeded, but I never heard back\" — so a naive client that retries on any timeout risks re-submitting a request the server already fully processed. For a payment or order API, that difference is the difference between one charge and two. An idempotency key removes the ambiguity: the client generates one key per logical operation, sends it on every retry, and the server treats repeats of the same key as \"already handled\" rather than \"do it again.\"",
-  },
-  {
-    q: 'What are the core trade-offs between REST and GraphQL?',
-    a: "REST exposes multiple resource-based endpoints, each returning a server-defined, fixed shape of data; that fixed shape makes REST responses trivially cacheable by URL (a CDN or HTTP cache just keys on the URL) but it commonly causes over-fetching (getting fields you don't need) or under-fetching (needing several follow-up calls to assemble a full view, like a user, their posts, and their friends). GraphQL exposes a single endpoint where the client specifies exactly the fields it wants in one query, eliminating over/under-fetching and round trips, but it loses that easy URL-based caching (most GraphQL caching is done at the client, e.g. Apollo's normalized cache) and shifts real complexity onto the server, which now has to resolve arbitrary nested queries efficiently.",
-  },
-  {
-    q: 'When would you choose WebSockets over long polling?',
-    a: "Choose WebSockets when you need frequent, low-latency, bidirectional communication — chat apps, live dashboards, multiplayer games — because after one upgrade handshake, both sides can push data over the same open connection with almost no per-message overhead. Long polling is preferable when updates are infrequent, your infrastructure (proxies, load balancers, corporate firewalls) doesn't reliably support persistent connections, or you want to keep using plain stateless HTTP semantics without maintaining connection state on your servers. The practical cost of WebSockets is that an open connection consumes a server-side resource (a socket, some memory) for as long as the client is connected, which matters at very large scale.",
-  },
-  {
-    q: 'What does an API gateway centralize, and what should stay inside each individual service?',
-    a: "An API gateway centralizes cross-cutting concerns that are identical across every service and have nothing to do with business logic: authentication/token validation, rate limiting, TLS termination, request routing to the right backend, and sometimes response transformation or aggregation. What should stay inside each service is anything specific to that service's domain: business rules, data validation tied to that service's model, and authorization decisions that depend on domain-specific state (e.g. \"can this specific user cancel this specific order\") rather than just \"is this a valid, authenticated caller.\" The dividing line interviewers look for is: infrastructure concern versus domain concern.",
-  },
-  {
-    q: 'What are the trade-offs between webhooks and polling for detecting an external event?',
-    a: "Polling means you repeatedly ask a service \"anything new?\" on a fixed interval — simple to implement and works behind almost any network setup, but wastes requests when nothing has changed and adds latency up to your poll interval before you notice an event. Webhooks invert the relationship: the external service calls an endpoint you expose the moment an event happens, giving you near-instant notification with no wasted requests, but they require you to expose a public, reliable endpoint, handle retries and duplicate deliveries from the sender's side, and verify the caller is who it claims to be (e.g. via a signing secret) since anyone who finds your webhook URL could otherwise post fake events to it.",
-  },
-  {
-    q: 'How does WebRTC avoid routing audio/video through a central server, and why does that matter?',
-    a: "WebRTC negotiates a direct peer-to-peer connection between two browsers (using STUN/TURN servers only to help them discover reachable network paths through NAT, not to relay the actual media in the common case), so audio, video, and data flow directly between the participants' devices rather than through your application server. This matters because relaying every video frame through your own infrastructure would multiply your bandwidth costs and add a round trip of latency for every packet; a signaling server is still needed up front to help the two peers exchange connection details, but once the peer-to-peer link is established, that server is out of the media path entirely.",
-  },
-];
 
 export default function ApiCommunicationPatternsPage() {
   return (
@@ -159,8 +27,6 @@ export default function ApiCommunicationPatternsPage() {
             { id: 'theory', label: 'Theory & Diagrams' },
             { id: 'trade-offs', label: 'Trade-offs' },
             { id: 'real-world', label: 'Real-World Examples' },
-            { id: 'interview-questions', label: 'Interview Questions' },
-            { id: 'code', label: 'Code & Output' },
           ]}
         />
 
@@ -287,6 +153,38 @@ export default function ApiCommunicationPatternsPage() {
               <figcaption>REST trades round trips for cacheability; GraphQL trades cacheability for precision in one round trip</figcaption>
             </figure>
 
+            <h4>Advantages of REST</h4>
+            <ul>
+              <li><strong>Trivial HTTP caching:</strong> because each resource has its own stable URL, CDNs and browser caches can key on that URL directly, with no extra caching layer to build.</li>
+              <li><strong>Simple mental model:</strong> a fixed set of endpoints, each returning a predictable shape, is easy for any client (including ones you don't control) to consume with nothing more than a standard HTTP client.</li>
+              <li><strong>Uses HTTP semantics directly:</strong> status codes, verbs, and headers already carry meaning (404, 201, Cache-Control), so you get a lot of behavior for free instead of reinventing it inside a query language.</li>
+              <li><strong>Simple server-side implementation:</strong> each endpoint resolves one predictable query, so there's no risk of a client submitting an expensive, deeply-nested query that the server has to protect itself against.</li>
+            </ul>
+
+            <h4>Disadvantages of REST</h4>
+            <ul>
+              <li><strong>Over-fetching:</strong> a fixed response shape often includes fields the client has no use for, wasting bandwidth, especially on mobile clients.</li>
+              <li><strong>Under-fetching:</strong> assembling one screen's worth of data (a user, their posts, their friends) frequently needs several sequential round trips to different endpoints.</li>
+              <li><strong>Endpoint sprawl:</strong> supporting every client's exact data needs tends to produce more and more specialized endpoints over time, each one more code to maintain.</li>
+              <li><strong>Versioning is awkward:</strong> changing a resource's shape can break existing clients, usually forcing a new versioned endpoint (<code>/v2/users/1</code>) rather than a clean in-place evolution.</li>
+            </ul>
+
+            <h4>Advantages of GraphQL</h4>
+            <ul>
+              <li><strong>No over- or under-fetching:</strong> the client asks for exactly the fields it needs, across multiple related resources, and gets exactly that shape back in one response.</li>
+              <li><strong>One round trip for complex views:</strong> a single query can pull a user, their posts, and their friends together, replacing what would be several REST calls.</li>
+              <li><strong>Schema acts as a contract:</strong> the type system is self-documenting and lets tooling (autocomplete, validation) catch mistakes before a request is even sent.</li>
+              <li><strong>Evolves without versioning:</strong> new fields can be added to the schema without breaking existing queries, since clients only ever ask for the fields they already know about.</li>
+            </ul>
+
+            <h4>Disadvantages of GraphQL</h4>
+            <ul>
+              <li><strong>Loses simple HTTP caching:</strong> since every query goes to the same single endpoint (usually via POST), a CDN can't cache by URL the way it does for REST; caching has to be reimplemented at the client or via a persisted-query layer.</li>
+              <li><strong>Server-side complexity goes up:</strong> the server must resolve arbitrary nested queries efficiently and guard against expensive or malicious ones (deeply nested queries, N+1 database calls hidden behind resolvers).</li>
+              <li><strong>Harder to rate-limit or monitor per-operation:</strong> because every request hits the same endpoint, you need query-aware tooling to tell one expensive query apart from another, instead of just watching per-URL metrics.</li>
+              <li><strong>Steeper learning curve:</strong> teams need to learn schema design, resolvers, and query cost analysis, which is more upfront investment than standing up a REST endpoint.</li>
+            </ul>
+
             <h3>WebSockets vs. long polling</h3>
             <p>
               A <strong>WebSocket</strong> starts as a normal HTTP request that both sides agree to
@@ -405,20 +303,74 @@ export default function ApiCommunicationPatternsPage() {
           </FlowStep>
 
           <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
-            <TwoCol>
-              <Callout kind="good" title="✓ Reach for GraphQL / WebSockets / webhooks when">
-                <ul>
-                  <li>Clients need precisely-shaped, multi-resource data in one round trip (GraphQL), or need frequent low-latency bidirectional updates (WebSockets), or need near-instant notification of external events without wasted polling (webhooks).</li>
-                  <li>You control both ends well enough to handle the added complexity: query cost control on the server for GraphQL, connection state for WebSockets, endpoint security and retry handling for webhooks.</li>
-                </ul>
-              </Callout>
-              <Callout kind="bad" title="✕ Reach for REST / long polling / polling when">
-                <ul>
-                  <li>You want simple, cacheable, resource-oriented endpoints (REST) or need to work reliably through infrastructure that doesn&apos;t support persistent connections well (long polling).</li>
-                  <li>You don&apos;t control the calling side and can&apos;t expose a public endpoint at all (polling is sometimes the only option available to a client).</li>
-                </ul>
-              </Callout>
-            </TwoCol>
+            <p>
+              REST and GraphQL both answer &quot;how does a client get data from the server,&quot; but
+              they shape that conversation very differently. Here&apos;s how they actually compare, and
+              when to reach for each.
+            </p>
+
+            <h3>Difference Between REST and GraphQL</h3>
+            <table className="estimate-table">
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>REST</th>
+                  <th>GraphQL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>What it solves</td>
+                  <td>Simple, cacheable access to individually-addressable resources</td>
+                  <td>Precisely-shaped, multi-resource data in a single request</td>
+                </tr>
+                <tr>
+                  <td>Endpoint shape</td>
+                  <td>Many endpoints, one per resource (<code>/users/1</code>, <code>/users/1/posts</code>)</td>
+                  <td>One endpoint (<code>/graphql</code>), query shape decided by the client</td>
+                </tr>
+                <tr>
+                  <td>Overhead</td>
+                  <td>Low per-request overhead, but often several round trips to assemble one view</td>
+                  <td>One round trip, but higher server-side cost resolving nested fields</td>
+                </tr>
+                <tr>
+                  <td>Caching</td>
+                  <td>Trivial — CDNs and browsers cache by URL out of the box</td>
+                  <td>Hard — same endpoint for every query, needs client-side or persisted-query caching</td>
+                </tr>
+                <tr>
+                  <td>Failure/complexity behavior</td>
+                  <td>A malformed request fails one predictable endpoint call</td>
+                  <td>A poorly-designed query can trigger deep resolver chains or N+1 database calls</td>
+                </tr>
+                <tr>
+                  <td>Scalability lever</td>
+                  <td>Scale by adding CDN/cache layers in front of endpoints</td>
+                  <td>Scale by adding query cost limits, batching (DataLoader), and persisted queries</td>
+                </tr>
+                <tr>
+                  <td>Typical use case</td>
+                  <td>Public APIs, simple CRUD services, anything needing wide client compatibility</td>
+                  <td>Mobile/IDE clients assembling complex, multi-resource views efficiently</td>
+                </tr>
+                <tr>
+                  <td>Real system example</td>
+                  <td>GitHub REST API v3, Stripe&apos;s core payments API</td>
+                  <td>GitHub GraphQL API v4, Shopify&apos;s Storefront API</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Why Choose GraphQL Over REST?</h3>
+            <ol>
+              <li><strong>Eliminates over-fetching and under-fetching:</strong> the client specifies exactly the fields it needs, nothing more, nothing less. Analogy: it&apos;s like ordering à la carte instead of being served a fixed set menu where half the dishes go untouched.</li>
+              <li><strong>One round trip for complex views:</strong> a single query can pull a user, their posts, and their friends together instead of chaining several REST calls. Analogy: it&apos;s one trip through a drive-through window with everything bagged together, instead of circling back multiple times for each item.</li>
+              <li><strong>Strongly-typed schema as a contract:</strong> the schema documents itself and lets tooling catch mistakes before the request is even sent. Analogy: it&apos;s like a restaurant menu that also tells you exactly what ingredients are in every dish, instead of guessing.</li>
+              <li><strong>Faster client iteration:</strong> frontend teams can change what data they need without waiting on the backend to ship a new endpoint. Analogy: it&apos;s like being handed a full pantry and cooking whatever recipe you want, rather than waiting for the kitchen to prepare a new fixed dish for you.</li>
+              <li><strong>Schema evolves without breaking clients:</strong> new fields can be added freely since existing queries only ask for fields they already know about. Analogy: it&apos;s like adding new aisles to a supermarket — shoppers who never visit them are completely unaffected.</li>
+            </ol>
+
             <p style={{ marginTop: 16 }}>
               <strong>What interviewers are listening for:</strong> that you understand idempotency
               as a direct consequence of the fact that a network can lose a <em>response</em> just as
@@ -449,23 +401,6 @@ export default function ApiCommunicationPatternsPage() {
               <li><strong>Stripe &amp; GitHub webhooks</strong> — notify external systems the instant a payment event or a repository event happens, rather than making integrators poll for changes.</li>
               <li><strong>Google Meet &amp; Discord voice/video</strong> — use WebRTC to route audio and video directly between participants&apos; devices wherever possible, minimizing server relay cost and latency.</li>
             </ul>
-            <FlowContinue nextId="interview-questions" label="Interview Questions" />
-          </FlowStep>
-
-          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
-            <p>Click a question to reveal the answer.</p>
-            <QA items={qaItems} />
-            <FlowContinue nextId="code" label="Code & Output" />
-          </FlowStep>
-
-          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
-            <p>
-              A simplified idempotency-key cache for a &quot;charge&quot; endpoint. The first call
-              with a given key processes the charge and stores the result; two further calls with the
-              same key return the cached result without reprocessing; a call with a new key processes
-              a new charge. The output is identical across all four languages.
-            </p>
-            <CodeTerminal snippets={snippets} />
           </FlowStep>
 
           <PageNav

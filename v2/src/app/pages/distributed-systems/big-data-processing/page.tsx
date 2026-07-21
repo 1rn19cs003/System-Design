@@ -4,168 +4,14 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import QA from '@/components/QA';
-import CodeTerminal from '@/components/CodeTerminal';
 import FlowStep from '@/components/FlowStep';
 import FlowContinue from '@/components/FlowContinue';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 4;
 
 export const metadata = {
   title: 'Big Data Processing — System Design Architectures',
 };
-
-const OUTPUT = `Mapped: [(the,1), (quick,1), (fox,1), (the,1), (lazy,1), (dog,1), (the,1), (fox,1), (ran,1)]
-Word frequencies (sorted alphabetically):
-dog: 1
-fox: 2
-lazy: 1
-quick: 1
-ran: 1
-the: 3`;
-
-const snippets = {
-  java: {
-    code: `import java.util.*;
-
-public class MapReduceWordCount {
-    public static void main(String[] args) {
-        String[] texts = { "the quick fox", "the lazy dog", "the fox ran" };
-
-        // Map: split each text into (word, 1) pairs
-        StringBuilder mappedStr = new StringBuilder();
-        List<String> words = new ArrayList<>();
-        for (String text : texts) {
-            for (String word : text.split(" ")) {
-                words.add(word);
-            }
-        }
-        for (int i = 0; i < words.size(); i++) {
-            mappedStr.append("(").append(words.get(i)).append(",1)");
-            if (i != words.size() - 1) mappedStr.append(", ");
-        }
-        System.out.println("Mapped: [" + mappedStr + "]");
-
-        // Reduce: sum counts per word
-        Map<String, Integer> freq = new TreeMap<>();
-        for (String word : words) {
-            freq.merge(word, 1, Integer::sum);
-        }
-
-        System.out.println("Word frequencies (sorted alphabetically):");
-        for (Map.Entry<String, Integer> e : freq.entrySet()) {
-            System.out.println(e.getKey() + ": " + e.getValue());
-        }
-    }
-}`,
-    output: OUTPUT,
-  },
-  python: {
-    code: `texts = ["the quick fox", "the lazy dog", "the fox ran"]
-
-# Map: split each text into (word, 1) pairs
-words = []
-for text in texts:
-    words.extend(text.split(" "))
-
-mapped_str = ", ".join(f"({w},1)" for w in words)
-print(f"Mapped: [{mapped_str}]")
-
-# Reduce: sum counts per word
-freq = {}
-for word in words:
-    freq[word] = freq.get(word, 0) + 1
-
-print("Word frequencies (sorted alphabetically):")
-for word in sorted(freq):
-    print(f"{word}: {freq[word]}")`,
-    output: OUTPUT,
-  },
-  javascript: {
-    code: `const texts = ["the quick fox", "the lazy dog", "the fox ran"];
-
-// Map: split each text into (word, 1) pairs
-const words = [];
-for (const text of texts) {
-  words.push(...text.split(" "));
-}
-
-const mappedStr = words.map((w) => \`(\${w},1)\`).join(", ");
-console.log(\`Mapped: [\${mappedStr}]\`);
-
-// Reduce: sum counts per word
-const freq = {};
-for (const word of words) {
-  freq[word] = (freq[word] || 0) + 1;
-}
-
-console.log("Word frequencies (sorted alphabetically):");
-for (const word of Object.keys(freq).sort()) {
-  console.log(\`\${word}: \${freq[word]}\`);
-}`,
-    output: OUTPUT,
-  },
-  cpp: {
-    code: `#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <map>
-
-int main() {
-    std::vector<std::string> texts = { "the quick fox", "the lazy dog", "the fox ran" };
-
-    // Map: split each text into (word, 1) pairs
-    std::vector<std::string> words;
-    for (auto& text : texts) {
-        std::istringstream iss(text);
-        std::string word;
-        while (iss >> word) words.push_back(word);
-    }
-
-    std::string mappedStr;
-    for (size_t i = 0; i < words.size(); i++) {
-        mappedStr += "(" + words[i] + ",1)";
-        if (i + 1 < words.size()) mappedStr += ", ";
-    }
-    std::cout << "Mapped: [" << mappedStr << "]" << std::endl;
-
-    // Reduce: sum counts per word (std::map keeps keys sorted)
-    std::map<std::string, int> freq;
-    for (auto& word : words) freq[word]++;
-
-    std::cout << "Word frequencies (sorted alphabetically):" << std::endl;
-    for (auto& [word, count] : freq) {
-        std::cout << word << ": " << count << std::endl;
-    }
-    return 0;
-}`,
-    output: OUTPUT,
-  },
-};
-
-const qaItems = [
-  {
-    q: 'How do you decide between batch and stream processing for a given problem?',
-    a: "The decision comes down to how quickly you need to react to new data and how much that latency actually matters to the business. Batch processing accumulates data over a window (hourly, nightly) and processes it all at once, which is efficient and simple for anything that only needs to be right by tomorrow morning — billing reports, daily aggregates, historical analytics. Stream processing handles each event as it arrives, which is necessary when a delayed reaction has real cost — fraud detection needs to block a suspicious transaction before it clears, not in tomorrow's report; a live dashboard needs to reflect what's happening now. The trade-off is that stream processing is architecturally more complex (state management, out-of-order events, exactly-once semantics) for a latency guarantee batch simply doesn't need to make.",
-  },
-  {
-    q: "What does MapReduce's shuffle step actually do, and why is it necessary?",
-    a: "After the map phase, every mapper has produced key-value pairs scattered across whatever machine happened to run it — one mapper might emit a few (\"the\", 1) pairs, another mapper might emit different (\"the\", 1) pairs from a different chunk of input. The shuffle (and sort) step is the redistribution phase: it takes every emitted pair across the whole cluster and routes all pairs sharing the same key to the same reducer, so that a single reducer sees the complete list of values for a key (e.g. every (\"the\", 1) pair from every mapper) and can correctly aggregate them. Without shuffle, each reducer would only see a partial, machine-local view of each key's values, and the final counts would be wrong.",
-  },
-  {
-    q: 'What is the difference between ETL and ELT, and why did ELT become more common?',
-    a: "ETL (Extract, Transform, Load) transforms data into its final, clean shape before loading it into the destination — the transformation happens on a separate processing layer, and only structured, ready-to-query data ever lands in the warehouse. ELT (Extract, Load, Transform) loads the raw data into the destination first and performs the transformation afterward, using the destination's own compute. ELT became more common as cloud data warehouses (Snowflake, BigQuery, Redshift) got cheap, elastic compute — it's now often simpler and faster to dump raw data in immediately and transform it with SQL inside the warehouse than to maintain a separate transformation pipeline, and keeping the raw data around also means you can always re-derive a different transformation later without re-extracting from the source.",
-  },
-  {
-    q: 'How would you choose between a data lake and a data warehouse for a given use case?',
-    a: "Choose a data lake when you need to cheaply store large volumes of raw or semi-structured data whose eventual use isn't fully known yet — ML training data, raw event logs, video/image archives — because a lake imposes no schema at write time (schema-on-read) and storage is cheap. Choose a data warehouse when you have well-understood, structured data that business users or dashboards will query repeatedly and need fast, predictable performance for — sales figures, user metrics, financial reports — because a warehouse's schema-on-write and columnar storage are specifically optimized for that kind of repeated analytical query. Many real architectures use both: a lake as the durable raw store, feeding a warehouse via an ETL/ELT pipeline for the curated, query-optimized layer.",
-  },
-  {
-    q: "How does a data warehouse's schema-on-write trade flexibility for query speed?",
-    a: "Schema-on-write means every row is validated against a predefined structure — column names, types, constraints — at the moment it's written, so the warehouse always knows exactly what shape of data lives where. That upfront rigidity is precisely what lets the warehouse use structure-dependent optimizations: columnar storage layouts that only read the columns a query actually needs, pre-computed statistics for query planning, and indexes built around known column types. The cost is flexibility — if the source data's shape changes or doesn't fit the schema, it's rejected or requires a schema migration before it can be loaded, whereas a schema-on-read system (a data lake) would have simply accepted the data as-is and dealt with structure only when something eventually queried it.",
-  },
-];
 
 export default function BigDataProcessingPage() {
   return (
@@ -181,8 +27,6 @@ export default function BigDataProcessingPage() {
             { id: 'theory', label: 'Theory & Diagrams' },
             { id: 'trade-offs', label: 'Trade-offs' },
             { id: 'real-world', label: 'Real-World Examples' },
-            { id: 'interview-questions', label: 'Interview Questions' },
-            { id: 'code', label: 'Code & Output' },
           ]}
         />
 
@@ -268,6 +112,38 @@ export default function BigDataProcessingPage() {
               />
               <figcaption>Process it all at once on a schedule, or process each record the moment it shows up</figcaption>
             </figure>
+
+            <h4>Advantages of Batch Processing</h4>
+            <ul>
+              <li><strong>High throughput:</strong> Because a batch job works over a large, complete, static chunk of data, it can be heavily optimized for volume rather than per-record latency, processing millions of records efficiently in one pass.</li>
+              <li><strong>Simple failure recovery:</strong> If a batch job fails partway through, the fix is almost always to just re-run it over the same input — there's no running state to reconstruct.</li>
+              <li><strong>Lower operational complexity:</strong> There's no long-lived process to keep healthy around the clock, no backpressure to manage, and no out-of-order events to reconcile.</li>
+              <li><strong>Cost-efficient for large volumes:</strong> Compute can be provisioned only for the scheduled run window instead of running continuously, which is cheaper for workloads that don't need a real-time answer.</li>
+            </ul>
+
+            <h4>Disadvantages of Batch Processing</h4>
+            <ul>
+              <li><strong>High latency:</strong> Results are only as fresh as the last scheduled run — a nightly job means insights are up to 24 hours stale.</li>
+              <li><strong>Not suitable for time-sensitive decisions:</strong> Fraud detection, live pricing, and real-time alerting all need a reaction faster than any batch window can offer.</li>
+              <li><strong>Wasted work on failure:</strong> If a large batch job fails near the end, the common recovery path is to re-run the entire job from the start, re-doing work that had already completed successfully.</li>
+              <li><strong>Resource spikes:</strong> Because all the work is concentrated into a scheduled run, that window can demand a large burst of compute rather than a smooth, spread-out load.</li>
+            </ul>
+
+            <h4>Advantages of Stream Processing</h4>
+            <ul>
+              <li><strong>Low latency:</strong> Each event is handled within milliseconds of arriving, which is what makes real-time dashboards, fraud detection, and alerting possible at all.</li>
+              <li><strong>Continuous freshness:</strong> The system's view of the world is always current — there's no waiting for the next scheduled run to see what just happened.</li>
+              <li><strong>Smoother resource usage:</strong> Work arrives continuously and is processed continuously, rather than piling up into one large, spiky processing window.</li>
+              <li><strong>Enables reactive systems:</strong> Downstream consumers can trigger actions the instant a condition is met, instead of discovering it hours later in a report.</li>
+            </ul>
+
+            <h4>Disadvantages of Stream Processing</h4>
+            <ul>
+              <li><strong>Operational complexity:</strong> A stream processor has to manage running state, handle out-of-order or late events, and decide on exactly-once vs. at-least-once processing semantics.</li>
+              <li><strong>Harder failure recovery:</strong> Recovering a stateful, continuously running pipeline after a crash is far more involved than simply re-running a batch job over static input.</li>
+              <li><strong>Higher always-on cost:</strong> The processing cluster typically has to run continuously to catch every event as it arrives, rather than only during a scheduled window.</li>
+              <li><strong>Harder to reason about correctness:</strong> Debugging "why did this event produce the wrong result" is harder when state, ordering, and timing all interact, compared to re-running a deterministic batch job.</li>
+            </ul>
 
             <p>
               In production, most teams don&apos;t actually pick one or the other — they run both,
@@ -392,20 +268,69 @@ export default function BigDataProcessingPage() {
           </FlowStep>
 
           <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
-            <TwoCol>
-              <Callout kind="good" title="✓ Reach for stream processing / a data lake when">
-                <ul>
-                  <li>You need to react within seconds or less (fraud detection, live dashboards, alerting), or you're storing large volumes of raw/semi-structured data whose eventual use isn't fully known yet.</li>
-                  <li>You can afford the added operational complexity of managing running state, out-of-order events, and processing-guarantee semantics.</li>
-                </ul>
-              </Callout>
-              <Callout kind="bad" title="✕ Reach for batch processing / a data warehouse when">
-                <ul>
-                  <li>Being right by tomorrow morning is genuinely fine (daily reports, billing runs, historical analytics), or the data is well-understood, structured, and queried repeatedly by dashboards/BI tools.</li>
-                  <li>You want the operational simplicity of re-running a job over a static, complete chunk of data rather than managing a continuously running pipeline.</li>
-                </ul>
-              </Callout>
-            </TwoCol>
+            <p>
+              Batch and stream processing solve the same problem — turning raw data into something
+              useful — on fundamentally different clocks. Here&apos;s how they actually compare, and
+              when to reach for each.
+            </p>
+
+            <h3>Difference Between Batch Processing and Stream Processing</h3>
+            <table className="estimate-table">
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>Batch Processing</th>
+                  <th>Stream Processing</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Latency</td>
+                  <td>Minutes to hours (bound by schedule)</td>
+                  <td>Milliseconds to seconds</td>
+                </tr>
+                <tr>
+                  <td>Data scope per run</td>
+                  <td>A large, complete, static chunk</td>
+                  <td>One event at a time, unbounded stream</td>
+                </tr>
+                <tr>
+                  <td>Cost model</td>
+                  <td>Compute provisioned for scheduled windows only</td>
+                  <td>Cluster runs continuously, always-on cost</td>
+                </tr>
+                <tr>
+                  <td>Operational complexity</td>
+                  <td>Low — re-run the job on failure</td>
+                  <td>High — state, ordering, exactly-once semantics</td>
+                </tr>
+                <tr>
+                  <td>Failure recovery</td>
+                  <td>Re-run over the same static input</td>
+                  <td>Must checkpoint and resume running state</td>
+                </tr>
+                <tr>
+                  <td>Typical use case</td>
+                  <td>Billing runs, daily reports, historical analytics</td>
+                  <td>Fraud detection, live dashboards, alerting</td>
+                </tr>
+                <tr>
+                  <td>Real system example</td>
+                  <td>Hadoop MapReduce, nightly Spark batch jobs</td>
+                  <td>Kafka Streams, Apache Flink</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Why Choose Stream Processing Over Batch Processing?</h3>
+            <ol>
+              <li><strong>Immediate reaction to events:</strong> Stream processing reacts the instant an event arrives instead of waiting for the next scheduled run. Analogy: It&apos;s like a smoke detector that goes off the moment it senses smoke, instead of a fire inspector who only checks the building once a night.</li>
+              <li><strong>Always-fresh state:</strong> A live dashboard fed by a stream always reflects what&apos;s happening right now. Analogy: It&apos;s like watching a live scoreboard at a stadium instead of reading the final score in tomorrow&apos;s newspaper.</li>
+              <li><strong>Prevents costly delays:</strong> Catching a fraudulent transaction before it clears avoids a loss that a next-morning report can only document after the fact. Analogy: It&apos;s like a bouncer stopping trouble at the door, rather than reviewing the security footage the next day.</li>
+              <li><strong>Smoother load on infrastructure:</strong> Processing each event as it comes in spreads work evenly instead of piling it into one big nightly spike. Analogy: It&apos;s like a toll booth processing cars continuously as they arrive, instead of letting them all queue up and clearing the line once an hour.</li>
+              <li><strong>Enables real-time automation:</strong> Downstream systems can trigger actions immediately, without a human or a scheduled job in the loop. Analogy: It&apos;s like a sprinkler system that activates the second it detects fire, rather than waiting for someone to notice and manually turn it on.</li>
+            </ol>
+
             <p style={{ marginTop: 16 }}>
               <strong>What interviewers are listening for:</strong> that you can justify a batch vs.
               stream choice against actual latency requirements rather than defaulting to
@@ -436,23 +361,6 @@ export default function BigDataProcessingPage() {
               <li><strong>Amazon S3 with Redshift or Snowflake</strong> — a common architecture pairing S3 as the raw data lake with Redshift or Snowflake as the structured, query-optimized data warehouse layer built on top of it.</li>
               <li><strong>Kafka Streams</strong> — a library for building real-time stream processing applications directly on top of Kafka topics, without needing a separate processing cluster.</li>
             </ul>
-            <FlowContinue nextId="interview-questions" label="Interview Questions" />
-          </FlowStep>
-
-          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
-            <p>Click a question to reveal the answer.</p>
-            <QA items={qaItems} />
-            <FlowContinue nextId="code" label="Code & Output" />
-          </FlowStep>
-
-          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
-            <p>
-              A simplified, deterministic MapReduce-style word count over three fixed text strings.
-              The map step splits each string into individual words with a count of 1; the reduce
-              step sums the counts per word into a final frequency map, printed sorted alphabetically.
-              The output is identical across all four languages.
-            </p>
-            <CodeTerminal snippets={snippets} />
           </FlowStep>
 
           <PageNav

@@ -4,212 +4,14 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import QA from '@/components/QA';
-import CodeTerminal from '@/components/CodeTerminal';
 import FlowStep from '@/components/FlowStep';
 import FlowContinue from '@/components/FlowContinue';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 4;
 
 export const metadata = {
   title: 'Distributed Transactions & State — System Design Architectures',
 };
-
-const OUTPUT = `Replica 1 increments: R1=1, R1=2, R1=3 (local state {R1: 3, R2: 0})
-Replica 2 increments: R2=1, R2=2, R2=3, R2=4, R2=5 (local state {R1: 0, R2: 5})
-Merging replica 1 and replica 2 (element-wise max per node)...
-Merged vector: {R1: 3, R2: 5}
-Total count = sum(merged vector) = 8
-Merge is commutative: merging in the opposite order gives the same vector: {R1: 3, R2: 5}
-Final converged total on both replicas: 8`;
-
-const snippets = {
-  java: {
-    code: `import java.util.*;
-
-public class GCounterDemo {
-    // A G-Counter CRDT: each replica only increments its own slot.
-    // Merging takes the element-wise max across replicas, which is
-    // commutative, associative, and idempotent -- no coordination needed.
-    static Map<String, Integer> merge(Map<String, Integer> a, Map<String, Integer> b) {
-        Map<String, Integer> out = new LinkedHashMap<>();
-        Set<String> keys = new LinkedHashSet<>();
-        keys.addAll(a.keySet());
-        keys.addAll(b.keySet());
-        for (String k : keys) {
-            out.put(k, Math.max(a.getOrDefault(k, 0), b.getOrDefault(k, 0)));
-        }
-        return out;
-    }
-
-    static int total(Map<String, Integer> v) {
-        int sum = 0;
-        for (int x : v.values()) sum += x;
-        return sum;
-    }
-
-    public static void main(String[] args) {
-        Map<String, Integer> r1 = new LinkedHashMap<>(Map.of("R1", 0, "R2", 0));
-        for (int i = 1; i <= 3; i++) r1.put("R1", i);
-        System.out.println("Replica 1 increments: R1=1, R1=2, R1=3 (local state {R1: 3, R2: 0})");
-
-        Map<String, Integer> r2 = new LinkedHashMap<>(Map.of("R1", 0, "R2", 0));
-        for (int i = 1; i <= 5; i++) r2.put("R2", i);
-        System.out.println("Replica 2 increments: R2=1, R2=2, R2=3, R2=4, R2=5 (local state {R1: 0, R2: 5})");
-
-        System.out.println("Merging replica 1 and replica 2 (element-wise max per node)...");
-        Map<String, Integer> merged = merge(r1, r2);
-        System.out.println("Merged vector: {R1: " + merged.get("R1") + ", R2: " + merged.get("R2") + "}");
-        System.out.println("Total count = sum(merged vector) = " + total(merged));
-
-        Map<String, Integer> mergedReverse = merge(r2, r1);
-        System.out.println("Merge is commutative: merging in the opposite order gives the same vector: {R1: "
-            + mergedReverse.get("R1") + ", R2: " + mergedReverse.get("R2") + "}");
-        System.out.println("Final converged total on both replicas: " + total(mergedReverse));
-    }
-}`,
-    output: OUTPUT,
-  },
-  python: {
-    code: `# A G-Counter CRDT: each replica only increments its own slot.
-# Merging takes the element-wise max across replicas, which is
-# commutative, associative, and idempotent -- no coordination needed.
-
-def merge(a, b):
-    keys = list(dict.fromkeys(list(a.keys()) + list(b.keys())))
-    return {k: max(a.get(k, 0), b.get(k, 0)) for k in keys}
-
-def total(v):
-    return sum(v.values())
-
-r1 = {"R1": 0, "R2": 0}
-for i in range(1, 4):
-    r1["R1"] = i
-print("Replica 1 increments: R1=1, R1=2, R1=3 (local state {R1: 3, R2: 0})")
-
-r2 = {"R1": 0, "R2": 0}
-for i in range(1, 6):
-    r2["R2"] = i
-print("Replica 2 increments: R2=1, R2=2, R2=3, R2=4, R2=5 (local state {R1: 0, R2: 5})")
-
-print("Merging replica 1 and replica 2 (element-wise max per node)...")
-merged = merge(r1, r2)
-print(f"Merged vector: {{R1: {merged['R1']}, R2: {merged['R2']}}}")
-print(f"Total count = sum(merged vector) = {total(merged)}")
-
-merged_reverse = merge(r2, r1)
-print(f"Merge is commutative: merging in the opposite order gives the same vector: "
-      f"{{R1: {merged_reverse['R1']}, R2: {merged_reverse['R2']}}}")
-print(f"Final converged total on both replicas: {total(merged_reverse)}")`,
-    output: OUTPUT,
-  },
-  javascript: {
-    code: `// A G-Counter CRDT: each replica only increments its own slot.
-// Merging takes the element-wise max across replicas, which is
-// commutative, associative, and idempotent -- no coordination needed.
-
-function merge(a, b) {
-  const keys = [...new Set([...Object.keys(a), ...Object.keys(b)])];
-  const out = {};
-  for (const k of keys) out[k] = Math.max(a[k] || 0, b[k] || 0);
-  return out;
-}
-
-function total(v) {
-  return Object.values(v).reduce((s, x) => s + x, 0);
-}
-
-const r1 = { R1: 0, R2: 0 };
-for (let i = 1; i <= 3; i++) r1.R1 = i;
-console.log("Replica 1 increments: R1=1, R1=2, R1=3 (local state {R1: 3, R2: 0})");
-
-const r2 = { R1: 0, R2: 0 };
-for (let i = 1; i <= 5; i++) r2.R2 = i;
-console.log("Replica 2 increments: R2=1, R2=2, R2=3, R2=4, R2=5 (local state {R1: 0, R2: 5})");
-
-console.log("Merging replica 1 and replica 2 (element-wise max per node)...");
-const merged = merge(r1, r2);
-console.log(\`Merged vector: {R1: \${merged.R1}, R2: \${merged.R2}}\`);
-console.log(\`Total count = sum(merged vector) = \${total(merged)}\`);
-
-const mergedReverse = merge(r2, r1);
-console.log(\`Merge is commutative: merging in the opposite order gives the same vector: {R1: \${mergedReverse.R1}, R2: \${mergedReverse.R2}}\`);
-console.log(\`Final converged total on both replicas: \${total(mergedReverse)}\`);`,
-    output: OUTPUT,
-  },
-  cpp: {
-    code: `#include <iostream>
-#include <map>
-#include <string>
-#include <algorithm>
-
-// A G-Counter CRDT: each replica only increments its own slot.
-// Merging takes the element-wise max across replicas, which is
-// commutative, associative, and idempotent -- no coordination needed.
-
-std::map<std::string, int> merge(const std::map<std::string, int>& a, const std::map<std::string, int>& b) {
-    std::map<std::string, int> out;
-    for (auto& [k, v] : a) out[k] = std::max(out.count(k) ? out[k] : 0, v);
-    for (auto& [k, v] : b) out[k] = std::max(out.count(k) ? out[k] : 0, v);
-    return out;
-}
-
-int total(const std::map<std::string, int>& v) {
-    int sum = 0;
-    for (auto& [k, val] : v) sum += val;
-    return sum;
-}
-
-int main() {
-    std::map<std::string, int> r1 = {{"R1", 0}, {"R2", 0}};
-    for (int i = 1; i <= 3; i++) r1["R1"] = i;
-    std::cout << "Replica 1 increments: R1=1, R1=2, R1=3 (local state {R1: 3, R2: 0})" << std::endl;
-
-    std::map<std::string, int> r2 = {{"R1", 0}, {"R2", 0}};
-    for (int i = 1; i <= 5; i++) r2["R2"] = i;
-    std::cout << "Replica 2 increments: R2=1, R2=2, R2=3, R2=4, R2=5 (local state {R1: 0, R2: 5})" << std::endl;
-
-    std::cout << "Merging replica 1 and replica 2 (element-wise max per node)..." << std::endl;
-    auto merged = merge(r1, r2);
-    std::cout << "Merged vector: {R1: " << merged["R1"] << ", R2: " << merged["R2"] << "}" << std::endl;
-    std::cout << "Total count = sum(merged vector) = " << total(merged) << std::endl;
-
-    auto mergedReverse = merge(r2, r1);
-    std::cout << "Merge is commutative: merging in the opposite order gives the same vector: {R1: "
-              << mergedReverse["R1"] << ", R2: " << mergedReverse["R2"] << "}" << std::endl;
-    std::cout << "Final converged total on both replicas: " << total(mergedReverse) << std::endl;
-    return 0;
-}`,
-    output: OUTPUT,
-  },
-};
-
-const qaItems = [
-  {
-    q: "What exactly goes wrong when a Two-Phase Commit coordinator crashes between the prepare and commit phases?",
-    a: "Once a participant votes \"yes\" in the prepare phase, it must hold its locks and its uncommitted changes in a prepared state, ready to go either way, until it hears back from the coordinator. If the coordinator crashes before sending the final commit/abort decision, every participant that voted yes is stuck: it can't unilaterally commit (the coordinator might have decided abort because another participant said no) and it can't unilaterally abort (the coordinator might have already decided commit and told other participants). This is the blocking problem — participants hold locks and resources indefinitely until the coordinator recovers or a human intervenes, which can stall an entire cluster.",
-  },
-  {
-    q: "How does Three-Phase Commit reduce the blocking window compared to 2PC, and why doesn't it eliminate it?",
-    a: "3PC inserts a pre-commit phase between prepare and commit: after all participants vote yes, the coordinator broadcasts \"pre-commit\" and waits for acknowledgments before sending the final \"commit.\" Because every participant that reaches pre-commit knows the whole cluster voted yes, participants can use a timeout to safely commit on their own if the coordinator disappears after pre-commit — that's the improvement. But 3PC still assumes the network only fails by delaying messages, not by partitioning it into groups that can each proceed independently; under a real network partition, two isolated groups could still reach different decisions, so blocking (and worse, inconsistency) isn't fully solved, which is a large part of why 3PC saw little real-world adoption.",
-  },
-  {
-    q: "SAGA choreography vs. orchestration — what's the actual trade-off, and when would you pick one over the other?",
-    a: "In choreography, each service publishes an event when it finishes its local step, and the next service in line reacts to that event — there's no central coordinator, which keeps services decoupled and avoids a single component that needs to know the whole workflow. The cost is that the overall flow becomes implicit, scattered across every service's event handlers, which gets hard to trace, test, and reason about as the number of steps grows. Orchestration puts a dedicated saga orchestrator in charge, explicitly calling each step and running compensations on failure — this makes the workflow visible in one place and much easier to debug and extend, at the cost of introducing a central component (though it's simpler to make highly available than a 2PC coordinator, since it doesn't hold locks on other services' resources). Most teams reach for choreography for a small number of steps (two or three services) and switch to orchestration once a saga's step count or branching complexity grows.",
-  },
-  {
-    q: "What does a vector clock actually track, and what does it mean when two vector clocks are incomparable?",
-    a: "A vector clock is a map of counters, one per node in the system, that each node increments locally on every event and attaches to messages it sends; when a node receives a message, it merges the sender's clock into its own by taking the element-wise max. Comparing two vector clocks tells you about causality, not wall-clock time: if every counter in clock A is greater than or equal to the corresponding counter in clock B (and at least one is strictly greater), then the event with clock A causally happened after the event with clock B. If neither clock dominates the other — some counters are higher in A, others higher in B — the two events are concurrent, meaning neither could have known about the other, which is exactly the signature of a genuine write-write conflict that the application (or the user, via a merge UI) needs to resolve.",
-  },
-  {
-    q: "Why don't CRDTs need coordination to stay consistent, when a naive replicated data structure would?",
-    a: "A CRDT is designed so that every operation on it is representable in a form that is commutative, associative, and idempotent when merged — meaning the order replicas receive updates in, and how many times they see the same update, doesn't change the final result. A G-Counter only ever increments a replica's own slot and merges other replicas' slots via max, so two replicas that diverge while offline and later exchange state always converge to the same total regardless of which one merges first or how many times a message gets redelivered. A naive shared counter (\"replica sends +1, apply it\") isn't safe this way — duplicate delivery double-counts, and out-of-order delivery of increments and decrements can produce different results on different replicas, which is exactly the class of bug CRDTs are engineered to make structurally impossible.",
-  },
-  {
-    q: "In a microservices architecture, when would you reach for SAGA instead of Two-Phase Commit?",
-    a: "2PC requires every participant to hold locks on its own database while the coordinator collects votes, which works inside a single database engine's distributed transaction manager but becomes a severe availability and latency problem across independently-owned microservices — one slow or down service blocks the whole transaction, and you'd need every service to expose a 2PC-compatible transactional resource manager, which most HTTP/REST or message-based services simply don't. SAGA trades strict atomicity for availability: each service commits its own local transaction immediately (no cross-service locks held), and consistency is restored after the fact via compensating actions if a later step fails. The practical rule of thumb: reach for 2PC only when all participants are transactional resources you fully control within a tightly coupled system (e.g. a distributed SQL engine coordinating its own shards); reach for SAGA whenever the transaction spans independently deployed, independently owned services.",
-  },
-];
 
 export default function DistributedTransactionsPage() {
   return (
@@ -225,8 +27,6 @@ export default function DistributedTransactionsPage() {
             { id: 'theory', label: 'Theory & Diagrams' },
             { id: 'trade-offs', label: 'Trade-offs' },
             { id: 'real-world', label: 'Real-World Examples' },
-            { id: 'interview-questions', label: 'Interview Questions' },
-            { id: 'code', label: 'Code & Output' },
           ]}
         />
 
@@ -344,6 +144,22 @@ export default function DistributedTransactionsPage() {
               <figcaption>Both participants are stuck holding locks the instant the coordinator disappears mid-decision</figcaption>
             </figure>
 
+            <h4>Advantages of Two-Phase Commit</h4>
+            <ul>
+              <li><strong>True atomicity:</strong> Either every participant commits or every participant aborts — there is no in-between state where some nodes applied the change and others didn&apos;t.</li>
+              <li><strong>Strong consistency:</strong> Because nothing becomes visible until every participant has voted yes, readers never see a partially-applied multi-node write.</li>
+              <li><strong>Well-suited to tightly coupled systems:</strong> Inside a single distributed database engine that controls all its own shards, 2PC is a clean, provably correct way to keep cross-shard writes atomic.</li>
+              <li><strong>Simple mental model:</strong> The two-phase vote-then-commit structure is easy to reason about compared to reconciling state after the fact.</li>
+            </ul>
+
+            <h4>Disadvantages of Two-Phase Commit</h4>
+            <ul>
+              <li><strong>Blocking on coordinator failure:</strong> A coordinator crash between the prepare and commit phases leaves every participant that voted yes stuck holding locks indefinitely.</li>
+              <li><strong>Poor availability across services:</strong> Every participant must be reachable and responsive during the vote — one slow or down service stalls the entire transaction.</li>
+              <li><strong>Doesn&apos;t fit independently owned services:</strong> Most HTTP/REST or message-based microservices don&apos;t expose a 2PC-compatible transactional resource manager, so it&apos;s rarely usable across service boundaries.</li>
+              <li><strong>Operational burden during incidents:</strong> Recovering a stuck transaction often needs a paged on-call engineer to manually decide whether to force-commit or force-abort.</li>
+            </ul>
+
             <h3>Three-Phase Commit (3PC)</h3>
             <p>
               3PC addresses 2PC&apos;s blocking problem by splitting the second phase in two: after
@@ -409,6 +225,22 @@ export default function DistributedTransactionsPage() {
               <figcaption>No central coordinator — just services reacting to each other&apos;s events, for better and for worse</figcaption>
             </figure>
 
+            <h4>Advantages of the SAGA pattern</h4>
+            <ul>
+              <li><strong>High availability:</strong> Each service commits its own local transaction immediately, with no cross-service lock held while waiting on anyone else.</li>
+              <li><strong>Fits independently deployed services:</strong> SAGA doesn&apos;t require every participant to expose a shared transactional resource manager, so it works naturally across service boundaries owned by different teams.</li>
+              <li><strong>Failure is recoverable, not catastrophic:</strong> A failed step triggers well-defined compensating actions rather than leaving the system in an ambiguous, blocked state.</li>
+              <li><strong>Scales independently:</strong> Because there&apos;s no synchronous cluster-wide vote, each service can scale and fail independently of the others.</li>
+            </ul>
+
+            <h4>Disadvantages of the SAGA pattern</h4>
+            <ul>
+              <li><strong>No true atomicity:</strong> There&apos;s a real window where some steps have committed and others haven&apos;t — anyone reading state mid-saga can see a partially-applied transaction.</li>
+              <li><strong>Compensating actions must be designed explicitly:</strong> Every step needs a corresponding &quot;undo&quot; (e.g. refund a payment) that the engineering team has to design and test — it doesn&apos;t come for free like a database rollback.</li>
+              <li><strong>Debugging is harder with choreography:</strong> When each service reacts to events independently with no central coordinator, there&apos;s no single place to see the whole saga&apos;s current state.</li>
+              <li><strong>Compensations aren&apos;t always perfectly reversible:</strong> Some actions (e.g. sending a notification, charging a card that&apos;s later refunded with a fee) can&apos;t be undone as cleanly as a database write, leaving edge cases the design must account for.</li>
+            </ul>
+
             <h3>Vector clocks</h3>
             <p>
               Wall-clock timestamps are unreliable for ordering events across machines — clocks
@@ -467,20 +299,69 @@ export default function DistributedTransactionsPage() {
           </FlowStep>
 
           <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
-            <TwoCol>
-              <Callout kind="good" title="✓ Reach for 2PC/3PC-style atomic protocols when">
-                <ul>
-                  <li>All participants are transactional resources within a system you tightly control (e.g. shards of one distributed database), not independently owned microservices.</li>
-                  <li>You genuinely need all-or-nothing atomicity and can accept the availability cost of participants blocking on the coordinator.</li>
-                </ul>
-              </Callout>
-              <Callout kind="bad" title="✕ Reach for SAGA / CRDTs when">
-                <ul>
-                  <li>The transaction spans independently deployed services, and you&apos;d rather trade strict atomicity for availability and a reversible (not instantaneous) consistency guarantee.</li>
-                  <li>Replicas need to keep working while disconnected (offline-first, multi-region, collaborative editing) and reconcile automatically once reconnected, without a synchronous coordination step.</li>
-                </ul>
-              </Callout>
-            </TwoCol>
+            <p>
+              The two approaches above solve the same problem — keeping a multi-step operation
+              consistent across independent nodes — in fundamentally different ways. Here&apos;s
+              how they actually compare, and when to reach for each.
+            </p>
+
+            <h3>Difference Between Two-Phase Commit and SAGA</h3>
+            <table className="estimate-table">
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>Two-Phase Commit</th>
+                  <th>SAGA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Consistency guarantee</td>
+                  <td>Strong — all-or-nothing atomicity across every participant</td>
+                  <td>Eventual — reaches a consistent state via compensations, not instantly</td>
+                </tr>
+                <tr>
+                  <td>Coordinator required?</td>
+                  <td>Yes — a central coordinator drives prepare and commit phases</td>
+                  <td>Optional — orchestration uses one, choreography has none</td>
+                </tr>
+                <tr>
+                  <td>Fault tolerance / what happens on failure</td>
+                  <td>Participants that voted yes block, holding locks until the coordinator recovers</td>
+                  <td>Already-committed steps are undone via explicit compensating actions</td>
+                </tr>
+                <tr>
+                  <td>Latency/overhead</td>
+                  <td>Higher — every write waits on a full round of votes before committing</td>
+                  <td>Lower — each local transaction commits immediately, no cross-service wait</td>
+                </tr>
+                <tr>
+                  <td>Scalability</td>
+                  <td>Poor across independently owned services — one slow participant blocks all</td>
+                  <td>Scales well — each service commits and fails independently</td>
+                </tr>
+                <tr>
+                  <td>Typical use case</td>
+                  <td>Cross-shard transactions inside one tightly controlled distributed database</td>
+                  <td>Multi-service business workflows like checkout, booking, and order fulfillment</td>
+                </tr>
+                <tr>
+                  <td>Real system example</td>
+                  <td>CockroachDB and Spanner-style distributed SQL engines use 2PC-style protocols under the hood</td>
+                  <td>Stripe-style e-commerce checkout flows (reserve inventory, charge card, ship order)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Why Choose SAGA Over Two-Phase Commit?</h3>
+            <ol>
+              <li><strong>Availability:</strong> SAGA never requires a service to hold a cross-service lock while waiting on a vote. Analogy: it&apos;s like each vendor at a wedding (caterer, florist, band) handling their own booking independently rather than all three needing to say &quot;yes&quot; in the same phone call before any of them can confirm.</li>
+              <li><strong>No blocking on a single coordinator:</strong> A crashed orchestrator doesn&apos;t leave every service frozen holding resources. Analogy: it&apos;s like a relay race where each runner keeps their baton once they&apos;ve run their leg, instead of the whole team having to freeze in place until the coach blows a whistle.</li>
+              <li><strong>Fits independently owned services:</strong> SAGA doesn&apos;t require every participant to expose a shared transactional resource manager. Analogy: it&apos;s like coordinating with separate companies through polite emails and refund policies, rather than requiring them all to share one joint bank account.</li>
+              <li><strong>Recoverable failure path:</strong> A failed step triggers well-defined compensations instead of an ambiguous stuck state. Analogy: it&apos;s like a store&apos;s return policy — if a purchase doesn&apos;t work out, there&apos;s a known, explicit process to undo it, rather than the transaction hanging in limbo forever.</li>
+              <li><strong>Independent scaling:</strong> Each service commits and fails on its own schedule, without a synchronous cluster-wide vote gating every write. Analogy: it&apos;s like separate departments in a company each hitting their own deadlines, instead of the entire company waiting for one all-hands meeting to approve every decision.</li>
+            </ol>
+
             <p style={{ marginTop: 16 }}>
               <strong>What interviewers are listening for:</strong> that you can name 2PC&apos;s
               blocking failure mode precisely — a coordinator crash between prepare and commit — and
@@ -512,24 +393,6 @@ export default function DistributedTransactionsPage() {
               <li><strong>CockroachDB &amp; Spanner-style distributed SQL databases</strong> — implement cross-shard transactions using a two-phase-commit-style protocol under the hood, layered with additional mechanisms (like Spanner&apos;s TrueTime) to provide strong consistency guarantees across shards.</li>
               <li><strong>Redis CRDTs (Active-Active / CRDB)</strong> — Redis Enterprise&apos;s active-active geo-replication uses CRDTs for common data types so multiple regions can accept writes simultaneously and converge without conflict, even across a wide-area network with high latency.</li>
             </ul>
-            <FlowContinue nextId="interview-questions" label="Interview Questions" />
-          </FlowStep>
-
-          <FlowStep id="interview-questions" step={5} total={TOTAL_STEPS} title="Interview Questions">
-            <p>Click a question to reveal the answer.</p>
-            <QA items={qaItems} />
-            <FlowContinue nextId="code" label="Code & Output" />
-          </FlowStep>
-
-          <FlowStep id="code" step={6} total={TOTAL_STEPS} title="Code & Output">
-            <p>
-              A deterministic simulation of a G-Counter CRDT. Replica 1 increments its own slot three
-              times while offline; Replica 2 increments its own slot five times while offline. When
-              they reconnect, merging by taking the element-wise max per replica (then summing) always
-              converges to the correct total of 8 — regardless of merge order — with no coordination
-              or conflict resolution required.
-            </p>
-            <CodeTerminal snippets={snippets} />
           </FlowStep>
 
           <PageNav
