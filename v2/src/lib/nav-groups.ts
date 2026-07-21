@@ -4,7 +4,21 @@ export interface NavGroup {
   defaultOpen?: boolean;
   overviewHref?: string;
   links: { label: string; href: string }[];
+  /** Accent color for this section, used to color-code the navbar and sidebar so sections are visually distinct at a glance. */
+  color: string;
+  /** Light tint of `color`, used as a hover/active background. */
+  colorSoft: string;
 }
+
+/** Top-level section colors, also used directly by Header.tsx (which doesn't map 1:1 to a single GROUPS entry — HLD/LLD/Patterns each link to homepage anchors, not a single group id). */
+export const SECTION_COLORS = {
+  hld: { color: '#3b6ea5', soft: '#eaf1f8' },
+  lld: { color: '#7c5cbf', soft: '#f2eefb' },
+  patterns: { color: '#c97a2b', soft: '#fbeee0' },
+  distributedSystems: { color: '#2f8f4e', soft: '#eef8f0' },
+  caseStudies: { color: '#1f8a8c', soft: '#e3f5f5' },
+  reference: { color: '#b0446e', soft: '#fbe8ee' },
+} as const;
 
 /**
  * Single source of truth for the site's full navigation tree. Used by both
@@ -18,6 +32,8 @@ export const GROUPS: NavGroup[] = [
     label: 'HLD',
     defaultOpen: true,
     overviewHref: '/pages/hld',
+    color: SECTION_COLORS.hld.color,
+    colorSoft: SECTION_COLORS.hld.soft,
     links: [
       { label: 'Fundamentals', href: '/pages/hld/fundamentals' },
       { label: 'Load Balancing', href: '/pages/hld/load-balancing' },
@@ -32,6 +48,8 @@ export const GROUPS: NavGroup[] = [
     id: 'lld',
     label: 'LLD',
     overviewHref: '/pages/lld',
+    color: SECTION_COLORS.lld.color,
+    colorSoft: SECTION_COLORS.lld.soft,
     links: [
       { label: 'OOP Fundamentals', href: '/pages/lld/oop-fundamentals' },
       { label: 'SOLID Principles', href: '/pages/lld/solid-principles' },
@@ -42,6 +60,8 @@ export const GROUPS: NavGroup[] = [
     id: 'design-patterns-creational',
     label: 'Patterns — Creational',
     overviewHref: '/pages/lld/design-patterns',
+    color: SECTION_COLORS.patterns.color,
+    colorSoft: SECTION_COLORS.patterns.soft,
     links: [
       { label: 'Singleton', href: '/pages/lld/design-patterns/creational/singleton' },
       { label: 'Factory Method', href: '/pages/lld/design-patterns/creational/factory-method' },
@@ -53,6 +73,8 @@ export const GROUPS: NavGroup[] = [
   {
     id: 'design-patterns-structural',
     label: 'Patterns — Structural',
+    color: SECTION_COLORS.patterns.color,
+    colorSoft: SECTION_COLORS.patterns.soft,
     links: [
       { label: 'Adapter', href: '/pages/lld/design-patterns/structural/adapter' },
       { label: 'Bridge', href: '/pages/lld/design-patterns/structural/bridge' },
@@ -66,6 +88,8 @@ export const GROUPS: NavGroup[] = [
   {
     id: 'design-patterns-behavioral',
     label: 'Patterns — Behavioral',
+    color: SECTION_COLORS.patterns.color,
+    colorSoft: SECTION_COLORS.patterns.soft,
     links: [
       { label: 'Observer', href: '/pages/lld/design-patterns/behavioral/observer' },
       { label: 'Strategy', href: '/pages/lld/design-patterns/behavioral/strategy' },
@@ -84,6 +108,8 @@ export const GROUPS: NavGroup[] = [
     id: 'distributed-systems',
     label: 'Distributed Systems',
     overviewHref: '/pages/distributed-systems',
+    color: SECTION_COLORS.distributedSystems.color,
+    colorSoft: SECTION_COLORS.distributedSystems.soft,
     links: [
       { label: 'Consistency vs. Availability', href: '/pages/distributed-systems/consistency-vs-availability' },
       { label: 'Consensus & Leader Election', href: '/pages/distributed-systems/consensus-coordination' },
@@ -101,6 +127,8 @@ export const GROUPS: NavGroup[] = [
     id: 'case-studies',
     label: 'Case Studies',
     overviewHref: '/pages/case-studies',
+    color: SECTION_COLORS.caseStudies.color,
+    colorSoft: SECTION_COLORS.caseStudies.soft,
     links: [
       { label: 'URL Shortener', href: '/pages/case-studies/url-shortener' },
       { label: 'Twitter / X', href: '/pages/case-studies/twitter' },
@@ -113,6 +141,8 @@ export const GROUPS: NavGroup[] = [
     id: 'reference',
     label: 'Reference',
     overviewHref: '/pages/reference',
+    color: SECTION_COLORS.reference.color,
+    colorSoft: SECTION_COLORS.reference.soft,
     links: [
       { label: 'Latency Numbers', href: '/pages/reference/latency-numbers' },
       { label: 'Glossary', href: '/pages/reference/glossary' },

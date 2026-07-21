@@ -117,13 +117,21 @@ export default function TopicSidebar({ backHref, backLabel, toc }: TopicSidebarP
             });
           }}
         >
-          <summary className={activeGroupId === group.id ? 'active-group' : ''}>{group.label}</summary>
+          <summary
+            className={activeGroupId === group.id ? 'active-group' : ''}
+            style={{ ['--nav-color' as string]: group.color, ['--nav-color-soft' as string]: group.colorSoft }}
+          >
+            <span className="group-label">
+              <span className="group-dot" style={{ background: group.color }} aria-hidden="true" />
+              {group.label}
+            </span>
+          </summary>
           <div className="group-body">
             {group.overviewHref && (
               <Link
                 className={`toc-link${pathname === group.overviewHref ? ' active-page' : ''}`}
                 href={group.overviewHref}
-                style={{ fontWeight: 600 }}
+                style={{ fontWeight: 600, ['--nav-color' as string]: group.color, ['--nav-color-soft' as string]: group.colorSoft }}
               >
                 Overview →
               </Link>
@@ -133,6 +141,7 @@ export default function TopicSidebar({ backHref, backLabel, toc }: TopicSidebarP
                 className={`toc-link${pathname === l.href ? ' active-page' : ''}`}
                 href={l.href}
                 key={l.href}
+                style={{ ['--nav-color' as string]: group.color, ['--nav-color-soft' as string]: group.colorSoft }}
               >
                 {l.label}
               </Link>

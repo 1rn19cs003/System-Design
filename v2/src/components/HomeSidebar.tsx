@@ -45,15 +45,29 @@ export default function HomeSidebar() {
             return next;
           });
         }}>
-          <summary id={group.id}>{group.label}</summary>
+          <summary id={group.id} style={{ ['--nav-color' as string]: group.color, ['--nav-color-soft' as string]: group.colorSoft }}>
+            <span className="group-label">
+              <span className="group-dot" style={{ background: group.color }} aria-hidden="true" />
+              {group.label}
+            </span>
+          </summary>
           <div className="group-body">
             {group.overviewHref && (
-              <Link className="toc-link" href={group.overviewHref} style={{ fontWeight: 600 }}>
+              <Link
+                className="toc-link"
+                href={group.overviewHref}
+                style={{ fontWeight: 600, ['--nav-color' as string]: group.color, ['--nav-color-soft' as string]: group.colorSoft }}
+              >
                 Overview →
               </Link>
             )}
             {group.links.map((l) => (
-              <Link className="toc-link" href={l.href} key={l.href}>
+              <Link
+                className="toc-link"
+                href={l.href}
+                key={l.href}
+                style={{ ['--nav-color' as string]: group.color, ['--nav-color-soft' as string]: group.colorSoft }}
+              >
                 {l.label}
               </Link>
             ))}

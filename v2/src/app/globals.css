@@ -87,11 +87,32 @@ nav.header-nav a {
   color: var(--muted);
   padding: 7px 12px;
   border-radius: 7px;
+  position: relative;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* Links carrying --nav-color get a small color dot + color-tinted hover, so each
+   top-level section (HLD, LLD, Patterns, Distributed Systems, ...) is visually
+   distinct at a glance instead of everything sharing one blue accent. */
+nav.header-nav a[style*="--nav-color"]::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--nav-color, var(--accent));
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
 nav.header-nav a:hover {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+nav.header-nav a[style*="--nav-color"]:hover {
+  background: var(--nav-color-soft, var(--accent-soft));
+  color: var(--nav-color, var(--accent));
 }
 
 /* ---------- Layout ---------- */
@@ -145,22 +166,38 @@ nav.sidebar details.group > summary {
   letter-spacing: 0.05em;
   color: var(--muted);
   font-weight: 700;
+  gap: 8px;
 }
 
 nav.sidebar details.group > summary::-webkit-details-marker {
   display: none;
 }
 
+nav.sidebar details.group > summary .group-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
 nav.sidebar details.group > summary:hover {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--nav-color-soft, var(--accent-soft));
+  color: var(--nav-color, var(--accent));
+}
+
+nav.sidebar details.group > summary.active-group {
+  color: var(--nav-color, var(--accent));
+  background: var(--nav-color-soft, var(--accent-soft));
 }
 
 nav.sidebar details.group > summary::after {
   content: "▸";
   font-size: 11px;
   transition: transform 0.15s ease;
-  color: var(--accent);
+  color: var(--nav-color, var(--accent));
+  margin-left: auto;
 }
 
 nav.sidebar details.group[open] > summary::after {
@@ -181,8 +218,8 @@ nav.sidebar a.toc-link {
 }
 
 nav.sidebar a.toc-link:hover {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--nav-color-soft, var(--accent-soft));
+  color: var(--nav-color, var(--accent));
 }
 
 nav.sidebar .expand-all-btn {
@@ -237,8 +274,8 @@ nav.sidebar a.toc.active {
 /* Active page / active group highlighting in the full-site accordion nav */
 nav.sidebar a.top-link.active-page,
 nav.sidebar a.toc-link.active-page {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--nav-color-soft, var(--accent-soft));
+  color: var(--nav-color, var(--accent));
   font-weight: 700;
   position: relative;
 }
@@ -251,11 +288,12 @@ nav.sidebar a.toc-link.active-page::before {
   bottom: 8px;
   width: 3px;
   border-radius: 2px;
-  background: var(--accent);
+  background: var(--nav-color, var(--accent));
 }
 
-nav.sidebar details.group > summary.active-group {
-  color: var(--accent);
+nav.sidebar .group-label {
+  display: inline-flex;
+  align-items: center;
 }
 
 /* ---------- Main content ---------- */
