@@ -1,0 +1,57 @@
+<svg viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .box { fill: #ffffff; stroke: #3b6ea5; stroke-width: 1.5; }
+    .title-bg { fill: #eaf1f8; }
+    .title { font-size: 13.5px; font-weight: 600; fill: #2d2f33; }
+    .line { fill: #2d2f33; font-size: 11.5px; }
+    .divider { stroke: #3b6ea5; stroke-width: 1; }
+    .arrow { stroke: #6a7178; stroke-width: 1.5; fill: none; }
+    .label { font-size: 11px; fill: #6a7178; }
+  </style>
+
+  <!-- Enemy prototype -->
+  <rect x="30" y="30" width="220" height="110" rx="8" class="box"/>
+  <rect x="30" y="30" width="220" height="28" rx="8" class="title-bg"/>
+  <rect x="30" y="50" width="220" height="8" class="title-bg"/>
+  <text x="140" y="48" text-anchor="middle" class="title">Enemy (prototype)</text>
+  <line x1="30" y1="58" x2="250" y2="58" class="divider"/>
+  <text x="42" y="76" class="line">- type: String</text>
+  <text x="42" y="94" class="line">- stats: Stats</text>
+  <line x1="30" y1="102" x2="250" y2="102" class="divider"/>
+  <text x="42" y="120" class="line" font-weight="600">+ clone(): Enemy</text>
+
+  <!-- Stats -->
+  <rect x="30" y="200" width="220" height="70" rx="8" class="box"/>
+  <rect x="30" y="200" width="220" height="26" rx="8" class="title-bg"/>
+  <rect x="30" y="218" width="220" height="8" class="title-bg"/>
+  <text x="140" y="217" text-anchor="middle" class="title">Stats</text>
+  <line x1="30" y1="226" x2="250" y2="226" class="divider"/>
+  <text x="42" y="244" class="line">- health, damage: int</text>
+  <text x="42" y="260" class="line">+ deepCopy(): Stats</text>
+
+  <line x1="140" y1="140" x2="140" y2="198" class="arrow" marker-end="url(#diamond)"/>
+  <text x="150" y="172" class="label">has-a</text>
+
+  <!-- Cloned copies -->
+  <rect x="370" y="30" width="220" height="70" rx="8" class="box"/>
+  <text x="480" y="60" text-anchor="middle" class="title">orc1 = prototype.clone()</text>
+  <text x="382" y="82" class="line">stats → its OWN Stats copy</text>
+
+  <rect x="370" y="130" width="220" height="70" rx="8" class="box"/>
+  <text x="480" y="160" text-anchor="middle" class="title">orc2 = prototype.clone()</text>
+  <text x="382" y="182" class="line">stats → its OWN Stats copy</text>
+
+  <line x1="250" y1="70" x2="368" y2="65" class="arrow" marker-end="url(#arrowhead)"/>
+  <line x1="250" y1="90" x2="368" y2="160" class="arrow" marker-end="url(#arrowhead)"/>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#6a7178"/>
+    </marker>
+    <marker id="diamond" markerWidth="10" markerHeight="8" refX="5" refY="4" orient="auto">
+      <polygon points="0 4, 5 0, 10 4, 5 8" fill="#ffffff" stroke="#6a7178" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <text x="320" y="300" text-anchor="middle" class="label">Deep copy: each clone gets its own Stats instance — mutating one never affects the others.</text>
+</svg>

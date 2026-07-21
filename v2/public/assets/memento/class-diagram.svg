@@ -1,0 +1,38 @@
+<svg viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <rect x="30" y="30" width="220" height="110" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="140" y="52" text-anchor="middle" font-size="14" font-weight="600" fill="#2d2f33">TextEditor (Originator)</text>
+  <line x1="30" y1="60" x2="250" y2="60" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="46" y="78" font-size="12" fill="#2d2f33">- content: String</text>
+  <line x1="30" y1="86" x2="250" y2="86" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="46" y="104" font-size="12" fill="#2d2f33">+ save(): Memento</text>
+  <text x="46" y="120" font-size="12" fill="#2d2f33">+ restore(memento)</text>
+
+  <rect x="400" y="30" width="210" height="80" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.5"/>
+  <text x="505" y="52" text-anchor="middle" font-size="14" font-weight="600" fill="#2d2f33">EditorMemento</text>
+  <line x1="400" y1="60" x2="610" y2="60" stroke="#3b6ea5" stroke-width="1"/>
+  <text x="416" y="78" font-size="11" fill="#2d2f33">- content: String</text>
+  <text x="416" y="94" font-size="11" fill="#6a7178">(opaque outside Originator)</text>
+
+  <line x1="250" y1="70" x2="400" y2="65" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <text x="325" y="60" text-anchor="middle" font-size="11" fill="#6a7178">creates</text>
+
+  <rect x="150" y="200" width="220" height="90" rx="6" fill="#f6f8fa" stroke="#e3e6ea" stroke-width="1.2"/>
+  <text x="260" y="225" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2f33">History (Caretaker)</text>
+  <line x1="150" y1="233" x2="370" y2="233" stroke="#e3e6ea" stroke-width="1"/>
+  <text x="166" y="251" font-size="11" fill="#2d2f33">- stack: List&lt;Memento&gt;</text>
+  <text x="166" y="267" font-size="11" fill="#2d2f33">+ push(m) / + pop()</text>
+
+  <line x1="505" y1="110" x2="300" y2="200" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <text x="420" y="160" text-anchor="middle" font-size="11" fill="#6a7178">stores opaquely</text>
+
+  <line x1="260" y1="200" x2="140" y2="140" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="180" y="175" text-anchor="middle" font-size="11" fill="#6a7178">restore() on undo</text>
+
+  <text x="320" y="310" text-anchor="middle" font-size="11" fill="#6a7178">History never reads inside a Memento — only TextEditor does</text>
+</svg>

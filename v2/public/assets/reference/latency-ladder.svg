@@ -1,0 +1,41 @@
+<svg viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <text x="0" y="16" font-size="11" fill="#6a7178">shorter bar = faster (bars are log-scaled, not linear)</text>
+
+  <!-- row template: label (x=0,y), bar (x=270), value (x after bar) -->
+  <text x="0" y="42" font-size="11.5" fill="#2d2f33">L1 cache reference</text>
+  <rect x="270" y="32" width="6" height="14" rx="2" fill="#3b6ea5"/>
+  <text x="284" y="42" font-size="11" fill="#6a7178">~0.5 ns</text>
+
+  <text x="0" y="72" font-size="11.5" fill="#2d2f33">L2 cache reference</text>
+  <rect x="270" y="62" width="20" height="14" rx="2" fill="#3b6ea5"/>
+  <text x="298" y="72" font-size="11" fill="#6a7178">~7 ns</text>
+
+  <text x="0" y="102" font-size="11.5" fill="#2d2f33">Main memory reference</text>
+  <rect x="270" y="92" width="50" height="14" rx="2" fill="#3b6ea5"/>
+  <text x="328" y="102" font-size="11" fill="#6a7178">~100 ns</text>
+
+  <text x="0" y="132" font-size="11.5" fill="#2d2f33">Read 4 KB randomly from SSD</text>
+  <rect x="270" y="122" width="320" height="14" rx="2" fill="#3b6ea5"/>
+  <text x="598" y="132" font-size="11" fill="#6a7178">~150 µs</text>
+
+  <text x="0" y="162" font-size="11.5" fill="#2d2f33">Round trip within same datacenter</text>
+  <rect x="270" y="152" width="360" height="14" rx="2" fill="#3b6ea5"/>
+  <text x="638" y="162" font-size="11" fill="#6a7178">~500 µs</text>
+
+  <text x="0" y="192" font-size="11.5" fill="#2d2f33">Read 1 MB sequentially from SSD</text>
+  <rect x="270" y="182" width="400" height="14" rx="2" fill="#3b6ea5"/>
+  <text x="678" y="192" font-size="11" fill="#6a7178">~1 ms</text>
+
+  <text x="0" y="222" font-size="11.5" fill="#2d2f33">Disk seek</text>
+  <rect x="270" y="212" width="440" height="14" rx="2" fill="#c0392b"/>
+  <text x="280" y="222" font-size="11" fill="#ffffff">~10 ms</text>
+
+  <text x="0" y="252" font-size="11.5" fill="#2d2f33">Send packet CA → Netherlands → CA</text>
+  <rect x="270" y="242" width="480" height="14" rx="2" fill="#c0392b"/>
+  <text x="280" y="252" font-size="11" fill="#ffffff">~150 ms</text>
+
+  <text x="0" y="290" font-size="11" fill="#6a7178">Memory operations (blue) are nanoseconds. Disk seeks and cross-continent</text>
+  <text x="0" y="306" font-size="11" fill="#6a7178">network trips (red) are milliseconds — roughly a million times slower.</text>
+
+  <title>Latency ladder from L1 cache (0.5 ns) to a cross-continent network round trip (150 ms), showing the memory-to-network gap is roughly six orders of magnitude</title>
+</svg>

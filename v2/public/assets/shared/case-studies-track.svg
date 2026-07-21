@@ -1,0 +1,28 @@
+<svg viewBox="0 0 1000 190" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <rect x="10" y="20" width="180" height="150" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="100" y="46" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2d2f33">URL Shortener</text>
+  <text x="100" y="66" text-anchor="middle" font-size="9" fill="#6a7178">encoding, redirect</text>
+  <text x="100" y="80" text-anchor="middle" font-size="9" fill="#6a7178">read-heavy scale</text>
+
+  <rect x="205" y="20" width="180" height="150" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="295" y="46" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2d2f33">Twitter / X</text>
+  <text x="295" y="66" text-anchor="middle" font-size="9" fill="#6a7178">feed generation,</text>
+  <text x="295" y="80" text-anchor="middle" font-size="9" fill="#6a7178">fan-out trade-offs</text>
+
+  <rect x="400" y="20" width="180" height="150" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="490" y="46" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2d2f33">WhatsApp</text>
+  <text x="490" y="66" text-anchor="middle" font-size="9" fill="#6a7178">real-time delivery,</text>
+  <text x="490" y="80" text-anchor="middle" font-size="9" fill="#6a7178">message ordering</text>
+
+  <rect x="595" y="20" width="180" height="150" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="685" y="46" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2d2f33">Uber</text>
+  <text x="685" y="66" text-anchor="middle" font-size="9" fill="#6a7178">geospatial indexing,</text>
+  <text x="685" y="80" text-anchor="middle" font-size="9" fill="#6a7178">driver matching</text>
+
+  <rect x="790" y="20" width="180" height="150" rx="8" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.4"/>
+  <text x="880" y="46" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2d2f33">Netflix / YouTube</text>
+  <text x="880" y="66" text-anchor="middle" font-size="9" fill="#6a7178">video storage,</text>
+  <text x="880" y="80" text-anchor="middle" font-size="9" fill="#6a7178">CDN delivery</text>
+
+  <title>Five case studies covering read-heavy caching, feed fan-out, real-time messaging, geospatial matching, and large-object CDN delivery</title>
+</svg>
