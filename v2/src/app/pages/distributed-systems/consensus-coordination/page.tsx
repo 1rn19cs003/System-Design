@@ -4,13 +4,9 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import FlowStep from '@/components/FlowStep';
-import FlowContinue from '@/components/FlowContinue';
-
-const TOTAL_STEPS = 4;
 
 export const metadata = {
-  title: 'Consensus & Coordination — System Design Architectures',
+  title: 'Consensus & Leader Election — System Design Architectures',
 };
 
 export default function ConsensusCoordinationPage() {
@@ -35,10 +31,10 @@ export default function ConsensusCoordinationPage() {
             items={[
               { label: 'Home', href: '/' },
               { label: 'Distributed Systems', href: '/pages/distributed-systems' },
-              { label: 'Consensus & Coordination' },
+              { label: 'Consensus & Leader Election' },
             ]}
           />
-          <h1 id="overview">Consensus &amp; Coordination</h1>
+          <h1 id="overview">Consensus &amp; Leader Election</h1>
           <p>
             The moment a system has more than one server, you inherit a new question that a single
             machine never has to ask: how do independent nodes, each with their own view of the
@@ -47,7 +43,8 @@ export default function ConsensusCoordinationPage() {
             even when some nodes are slow, unreachable, or actively wrong.
           </p>
 
-          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
+          <section id="plain-english">
+            <h2>In Plain English</h2>
             <p>
               Think of a group project with five people and no manager. Someone has to decide who
               submits the final file — that&apos;s leader election. If that person goes silent for a
@@ -77,10 +74,10 @@ export default function ConsensusCoordinationPage() {
                 </p>
               </Callout>
             </TwoCol>
-            <FlowContinue nextId="theory" label="Theory & Diagrams" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
+          <section id="theory">
+            <h2>Theory &amp; Diagrams</h2>
             <h3>Heartbeats &amp; failure detection</h3>
             <p>
               A heartbeat is a small, periodic signal a node sends to prove it&apos;s still alive
@@ -233,10 +230,10 @@ export default function ConsensusCoordinationPage() {
               <li><strong>Wasted bandwidth:</strong> The same piece of information gets re-transmitted to nodes that already know it, since there&apos;s no central coordinator tracking who has heard what.</li>
               <li><strong>Harder to reason about worst-case latency:</strong> Because propagation depends on random peer selection, the exact number of rounds before full convergence is probabilistic, not guaranteed like a leader-driven commit.</li>
             </ul>
-            <FlowContinue nextId="trade-offs" label="Trade-offs" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
+          <section id="trade-offs">
+            <h2>Trade-offs</h2>
             <p>
               The two approaches above solve the same problem — getting information or agreement
               spread across a cluster — in fundamentally different ways. Here&apos;s how they
@@ -319,10 +316,10 @@ export default function ConsensusCoordinationPage() {
               progress, and why a majority-based protocol prevents both sides from committing
               conflicting writes simultaneously.
             </p>
-            <FlowContinue nextId="real-world" label="Real-World Examples" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
+          <section id="real-world">
+            <h2>Real-World Examples</h2>
             <ul>
               <li><strong>etcd &amp; Kubernetes</strong> — etcd uses Raft to replicate cluster state consistently across nodes; Kubernetes relies on etcd as its source of truth for the entire cluster&apos;s configuration.</li>
               <li><strong>Apache ZooKeeper</strong> — uses a Paxos-inspired protocol (ZAB) for leader election and coordination, historically the backbone of Kafka&apos;s and Hadoop&apos;s cluster coordination before Kafka moved to its own Raft-based controller (KRaft).</li>
@@ -330,11 +327,11 @@ export default function ConsensusCoordinationPage() {
               <li><strong>Amazon DynamoDB</strong> — uses gossip-style protocols internally for membership and failure detection, prioritizing availability over immediate strong consistency by design.</li>
               <li><strong>Redis Sentinel &amp; Redis Cluster</strong> — use heartbeats and a quorum-based voting process to detect a failed primary and promote a replica automatically.</li>
             </ul>
-          </FlowStep>
+          </section>
 
           <PageNav
-            prev={{ label: 'Distributed Systems', href: '/pages/distributed-systems' }}
-            next={{ label: 'Distributed Transactions & State', href: '/pages/distributed-systems/distributed-transactions' }}
+            prev={{ label: 'Consistency vs. Availability', href: '/pages/distributed-systems/consistency-vs-availability' }}
+            next={{ label: 'Distributed Transactions', href: '/pages/distributed-systems/distributed-transactions' }}
           />
         </main>
       </div>
@@ -343,10 +340,10 @@ export default function ConsensusCoordinationPage() {
         sectionColumn={{
           title: 'Distributed Systems',
           links: [
-            { label: 'Consensus & Coordination', href: '/pages/distributed-systems/consensus-coordination' },
-            { label: 'Resilience Patterns', href: '/pages/distributed-systems/resilience-patterns' },
-            { label: 'Big Data Processing', href: '/pages/distributed-systems/big-data-processing' },
-            { label: 'Observability & Security', href: '/pages/distributed-systems/observability-security' },
+            { label: 'Consistency vs. Availability', href: '/pages/distributed-systems/consistency-vs-availability' },
+            { label: 'Consensus & Leader Election', href: '/pages/distributed-systems/consensus-coordination' },
+            { label: 'DevOps Concepts', href: '/pages/distributed-systems/devops-concepts' },
+            { label: 'System Design Tradeoffs', href: '/pages/distributed-systems/system-design-tradeoffs' },
           ],
         }}
       />

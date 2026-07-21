@@ -1,0 +1,59 @@
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="scArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <!-- Row 1: Strong consistency -->
+  <text x="350" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">Strong Consistency</text>
+
+  <rect x="20" y="35" width="90" height="34" rx="6" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="65" y="56" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Write x=5</text>
+
+  <line x1="110" y1="52" x2="190" y2="52" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#scArrow)"/>
+  <line x1="110" y1="52" x2="350" y2="52" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#scArrow)"/>
+  <line x1="110" y1="52" x2="510" y2="52" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#scArrow)"/>
+
+  <rect x="190" y="35" width="80" height="34" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="230" y="56" text-anchor="middle" font-size="10" font-weight="700" fill="#2f8f4e">x = 5</text>
+  <rect x="350" y="35" width="80" height="34" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="390" y="56" text-anchor="middle" font-size="10" font-weight="700" fill="#2f8f4e">x = 5</text>
+  <rect x="510" y="35" width="80" height="34" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="550" y="56" text-anchor="middle" font-size="10" font-weight="700" fill="#2f8f4e">x = 5</text>
+
+  <text x="350" y="95" text-anchor="middle" font-size="9" fill="#6a7178">Write only acknowledged once every replica agrees — any read anywhere returns 5, immediately</text>
+
+  <line x1="0" y1="120" x2="700" y2="120" stroke="#eaf1f8" stroke-width="2"/>
+
+  <!-- Row 2: Eventual consistency -->
+  <text x="350" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">Eventual Consistency</text>
+
+  <rect x="20" y="165" width="90" height="34" rx="6" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="65" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Write x=5</text>
+
+  <line x1="110" y1="182" x2="190" y2="182" stroke="#3b6ea5" stroke-width="1.3" marker-end="url(#scArrow)"/>
+  <line x1="110" y1="182" x2="350" y2="182" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#scArrow)"/>
+  <line x1="110" y1="182" x2="510" y2="182" stroke="#3b6ea5" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#scArrow)"/>
+
+  <rect x="190" y="165" width="80" height="34" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.3"/>
+  <text x="230" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="#2f8f4e">x = 5</text>
+  <text x="230" y="211" text-anchor="middle" font-size="7.5" fill="#6a7178">Node 1 (just wrote)</text>
+
+  <rect x="350" y="165" width="80" height="34" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.3"/>
+  <text x="390" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="#c0392b">x = 3</text>
+  <text x="390" y="211" text-anchor="middle" font-size="7.5" fill="#6a7178">Node 2 (stale read!)</text>
+
+  <rect x="510" y="165" width="80" height="34" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.3"/>
+  <text x="550" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="#c0392b">x = 3</text>
+  <text x="550" y="211" text-anchor="middle" font-size="7.5" fill="#6a7178">Node 3 (not yet updated)</text>
+
+  <text x="350" y="235" text-anchor="middle" font-size="9" fill="#6a7178">Write is acknowledged immediately at Node 1 — Nodes 2 and 3 still serve the old value mid-flight</text>
+
+  <line x1="230" y1="255" x2="230" y2="270" stroke="#6a7178" stroke-width="1.2" marker-end="url(#scArrow)"/>
+  <line x1="390" y1="255" x2="390" y2="270" stroke="#6a7178" stroke-width="1.2" marker-end="url(#scArrow)"/>
+  <line x1="550" y1="255" x2="550" y2="270" stroke="#6a7178" stroke-width="1.2" marker-end="url(#scArrow)"/>
+  <text x="350" y="292" text-anchor="middle" font-size="9" font-weight="600" fill="#2f8f4e">...after a short replication delay, all three converge to x = 5</text>
+
+  <title>Strong consistency: a write to x=5 is acknowledged only once every replica has it, so any read anywhere immediately returns 5. Eventual consistency: the write is acknowledged as soon as one node has it, so a read from Node 2 or 3 mid-flight returns the stale value 3 until replication catches up and all nodes converge on 5</title>
+</svg>

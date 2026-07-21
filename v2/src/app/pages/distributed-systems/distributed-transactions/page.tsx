@@ -4,13 +4,9 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import FlowStep from '@/components/FlowStep';
-import FlowContinue from '@/components/FlowContinue';
-
-const TOTAL_STEPS = 4;
 
 export const metadata = {
-  title: 'Distributed Transactions & State — System Design Architectures',
+  title: 'Distributed Transactions — System Design Architectures',
 };
 
 export default function DistributedTransactionsPage() {
@@ -35,10 +31,10 @@ export default function DistributedTransactionsPage() {
             items={[
               { label: 'Home', href: '/' },
               { label: 'Distributed Systems', href: '/pages/distributed-systems' },
-              { label: 'Distributed Transactions & State' },
+              { label: 'Distributed Transactions' },
             ]}
           />
-          <h1 id="overview">Distributed Transactions &amp; State</h1>
+          <h1 id="overview">Distributed Transactions</h1>
           <p>
             A single database gives you transactions for free — an operation either fully commits or
             fully rolls back, and the engine handles it. The moment a &quot;transaction&quot; spans
@@ -51,7 +47,8 @@ export default function DistributedTransactionsPage() {
             tracking and resolving conflicting writes after the fact (vector clocks, CRDTs).
           </p>
 
-          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
+          <section id="plain-english">
+            <h2>In Plain English</h2>
             <p>
               Imagine booking a vacation that requires a flight, a hotel, and a rental car, each
               booked through a different company. There is no single &quot;undo everything&quot;
@@ -90,10 +87,10 @@ export default function DistributedTransactionsPage() {
                 </p>
               </Callout>
             </TwoCol>
-            <FlowContinue nextId="theory" label="Theory & Diagrams" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
+          <section id="theory">
+            <h2>Theory &amp; Diagrams</h2>
             <h3>Two-Phase Commit (2PC)</h3>
             <p>
               2PC makes a multi-node write atomic by introducing a coordinator that drives two
@@ -295,10 +292,10 @@ export default function DistributedTransactionsPage() {
               />
               <figcaption>The merge function itself guarantees convergence — there's no separate conflict-resolution step</figcaption>
             </figure>
-            <FlowContinue nextId="trade-offs" label="Trade-offs" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
+          <section id="trade-offs">
+            <h2>Trade-offs</h2>
             <p>
               The two approaches above solve the same problem — keeping a multi-step operation
               consistent across independent nodes — in fundamentally different ways. Here&apos;s
@@ -382,10 +379,10 @@ export default function DistributedTransactionsPage() {
               action — and to explain when you&apos;d choose choreography vs. orchestration as the
               number of steps grows.
             </p>
-            <FlowContinue nextId="real-world" label="Real-World Examples" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
+          <section id="real-world">
+            <h2>Real-World Examples</h2>
             <ul>
               <li><strong>Stripe and e-commerce order flows</strong> — a checkout that reserves inventory, charges a card, and creates a shipment is a textbook SAGA: each step is its own local transaction, and a failed payment or shipment triggers explicit compensations like releasing the inventory hold or issuing a refund.</li>
               <li><strong>Google Docs &amp; Figma</strong> — collaborative editors use CRDT-like or Operational Transformation approaches so that concurrent edits from multiple users (or from a user who was briefly offline) merge automatically into a consistent document without a central lock on every keystroke.</li>
@@ -393,11 +390,11 @@ export default function DistributedTransactionsPage() {
               <li><strong>CockroachDB &amp; Spanner-style distributed SQL databases</strong> — implement cross-shard transactions using a two-phase-commit-style protocol under the hood, layered with additional mechanisms (like Spanner&apos;s TrueTime) to provide strong consistency guarantees across shards.</li>
               <li><strong>Redis CRDTs (Active-Active / CRDB)</strong> — Redis Enterprise&apos;s active-active geo-replication uses CRDTs for common data types so multiple regions can accept writes simultaneously and converge without conflict, even across a wide-area network with high latency.</li>
             </ul>
-          </FlowStep>
+          </section>
 
           <PageNav
-            prev={{ label: 'Consensus & Coordination', href: '/pages/distributed-systems/consensus-coordination' }}
-            next={{ label: 'Resilience Patterns', href: '/pages/distributed-systems/resilience-patterns' }}
+            prev={{ label: 'Consensus & Leader Election', href: '/pages/distributed-systems/consensus-coordination' }}
+            next={{ label: 'DevOps Concepts', href: '/pages/distributed-systems/devops-concepts' }}
           />
         </main>
       </div>
@@ -406,10 +403,10 @@ export default function DistributedTransactionsPage() {
         sectionColumn={{
           title: 'Distributed Systems',
           links: [
-            { label: 'Consensus & Coordination', href: '/pages/distributed-systems/consensus-coordination' },
-            { label: 'Resilience Patterns', href: '/pages/distributed-systems/resilience-patterns' },
-            { label: 'Big Data Processing', href: '/pages/distributed-systems/big-data-processing' },
-            { label: 'Observability & Security', href: '/pages/distributed-systems/observability-security' },
+            { label: 'Consistency vs. Availability', href: '/pages/distributed-systems/consistency-vs-availability' },
+            { label: 'Consensus & Leader Election', href: '/pages/distributed-systems/consensus-coordination' },
+            { label: 'DevOps Concepts', href: '/pages/distributed-systems/devops-concepts' },
+            { label: 'System Design Tradeoffs', href: '/pages/distributed-systems/system-design-tradeoffs' },
           ],
         }}
       />

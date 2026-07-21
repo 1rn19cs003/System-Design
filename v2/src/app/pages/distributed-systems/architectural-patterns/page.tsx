@@ -4,13 +4,9 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import FlowStep from '@/components/FlowStep';
-import FlowContinue from '@/components/FlowContinue';
-
-const TOTAL_STEPS = 4;
 
 export const metadata = {
-  title: 'Architectural Patterns — System Design Architectures',
+  title: 'System Architectures — System Design Architectures',
 };
 
 export default function ArchitecturalPatternsPage() {
@@ -35,10 +31,10 @@ export default function ArchitecturalPatternsPage() {
             items={[
               { label: 'Home', href: '/' },
               { label: 'Distributed Systems', href: '/pages/distributed-systems' },
-              { label: 'Architectural Patterns' },
+              { label: 'System Architectures' },
             ]}
           />
-          <h1 id="overview">Architectural Patterns</h1>
+          <h1 id="overview">System Architectures</h1>
           <p>
             &quot;Client-server&quot; and &quot;microservices&quot; (covered on their own pages
             elsewhere in this guide) are two shapes a system can take, not the only two. This page
@@ -50,7 +46,8 @@ export default function ArchitecturalPatternsPage() {
             pure instance of one.
           </p>
 
-          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
+          <section id="plain-english">
+            <h2>In Plain English</h2>
             <p>
               Imagine three different ways to run a restaurant kitchen. <strong>Serverless</strong> is
               like a shared commercial kitchen you only pay for by the hour you actually cook in —
@@ -87,10 +84,10 @@ export default function ArchitecturalPatternsPage() {
                 </p>
               </Callout>
             </TwoCol>
-            <FlowContinue nextId="theory" label="Theory & Diagrams" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
+          <section id="theory">
+            <h2>Theory &amp; Diagrams</h2>
             <h3>Serverless architecture</h3>
             <p>
               In a serverless architecture, you deploy individual functions rather than a running
@@ -288,10 +285,10 @@ export default function ArchitecturalPatternsPage() {
               />
               <figcaption>Not a ladder to climb — a set of tools, most systems use several at once</figcaption>
             </figure>
-            <FlowContinue nextId="trade-offs" label="Trade-offs" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
+          <section id="trade-offs">
+            <h2>Trade-offs</h2>
             <p>
               Serverless and event-driven solve different problems — where code runs versus how
               services talk to each other — but interviews usually push on the same question for
@@ -375,10 +372,10 @@ export default function ArchitecturalPatternsPage() {
               from decoupling versus which ones just need a normal API call — and why P2P is rarely
               chosen for typical backend services despite its resilience story.
             </p>
-            <FlowContinue nextId="real-world" label="Real-World Examples" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
+          <section id="real-world">
+            <h2>Real-World Examples</h2>
             <ul>
               <li><strong>AWS Lambda, Vercel Functions, Cloudflare Workers</strong> — the major serverless compute platforms, each with different cold-start characteristics (Cloudflare Workers, built on V8 isolates rather than containers, has near-zero cold starts compared to container-based Lambda).</li>
               <li><strong>Netflix and Uber&apos;s event-driven backends</strong> — both run large parts of their platforms on Kafka, publishing domain events (a stream started, a trip completed) that dozens of independent downstream services consume for recommendations, billing, analytics, and fraud detection.</li>
@@ -386,11 +383,11 @@ export default function ArchitecturalPatternsPage() {
               <li><strong>Blockchain networks</strong> (Bitcoin, Ethereum) — P2P networks where every full node maintains and verifies its own copy of the ledger and gossips new transactions/blocks to its peers, with consensus rules (not a central authority) determining the agreed-upon state.</li>
               <li><strong>Skype&apos;s original architecture</strong> — early Skype routed voice calls through a P2P network of &quot;supernodes&quot; (ordinary users&apos; machines with enough bandwidth) rather than centralized servers, which is part of why it scaled so cheaply early on; Microsoft later moved it to centralized, cloud-hosted infrastructure for reliability and control.</li>
             </ul>
-          </FlowStep>
+          </section>
 
           <PageNav
-            prev={{ label: 'Big Data Processing', href: '/pages/distributed-systems/big-data-processing' }}
-            next={{ label: 'Observability & Security', href: '/pages/distributed-systems/observability-security' }}
+            prev={{ label: 'Big Data & Streaming', href: '/pages/distributed-systems/big-data-processing' }}
+            next={{ label: 'System Design Tradeoffs', href: '/pages/distributed-systems/system-design-tradeoffs' }}
           />
         </main>
       </div>
@@ -399,10 +396,10 @@ export default function ArchitecturalPatternsPage() {
         sectionColumn={{
           title: 'Distributed Systems',
           links: [
-            { label: 'Consensus & Coordination', href: '/pages/distributed-systems/consensus-coordination' },
-            { label: 'Resilience Patterns', href: '/pages/distributed-systems/resilience-patterns' },
-            { label: 'Big Data Processing', href: '/pages/distributed-systems/big-data-processing' },
-            { label: 'Observability & Security', href: '/pages/distributed-systems/observability-security' },
+            { label: 'Consistency vs. Availability', href: '/pages/distributed-systems/consistency-vs-availability' },
+            { label: 'Consensus & Leader Election', href: '/pages/distributed-systems/consensus-coordination' },
+            { label: 'DevOps Concepts', href: '/pages/distributed-systems/devops-concepts' },
+            { label: 'System Design Tradeoffs', href: '/pages/distributed-systems/system-design-tradeoffs' },
           ],
         }}
       />

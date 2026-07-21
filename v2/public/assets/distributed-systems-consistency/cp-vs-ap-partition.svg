@@ -1,0 +1,66 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="capArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b6ea5"/>
+    </marker>
+  </defs>
+
+  <!-- divider -->
+  <line x1="350" y1="10" x2="350" y2="310" stroke="#6a7178" stroke-width="1" stroke-dasharray="2,4"/>
+
+  <!-- LEFT: CP -->
+  <text x="175" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">CP System (Consistency over Availability)</text>
+
+  <!-- network partition line, left panel -->
+  <path d="M175,50 L165,90 L185,130 L165,170 L185,210 L175,250" fill="none" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="5,4"/>
+  <text x="175" y="45" text-anchor="middle" font-size="8" fill="#c0392b">partition</text>
+
+  <!-- majority side -->
+  <rect x="30" y="70" width="100" height="40" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="80" y="94" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">Node A</text>
+  <rect x="30" y="150" width="100" height="40" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="80" y="174" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">Node B</text>
+  <text x="80" y="66" text-anchor="middle" font-size="8.5" fill="#6a7178">majority (2 of 3)</text>
+
+  <!-- minority side -->
+  <rect x="220" y="110" width="100" height="40" rx="6" fill="#f4f6f8" stroke="#6a7178" stroke-width="1.3"/>
+  <text x="270" y="134" text-anchor="middle" font-size="10" font-weight="600" fill="#6a7178">Node C</text>
+  <text x="270" y="105" text-anchor="middle" font-size="8.5" fill="#6a7178">minority (1 of 3)</text>
+
+  <!-- results -->
+  <rect x="20" y="230" width="130" height="42" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="85" y="248" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f8f4e">Write accepted</text>
+  <text x="85" y="262" text-anchor="middle" font-size="8" fill="#2f8f4e">quorum reached</text>
+
+  <rect x="200" y="230" width="130" height="42" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.4"/>
+  <text x="265" y="248" text-anchor="middle" font-size="9.5" font-weight="700" fill="#c0392b">Write refused</text>
+  <text x="265" y="262" text-anchor="middle" font-size="8" fill="#c0392b">no quorum, stays unavailable</text>
+
+  <text x="175" y="300" text-anchor="middle" font-size="8.5" fill="#6a7178">Correctness over uptime: the minority side sits idle rather than risk disagreement</text>
+
+  <!-- RIGHT: AP -->
+  <text x="525" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#2d2f33">AP System (Availability over Consistency)</text>
+
+  <path d="M525,50 L515,90 L535,130 L515,170 L535,210 L525,250" fill="none" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="5,4"/>
+  <text x="525" y="45" text-anchor="middle" font-size="8" fill="#c0392b">partition</text>
+
+  <rect x="380" y="70" width="100" height="40" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="430" y="94" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">Node A</text>
+  <rect x="380" y="150" width="100" height="40" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="430" y="174" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">Node B</text>
+
+  <rect x="570" y="110" width="100" height="40" rx="6" fill="#eaf1f8" stroke="#3b6ea5" stroke-width="1.3"/>
+  <text x="620" y="134" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2f33">Node C</text>
+
+  <rect x="370" y="230" width="130" height="42" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="435" y="248" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f8f4e">Write accepted</text>
+  <text x="435" y="262" text-anchor="middle" font-size="8" fill="#2f8f4e">local, value = 5</text>
+
+  <rect x="550" y="230" width="130" height="42" rx="6" fill="#eef8f0" stroke="#2f8f4e" stroke-width="1.4"/>
+  <text x="615" y="248" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f8f4e">Write accepted</text>
+  <text x="615" y="262" text-anchor="middle" font-size="8" fill="#2f8f4e">local, value = 9</text>
+
+  <text x="525" y="300" text-anchor="middle" font-size="8.5" fill="#6a7178">Both sides stay up and diverge — reconciled once the partition heals</text>
+
+  <title>A network partition splitting three nodes: a CP system lets the majority side accept writes while the minority side refuses writes to stay correct; an AP system lets both sides keep accepting writes independently and reconciles the divergence once the partition heals</title>
+</svg>

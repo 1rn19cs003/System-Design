@@ -4,13 +4,9 @@ import TopicSidebar from '@/components/TopicSidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageNav from '@/components/PageNav';
 import { Callout, TwoCol } from '@/components/Callout';
-import FlowStep from '@/components/FlowStep';
-import FlowContinue from '@/components/FlowContinue';
-
-const TOTAL_STEPS = 4;
 
 export const metadata = {
-  title: 'Big Data Processing — System Design Architectures',
+  title: 'Big Data & Streaming — System Design Architectures',
 };
 
 export default function BigDataProcessingPage() {
@@ -35,10 +31,10 @@ export default function BigDataProcessingPage() {
             items={[
               { label: 'Home', href: '/' },
               { label: 'Distributed Systems', href: '/pages/distributed-systems' },
-              { label: 'Big Data Processing' },
+              { label: 'Big Data & Streaming' },
             ]}
           />
-          <h1 id="overview">Big Data Processing</h1>
+          <h1 id="overview">Big Data &amp; Streaming</h1>
           <p>
             Once data outgrows what a single machine can store or process in a reasonable time, you
             need a different set of tools: ways to process huge volumes either on a schedule or
@@ -49,7 +45,8 @@ export default function BigDataProcessingPage() {
             warehouse.
           </p>
 
-          <FlowStep id="plain-english" step={1} total={TOTAL_STEPS} title="In Plain English" defaultOpen>
+          <section id="plain-english">
+            <h2>In Plain English</h2>
             <p>
               Imagine a warehouse receiving deliveries all day. Batch processing is like closing the
               doors at 6pm and having one team sort and log everything that arrived that day, all at
@@ -84,10 +81,10 @@ export default function BigDataProcessingPage() {
                 </p>
               </Callout>
             </TwoCol>
-            <FlowContinue nextId="theory" label="Theory & Diagrams" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="theory" step={2} total={TOTAL_STEPS} title="Theory & Diagrams">
+          <section id="theory">
+            <h2>Theory &amp; Diagrams</h2>
             <h3>Batch vs. stream processing</h3>
             <p>
               <strong>Batch processing</strong> accumulates data over a window of time and processes
@@ -264,10 +261,10 @@ export default function BigDataProcessingPage() {
               />
               <figcaption>Structure it when you read it, or structure it when you write it — the trade-off is flexibility versus query speed</figcaption>
             </figure>
-            <FlowContinue nextId="trade-offs" label="Trade-offs" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="trade-offs" step={3} total={TOTAL_STEPS} title="Trade-offs">
+          <section id="trade-offs">
+            <h2>Trade-offs</h2>
             <p>
               Batch and stream processing solve the same problem — turning raw data into something
               useful — on fundamentally different clocks. Here&apos;s how they actually compare, and
@@ -350,10 +347,10 @@ export default function BigDataProcessingPage() {
               a lake-plus-warehouse architecture where raw data lands in a lake and a curated,
               query-optimized layer is derived into a warehouse.
             </p>
-            <FlowContinue nextId="real-world" label="Real-World Examples" />
-          </FlowStep>
+          </section>
 
-          <FlowStep id="real-world" step={4} total={TOTAL_STEPS} title="Real-World Examples">
+          <section id="real-world">
+            <h2>Real-World Examples</h2>
             <ul>
               <li><strong>Apache Spark &amp; Apache Flink</strong> — widely used engines for both batch and stream processing, with Flink built stream-first and Spark historically batch-first before adding Structured Streaming.</li>
               <li><strong>Hadoop MapReduce</strong> — the original open-source implementation of the MapReduce model, historically the backbone of large-scale batch processing before Spark became the more common default.</li>
@@ -361,11 +358,11 @@ export default function BigDataProcessingPage() {
               <li><strong>Amazon S3 with Redshift or Snowflake</strong> — a common architecture pairing S3 as the raw data lake with Redshift or Snowflake as the structured, query-optimized data warehouse layer built on top of it.</li>
               <li><strong>Kafka Streams</strong> — a library for building real-time stream processing applications directly on top of Kafka topics, without needing a separate processing cluster.</li>
             </ul>
-          </FlowStep>
+          </section>
 
           <PageNav
-            prev={{ label: 'API & Communication Patterns', href: '/pages/distributed-systems/api-communication-patterns' }}
-            next={{ label: 'Architectural Patterns', href: '/pages/distributed-systems/architectural-patterns' }}
+            prev={{ label: 'Authentication Mechanisms', href: '/pages/distributed-systems/authentication-mechanisms' }}
+            next={{ label: 'System Architectures', href: '/pages/distributed-systems/architectural-patterns' }}
           />
         </main>
       </div>
@@ -374,10 +371,10 @@ export default function BigDataProcessingPage() {
         sectionColumn={{
           title: 'Distributed Systems',
           links: [
-            { label: 'Consensus & Coordination', href: '/pages/distributed-systems/consensus-coordination' },
-            { label: 'Resilience Patterns', href: '/pages/distributed-systems/resilience-patterns' },
-            { label: 'Big Data Processing', href: '/pages/distributed-systems/big-data-processing' },
-            { label: 'Observability & Security', href: '/pages/distributed-systems/observability-security' },
+            { label: 'Consistency vs. Availability', href: '/pages/distributed-systems/consistency-vs-availability' },
+            { label: 'Consensus & Leader Election', href: '/pages/distributed-systems/consensus-coordination' },
+            { label: 'DevOps Concepts', href: '/pages/distributed-systems/devops-concepts' },
+            { label: 'System Design Tradeoffs', href: '/pages/distributed-systems/system-design-tradeoffs' },
           ],
         }}
       />
