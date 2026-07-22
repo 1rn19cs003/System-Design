@@ -617,7 +617,10 @@ main.content h3:first-of-type {
 
 /* Diagrams */
 img.diagram-img {
+  display: block;
   max-width: 100%;
+  height: auto;
+  margin: 0 auto;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: #fff;
@@ -625,7 +628,8 @@ img.diagram-img {
 }
 
 figure {
-  margin: 0 0 16px;
+  margin: 0 0 20px;
+  text-align: center;
 }
 
 figcaption {
@@ -633,6 +637,9 @@ figcaption {
   color: var(--muted);
   margin-top: 6px;
   text-align: center;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 pre {

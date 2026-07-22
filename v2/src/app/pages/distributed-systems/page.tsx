@@ -19,8 +19,7 @@ export default function DistributedSystemsHubPage() {
           toc={[
             { id: 'overview', label: 'Overview' },
             { id: 'learn', label: "What You'll Learn" },
-            { id: 'syllabus', label: 'The 10 Topics' },
-            { id: 'also-covered', label: 'Already Covered Elsewhere' },
+            { id: 'syllabus', label: 'The Full Journey' },
           ]}
           jumpLinks={[
             { label: 'Consistency vs. Availability', href: '/pages/distributed-systems/consistency-vs-availability' },
@@ -43,172 +42,178 @@ export default function DistributedSystemsHubPage() {
             Once a system spans more than one machine, a whole new class of problems shows up that
             single-server thinking never has to deal with: nodes disagreeing about the truth, network
             calls that time out silently, and one failing dependency dragging down everything around
-            it. This section is the toolkit for exactly those problems — the concepts that separate a
-            &quot;it works on my laptop&quot; design from one that survives real production traffic
-            and real hardware failure. It builds directly on <a href="/pages/core-principles">Core
-            Principles</a> and the <a href="/pages/hld">HLD</a> track, so if either of those still
-            feel shaky, start there first.
+            it. This page lays out the full learning journey in the order most people actually study
+            it — starting from the basics, through the topics that are unique to this section, ending
+            with practice problems that pull everything together.
           </p>
 
           <section id="learn">
             <h2>What You&apos;ll Learn</h2>
             <p>
-              Ten focused topics, each named for what it actually is rather than how academic it
-              sounds — no required order, so pick whatever&apos;s closest to your next interview, or
-              work through all ten. A few closely related basics (load balancing, caching, message
-              queues, and so on) already have their own deep-dive pages under HLD, so this section
-              doesn&apos;t repeat them — see &quot;Already Covered Elsewhere&quot; below for direct
-              links to those.
+              18 stops, in the order below — some link to their own dedicated deep-dive elsewhere on
+              this site (marked <span className="tag">HLD</span>, <span className="tag">Case Studies</span>,
+              or <span className="tag">Reference</span>), most link to a page built specifically for
+              this section (marked <span className="tag">Distributed Systems</span>). There&apos;s no
+              requirement to go in order — jump straight to whatever&apos;s closest to your next
+              interview — but if you&apos;re starting from zero, going top to bottom is the intended
+              path.
             </p>
 
             <figure>
               <img
                 className="diagram-img"
                 src="/assets/shared/distributed-systems-track.svg"
-                alt="Ten Distributed Systems topics, building on the HLD and Core Principles tracks"
+                alt="The full Distributed Systems learning journey, building on the HLD and Core Principles tracks"
               />
-              <figcaption>No required order — pick the topic closest to your next interview, or work through all ten</figcaption>
+              <figcaption>One continuous journey — the topics unique to this section are woven in alongside the fundamentals they build on</figcaption>
             </figure>
           </section>
 
           <section id="syllabus">
-            <h2>The 10 Topics</h2>
+            <h2>The Full Journey</h2>
             <ul className="syllabus">
               <li>
                 <span className="num">1</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/consistency-vs-availability">Consistency vs. Availability</a>
-                  <p>The CAP theorem in practice — strong vs. eventual consistency, causal and read-your-writes consistency, and transaction isolation levels.</p>
+                  <a className="topic-title" href="/pages/hld/fundamentals">Basics</a>
+                  <span className="tag-row"><span className="tag">HLD</span></span>
+                  <p>What is System Design, horizontal vs. vertical scaling, capacity estimation, HTTP, TCP/IP.</p>
                 </div>
               </li>
               <li>
                 <span className="num">2</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/consensus-coordination">Consensus &amp; Leader Election</a>
-                  <p>How a cluster of independent nodes agrees on one truth — heartbeats, leader election, Raft/Paxos-style consensus, and gossip protocols.</p>
+                  <a className="topic-title" href="/pages/hld/load-balancing">Load Balancing</a>
+                  <span className="tag-row"><span className="tag">HLD</span></span>
+                  <p>Load balancing algorithms, consistent hashing, sharding.</p>
                 </div>
               </li>
               <li>
                 <span className="num">3</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/distributed-transactions">Distributed Transactions</a>
-                  <p>Keeping a logical transaction correct when it spans multiple services or databases — Two-Phase and Three-Phase Commit, the SAGA pattern, vector clocks, and CRDTs.</p>
+                  <a className="topic-title" href="/pages/hld/databases">DataStores</a>
+                  <span className="tag-row"><span className="tag">HLD</span></span>
+                  <p>Relational and NoSQL databases, replication, indexing.</p>
                 </div>
               </li>
               <li>
                 <span className="num">4</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/devops-concepts">DevOps Concepts</a>
-                  <p>Keeping a live system healthy — single points of failure, containers, service discovery, circuit breakers, bulkheads, monitoring, and chaos engineering.</p>
+                  <a className="topic-title" href="/pages/distributed-systems/consistency-vs-availability">Consistency vs. Availability</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>The CAP theorem in practice — strong vs. eventual consistency, causal and read-your-writes consistency, and transaction isolation levels.</p>
                 </div>
               </li>
               <li>
                 <span className="num">5</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/api-gateways">API Gateways</a>
-                  <p>The front door to your services — API gateway design, idempotency, rate limiting, and synchronous vs. asynchronous APIs.</p>
+                  <a className="topic-title" href="/pages/hld/message-queues">Message Queues</a>
+                  <span className="tag-row"><span className="tag">HLD</span></span>
+                  <p>Publisher-subscriber model, event-driven basics.</p>
                 </div>
               </li>
               <li>
                 <span className="num">6</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/realtime-communication">Realtime Communication</a>
-                  <p>Talking to clients live — REST vs. GraphQL, WebSockets vs. long polling, WebRTC, and webhooks.</p>
+                  <a className="topic-title" href="/pages/distributed-systems/devops-concepts">DevOps Concepts</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>Keeping a live system healthy — single points of failure, containers, service discovery, circuit breakers, bulkheads, monitoring, and chaos engineering.</p>
                 </div>
               </li>
               <li>
                 <span className="num">7</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/authentication-mechanisms">Authentication Mechanisms</a>
-                  <p>Proving who someone is and controlling what they can do — OAuth 2.0, JWT vs. session-based auth, RBAC, and TLS.</p>
+                  <a className="topic-title" href="/pages/hld/caching">Caching</a>
+                  <span className="tag-row"><span className="tag">HLD</span></span>
+                  <p>Distributed caching, CDNs, write and replacement policies.</p>
                 </div>
               </li>
               <li>
                 <span className="num">8</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/big-data-processing">Big Data &amp; Streaming</a>
-                  <p>Processing data too large for one machine — batch vs. stream processing, ETL pipelines, MapReduce, and data lakes vs. data warehouses.</p>
+                  <a className="topic-title" href="/pages/hld/microservices">Microservices</a>
+                  <span className="tag-row"><span className="tag">HLD</span></span>
+                  <p>Microservices vs. monoliths, migration strategies.</p>
                 </div>
               </li>
               <li>
                 <span className="num">9</span>
                 <div>
-                  <a className="topic-title" href="/pages/distributed-systems/architectural-patterns">System Architectures</a>
-                  <p>Choosing the overall shape of a system — serverless, event-driven architecture, and peer-to-peer, with a comparison back to client-server and microservices.</p>
+                  <a className="topic-title" href="/pages/distributed-systems/api-gateways">API Gateways</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>The front door to your services — API gateway design, idempotency, rate limiting, and synchronous vs. asynchronous APIs.</p>
                 </div>
               </li>
               <li>
                 <span className="num">10</span>
                 <div>
+                  <a className="topic-title" href="/pages/distributed-systems/realtime-communication">Realtime Communication</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>Talking to clients live — REST vs. GraphQL, WebSockets vs. long polling, WebRTC, and webhooks.</p>
+                </div>
+              </li>
+              <li>
+                <span className="num">11</span>
+                <div>
+                  <a className="topic-title" href="/pages/distributed-systems/authentication-mechanisms">Authentication Mechanisms</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>Proving who someone is and controlling what they can do — OAuth 2.0, JWT vs. session-based auth, RBAC, and TLS.</p>
+                </div>
+              </li>
+              <li>
+                <span className="num">12</span>
+                <div>
+                  <a className="topic-title" href="/pages/distributed-systems/consensus-coordination">Consensus &amp; Leader Election</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>How a cluster of independent nodes agrees on one truth — heartbeats, leader election, Raft/Paxos-style consensus, and gossip protocols.</p>
+                </div>
+              </li>
+              <li>
+                <span className="num">13</span>
+                <div>
+                  <a className="topic-title" href="/pages/distributed-systems/distributed-transactions">Distributed Transactions</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>Keeping a logical transaction correct when it spans multiple services or databases — Two-Phase and Three-Phase Commit, the SAGA pattern, vector clocks, and CRDTs.</p>
+                </div>
+              </li>
+              <li>
+                <span className="num">14</span>
+                <div>
+                  <a className="topic-title" href="/pages/distributed-systems/big-data-processing">Big Data &amp; Streaming</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>Processing data too large for one machine — batch vs. stream processing, ETL pipelines, MapReduce, and data lakes vs. data warehouses.</p>
+                </div>
+              </li>
+              <li>
+                <span className="num">15</span>
+                <div>
+                  <a className="topic-title" href="/pages/distributed-systems/architectural-patterns">System Architectures</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
+                  <p>Choosing the overall shape of a system — serverless, event-driven architecture, and peer-to-peer, with a comparison back to client-server and microservices.</p>
+                </div>
+              </li>
+              <li>
+                <span className="num">16</span>
+                <div>
                   <a className="topic-title" href="/pages/distributed-systems/system-design-tradeoffs">System Design Tradeoffs</a>
+                  <span className="tag-row"><span className="tag">Distributed Systems</span></span>
                   <p>The trade-off dichotomies that come up in almost every interview — pull vs. push, memory vs. latency, throughput vs. latency, latency vs. accuracy, and SQL vs. NoSQL.</p>
                 </div>
               </li>
-            </ul>
-          </section>
-
-          <section id="also-covered">
-            <h2>Already Covered Elsewhere</h2>
-            <p>
-              These fundamentals come up on most system design roadmaps, but this site already has a
-              dedicated deep-dive page for each one under HLD (or another section) — rather than
-              duplicate that content here, this is a direct shortcut to it.
-            </p>
-            <ul className="syllabus">
               <li>
-                <span className="num">→</span>
-                <div>
-                  <a className="topic-title" href="/pages/hld/fundamentals">Basics</a>
-                  <p>What is System Design, horizontal vs. vertical scaling, capacity estimation, HTTP, TCP/IP — see HLD Fundamentals.</p>
-                </div>
-              </li>
-              <li>
-                <span className="num">→</span>
-                <div>
-                  <a className="topic-title" href="/pages/hld/load-balancing">Load Balancing</a>
-                  <p>Load balancing algorithms, consistent hashing, sharding — see HLD Load Balancing.</p>
-                </div>
-              </li>
-              <li>
-                <span className="num">→</span>
-                <div>
-                  <a className="topic-title" href="/pages/hld/databases">DataStores</a>
-                  <p>Relational and NoSQL databases, replication, indexing — see HLD Databases.</p>
-                </div>
-              </li>
-              <li>
-                <span className="num">→</span>
-                <div>
-                  <a className="topic-title" href="/pages/hld/message-queues">Message Queues</a>
-                  <p>Publisher-subscriber model, event-driven basics — see HLD Message Queues.</p>
-                </div>
-              </li>
-              <li>
-                <span className="num">→</span>
-                <div>
-                  <a className="topic-title" href="/pages/hld/caching">Caching</a>
-                  <p>Distributed caching, CDNs, write and replacement policies — see HLD Caching.</p>
-                </div>
-              </li>
-              <li>
-                <span className="num">→</span>
-                <div>
-                  <a className="topic-title" href="/pages/hld/microservices">Microservices</a>
-                  <p>Microservices vs. monoliths, migration strategies — see HLD Microservices.</p>
-                </div>
-              </li>
-              <li>
-                <span className="num">→</span>
+                <span className="num">17</span>
                 <div>
                   <a className="topic-title" href="/pages/case-studies">Practice Problems</a>
-                  <p>Full system design walkthroughs (URL Shortener, Twitter, WhatsApp, Uber, Netflix) — see Case Studies.</p>
+                  <span className="tag-row"><span className="tag">Case Studies</span></span>
+                  <p>Full system design walkthroughs — URL Shortener, Twitter, WhatsApp, Uber, Netflix — pulling the entire journey together.</p>
                 </div>
               </li>
               <li>
-                <span className="num">→</span>
+                <span className="num">18</span>
                 <div>
                   <a className="topic-title" href="/pages/reference">Additional Resources</a>
-                  <p>Latency numbers every engineer should know, and a glossary of terms — see Reference.</p>
+                  <span className="tag-row"><span className="tag">Reference</span></span>
+                  <p>Latency numbers every engineer should know, and a glossary of terms.</p>
                 </div>
               </li>
             </ul>
